@@ -1,0 +1,15 @@
+# Cloudflare Pages のレスポンスヘッダー設定
+# HTML を常に再検証させる。これがないとブラウザが古い版を掴み続け、
+# 更新しても端末側に反映されない（スマホで特に起きやすい）。
+
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# 画像は内容が変わらないので長期キャッシュしてよい
+/*.png
+  Cache-Control: public, max-age=604800
+
+/ogp.png
+  Cache-Control: public, max-age=604800

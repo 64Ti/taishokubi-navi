@@ -463,6 +463,118 @@ input[type="date"]:focus,input[type="number"]:focus{
 }
 
 /* =========================================================
+   会社独自の休日・出勤日（アコーディオン）
+   ========================================================= */
+details.cd{
+  border:1.5px solid var(--line);
+  border-radius:var(--r-sm);
+  background:#fcfdff;
+  overflow:hidden;
+}
+details.cd[open]{background:#fff;border-color:var(--brand-100);}
+details.cd summary{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  cursor:pointer;
+  list-style:none;
+  font-size:.87rem;font-weight:700;line-height:1.6;
+}
+details.cd summary::-webkit-details-marker{display:none;}
+details.cd summary .cd-t{flex:1 1 auto;min-width:0;}
+details.cd summary .cd-t em{
+  display:inline-block;font-style:normal;
+  font-size:.64rem;font-weight:800;letter-spacing:.04em;
+  color:var(--ink-3);background:var(--line-2);border:1px solid var(--line);
+  border-radius:5px;padding:2px 7px;margin-left:7px;transform:translateY(-1px);
+}
+details.cd summary::after{
+  content:"";
+  flex:0 0 22px;
+  align-self:center;
+  width:22px;height:22px;
+  line-height:0;
+  border-radius:50%;
+  border:1px solid var(--brand-100);
+  background:var(--brand-50)
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M2.6%204.6L6%208L9.4%204.6'%20fill='none'%20stroke='%232563eb'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 12px 12px no-repeat;
+}
+details.cd[open] summary::after{transform:rotate(180deg);}
+.cd-badge{
+  flex:none;
+  font-size:.68rem;font-weight:800;letter-spacing:.02em;
+  color:#fff;background:var(--brand-600);
+  border-radius:999px;padding:3px 9px;white-space:nowrap;
+}
+.cd-in{padding:2px 14px 15px;border-top:1px solid var(--line-2);padding-top:13px;}
+.cd-note{font-size:.755rem;line-height:1.75;color:var(--ink-3);margin:0 0 14px;}
+
+.cd-block{margin-bottom:16px;}
+.cd-h{
+  display:flex;align-items:center;gap:7px;
+  font-size:.815rem;font-weight:800;margin-bottom:8px;
+}
+.cd-tag{
+  flex:none;
+  width:22px;height:22px;border-radius:7px;
+  display:grid;place-items:center;
+  font-size:.7rem;font-weight:800;color:#fff;
+}
+.cd-tag.off{background:var(--danger);}
+.cd-tag.work{background:var(--emerald-600);}
+
+.cd-add{display:flex;gap:8px;align-items:stretch;}
+.cd-add input[type="date"]{flex:1 1 auto;min-width:0;min-height:46px;padding:10px 12px;font-size:.94rem;}
+.cd-add-btn{
+  flex:none;
+  min-height:46px;padding:0 16px;
+  font-family:inherit;font-size:.85rem;font-weight:800;
+  color:#fff;border:none;border-radius:var(--r-sm);
+  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
+  box-shadow:0 3px 10px -4px rgba(37,99,235,.7);
+  cursor:pointer;
+  transition:transform .16s var(--ease), filter .18s var(--ease);
+}
+.cd-add-btn:active{transform:scale(.96);}
+.cd-add-btn:focus-visible{outline:2px solid var(--brand-500);outline-offset:2px;}
+
+.cd-list{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:7px;}
+.cd-empty{
+  font-size:.745rem;color:var(--ink-3);
+  background:var(--line-2);border-radius:7px;padding:7px 11px;width:100%;
+}
+.cd-chip{
+  display:inline-flex;align-items:center;gap:2px;
+  font-size:.78rem;font-weight:700;
+  border-radius:999px;
+  padding:5px 5px 5px 12px;
+  border:1px solid;
+}
+.cd-chip.off{background:var(--danger-50);border-color:var(--danger-100);color:var(--danger-ink);}
+.cd-chip.work{background:var(--emerald-50);border-color:#a7f3d0;color:var(--emerald-700);}
+.cd-del{
+  flex:none;
+  width:26px;height:26px;
+  display:grid;place-items:center;
+  font-family:inherit;font-size:1rem;font-weight:800;line-height:1;
+  color:inherit;background:transparent;border:none;border-radius:50%;
+  cursor:pointer;opacity:.65;
+  transition:opacity .16s var(--ease), background .16s var(--ease);
+}
+.cd-del:hover{opacity:1;background:rgba(0,0,0,.07);}
+.cd-del:active{transform:scale(.9);}
+.cd-del:focus-visible{outline:2px solid currentColor;outline-offset:1px;opacity:1;}
+
+.cd-pri{
+  font-size:.745rem;line-height:1.8;color:var(--ink-2);
+  background:var(--brand-50);border:1px solid var(--brand-100);
+  border-radius:var(--r-sm);padding:10px 12px;margin:0;
+}
+.cd-pri b{color:var(--brand-700);}
+
+/* =========================================================
    Report
    ========================================================= */
 .report{scroll-margin-top:74px;}
@@ -712,20 +824,27 @@ details.law{
   overflow:hidden;
 }
 details.law summary{
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;          /* 〇をテキストブロックの上下中央に置く */
+  gap:10px;
   font-size:.875rem;font-weight:700;line-height:1.65;
   padding:14px 15px;
   cursor:pointer;
   list-style:none;
   transition:background .18s var(--ease);
 }
+/* 折り返して複数行になっても、テキスト側だけが伸びて〇は中央を保つ */
+details.law summary > span{flex:1 1 auto;min-width:0;}
 details.law summary::-webkit-details-marker{display:none;}
 details.law summary:hover{background:#f9fbfd;}
 /* 〇と矢印を1つの要素にまとめ、開閉時は円ごと180度回す（ズレようがない構造） */
 details.law summary::after{
   content:"";
-  flex:none;
+  flex:0 0 22px;          /* 狭い画面でも縮まない */
+  align-self:center;      /* 親の align-items に依存せず自身で中央を確定させる */
   width:22px;height:22px;
+  line-height:0;          /* 行ボックスの影響を受けないようにする */
   border-radius:50%;
   border:1px solid var(--brand-100);
   background:var(--brand-50)
@@ -966,6 +1085,38 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
       </label>
       <input type="number" id="handoverDays" value="0" min="0" max="60" step="1" inputmode="numeric">
     </div>
+
+    <div class="field">
+      <details class="cd" id="customDays">
+        <summary>
+          <span class="cd-t">会社独自の休日・出勤日を設定する<em>任意</em></span>
+          <span class="cd-badge" id="cdBadge" hidden></span>
+        </summary>
+        <div class="cd-in">
+          <p class="cd-note">夏季休暇・創立記念日・年末年始などの独自の休みや、祝日出勤・土曜出勤を日付ごとに指定できます。設定するとその場で再計算されます。</p>
+
+          <div class="cd-block">
+            <div class="cd-h"><span class="cd-tag off">休</span>会社独自の休み</div>
+            <div class="cd-add">
+              <input type="date" id="cdOffInput" aria-label="会社独自の休みの日付">
+              <button type="button" class="cd-add-btn" id="cdOffAdd">追加</button>
+            </div>
+            <ul class="cd-list" id="cdOffList"></ul>
+          </div>
+
+          <div class="cd-block">
+            <div class="cd-h"><span class="cd-tag work">出</span>会社独自の出勤日</div>
+            <div class="cd-add">
+              <input type="date" id="cdWorkInput" aria-label="会社独自の出勤日の日付">
+              <button type="button" class="cd-add-btn" id="cdWorkAdd">追加</button>
+            </div>
+            <ul class="cd-list" id="cdWorkList"></ul>
+          </div>
+
+          <p class="cd-pri">判定の優先順位：<b>① 独自の出勤日</b>（土日祝でも出勤）→ ② 独自の休み（平日でも休み）→ ③ 定休日・国民の祝日</p>
+        </div>
+      </details>
+    </div>
   </section>
 
   <!-- STEP 3 -->
@@ -1003,7 +1154,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   <h2 class="report-head">制度解説ノート（法的な根拠）</h2>
 
   <details class="law">
-    <summary>なぜ「月末退職」が得になりやすいのか</summary>
+    <summary><span>なぜ「月末退職」が得になりやすいのか</span></summary>
     <div class="in">
       <p>社会保険（健康保険・厚生年金）の<b>資格喪失日は「退職日の翌日」</b>です。そして保険料は<b>資格喪失日の属する月の前月分まで</b>徴収されます。</p>
       <p>3月31日退職なら資格喪失日は4月1日。3月分の保険料が発生し、その<b>半額を会社が負担</b>します。一方、3月30日退職だと資格喪失日は3月31日となり、3月分の厚生年金・健康保険料は発生しません。</p>
@@ -1013,7 +1164,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   </details>
 
   <details class="law">
-    <summary>社会保険料はどう計算しているのか</summary>
+    <summary><span>社会保険料はどう計算しているのか</span></summary>
     <div class="in">
       <p>保険料は月給そのものではなく、月給を等級に当てはめた<b>「標準報酬月額」</b>を基準に決まります。本ツールは協会けんぽの<b>全50等級</b>の等級表を内蔵し、入力された月給から等級を自動判定しています。</p>
       <p>本人負担額は次のとおりです（<b>いずれも労使折半</b>のため料率の半分）。</p>
@@ -1027,7 +1178,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   </details>
 
   <details class="law">
-    <summary>有給休暇は退職時に消化できるのか</summary>
+    <summary><span>有給休暇は退職時に消化できるのか</span></summary>
     <div class="in">
       <p>年次有給休暇は労働基準法第39条で認められた労働者の権利で、<b>取得に会社の許可は不要</b>です（時季指定権）。会社には時季変更権がありますが、退職日以降に振り替える余地がないため、<b>退職前の有休消化に対して時季変更権は行使できない</b>と解されています。</p>
       <p>そのため実務では、最終出社日の翌営業日から退職日までを有休消化にあてる形が一般的です。ただし引き継ぎを放り出すとトラブルになるため、引き継ぎ日数を確保したうえで逆算するのが安全です。</p>
@@ -1036,7 +1187,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   </details>
 
   <details class="law">
-    <summary>退職はいつまでに伝えればいいのか</summary>
+    <summary><span>退職はいつまでに伝えればいいのか</span></summary>
     <div class="in">
       <p>民法第627条第1項では、期間の定めのない雇用契約は<b>申し入れから2週間の経過</b>で終了します。一方、多くの会社の就業規則は「1か月前まで」と定めており、円満退職の実務上はこちらに合わせるのが無難です。</p>
       <p>本ツールは<b>退職日の1か月前</b>を上司への申し出目安日として算出しています。有給をすべて消化する場合は最終出社日がさらに前倒しになるため、<b>最終出社日から逆算して早めに切り出す</b>ことをおすすめします。</p>
@@ -1045,7 +1196,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   </details>
 
   <details class="law">
-    <summary>ボーナスは「支給日在籍」が条件のことが多い</summary>
+    <summary><span>ボーナスは「支給日在籍」が条件のことが多い</span></summary>
     <div class="in">
       <p>多くの会社の賞与規程には<b>「支給日に在籍していること」</b>という支給日在籍要件があります。査定対象期間をまるまる働いていても、支給日の前日に退職日が来ると受け取れないケースがあります。</p>
       <p>判例上も、賞与に功労報償的・将来の勤労意欲喚起の性格があることから、支給日在籍要件は原則として有効と扱われています。退職日を支給日の後ろへずらせるかどうかは、金額面で最も影響が大きい判断ポイントです。</p>
@@ -1054,7 +1205,7 @@ footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
   </details>
 
   <details class="law">
-    <summary>退職と入社の間に空白ができたら何をするのか</summary>
+    <summary><span>退職と入社の間に空白ができたら何をするのか</span></summary>
     <div class="in">
       <p>退職日の翌日＝入社日なら社会保険は途切れず移行します。1日でも空くと、その期間は<b>国民健康保険・国民年金に加入する義務</b>が生じます（手続きは市区町村の窓口、原則14日以内）。</p>
       <p>健康保険は、国民健康保険のかわりに<b>任意継続被保険者制度</b>（最大2年、原則20日以内に申請）を選べる場合があります。保険料はどちらが安いか人により異なるため、退職前に健康保険組合と市区町村の両方で試算しておくと確実です。</p>
@@ -1321,11 +1472,22 @@ function esc(s){
 /* =========================================================
    営業日判定・逆算
    ========================================================= */
-function makeIsBusinessDay(offDays, includeHolidays){
-  const off = new Set(offDays);
+/**
+ * 営業日判定。優先順位は次のとおり。
+ *   ① 会社独自の出勤日 … 土日祝でも営業日
+ *   ② 会社独自の休み   … 平日でも休み
+ *   ③ 定休日（曜日）・国民の祝日
+ */
+function makeIsBusinessDay(offDays, includeHolidays, customWork, customOff){
+  const off  = new Set(offDays);
+  const work = customWork instanceof Set ? customWork : new Set(customWork || []);
+  const rest = customOff  instanceof Set ? customOff  : new Set(customOff  || []);
   return function(d){
+    const key = toKey(d);
+    if(work.has(key)) return true;   // ① 最優先
+    if(rest.has(key)) return false;  // ② 第2優先
     if(off.has(d.getDay())) return false;
-    if(includeHolidays && HOLIDAY_SET.has(toKey(d))) return false;
+    if(includeHolidays && HOLIDAY_SET.has(key)) return false;
     return true;
   };
 }
@@ -1377,8 +1539,8 @@ function calcOptimalDate(considered, bonus){
    ========================================================= */
 function compute(input){
   const { considered, nextJoin, bonus, offDays, includeHolidays, paidLeaves, handoverDays,
-          monthlyPay, isOver40 } = input;
-  const isBusinessDay = makeIsBusinessDay(offDays, includeHolidays);
+          monthlyPay, isOver40, customWork, customOff } = input;
+  const isBusinessDay = makeIsBusinessDay(offDays, includeHolidays, customWork, customOff);
   const needDays = paidLeaves + handoverDays;
 
   // ① 最適退職日
@@ -1422,6 +1584,8 @@ function compute(input){
     lastWorkConsidered, lastWorkOptimal, noticeDate,
     needDays, paidLeaves, handoverDays,
     consideredIsMonthEnd, insuranceGain, bonusGain, totalGain, ins, monthlyPay,
+    customWorkCount: customWork ? customWork.size : 0,
+    customOffCount:  customOff  ? customOff.size  : 0,
     bonus, bonusMissedNow, blank, tooLate, noticePassed, noticeAfterLastWork,
     sameDay: diffDays(considered, optimal) === 0
   };
@@ -1533,7 +1697,11 @@ function render(r){
         <div class="tx">
           <div class="k">② 最終出社日（引き継ぎ完了）</div>
           <div class="v">${r.lastWorkOptimal ? esc(fmtJa(r.lastWorkOptimal)) : "算出できません"}</div>
-          <div class="s">有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日＝営業日${r.needDays}日分を逆算。</div>
+          <div class="s">有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日＝営業日${r.needDays}日分を逆算。${
+            (r.customWorkCount || r.customOffCount)
+              ? `<br>会社独自の${[r.customOffCount?`休み${r.customOffCount}日`:"", r.customWorkCount?`出勤日${r.customWorkCount}日`:""].filter(Boolean).join("・")}を反映済み。`
+              : ""
+          }</div>
         </div>
       </div>
       <div class="plan-row hero-row">
@@ -1721,6 +1889,66 @@ function buildWeekdayGrid(){
   });
 }
 
+/* =========================================================
+   会社独自の休日・出勤日
+   ========================================================= */
+const customOffDays  = new Set();  // 会社独自の休み
+const customWorkDays = new Set();  // 会社独自の出勤日
+
+function fmtChip(d){
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${DOW_JA[d.getDay()]}）`;
+}
+
+function addCustomDay(kind){
+  const input = document.getElementById(kind === "work" ? "cdWorkInput" : "cdOffInput");
+  const d = parseDate(input.value);
+  if(!d){ toast("日付を選んでから「追加」を押してください"); return; }
+  const key    = toKey(d);
+  const target = kind === "work" ? customWorkDays : customOffDays;
+  const other  = kind === "work" ? customOffDays  : customWorkDays;
+
+  if(target.has(key)){ toast(`${fmtChip(d)} はすでに登録されています`); return; }
+  if(other.has(key)){
+    // 同じ日を両方には登録できないので、後から指定したほうへ移す
+    other.delete(key);
+    toast(kind === "work" ? "独自の休みから出勤日へ移しました" : "独自の出勤日から休みへ移しました");
+  }else{
+    toast(`${fmtChip(d)} を${kind === "work" ? "出勤日" : "休み"}に追加しました`);
+  }
+  target.add(key);
+  input.value = "";
+  renderCustomDays();
+  update();
+}
+
+function removeCustomDay(kind, key){
+  (kind === "work" ? customWorkDays : customOffDays).delete(key);
+  renderCustomDays();
+  update();
+}
+
+function renderCustomDays(){
+  [["off", customOffDays, "cdOffList"], ["work", customWorkDays, "cdWorkList"]].forEach(([kind, set, listId])=>{
+    const ul = document.getElementById(listId);
+    const keys = Array.from(set).sort();
+    if(!keys.length){
+      ul.innerHTML = `<li class="cd-empty">まだ登録がありません</li>`;
+      return;
+    }
+    ul.innerHTML = keys.map(k=>{
+      const label = fmtChip(parseDate(k));
+      return `<li class="cd-chip ${kind}"><span>${esc(label)}</span>` +
+             `<button type="button" class="cd-del" data-kind="${kind}" data-key="${k}" ` +
+             `aria-label="${esc(label)}を削除">×</button></li>`;
+    }).join("");
+  });
+
+  const n = customOffDays.size + customWorkDays.size;
+  const badge = document.getElementById("cdBadge");
+  badge.textContent = n ? `${n}件 設定中` : "";
+  badge.hidden = !n;
+}
+
 function clampInt(el, min, max, fallback){
   let v = parseInt(el.value, 10);
   if(!Number.isFinite(v)) return fallback;
@@ -1758,7 +1986,9 @@ function update(){
     includeHolidays: document.getElementById("includeHolidays").checked,
     paidLeaves:   clampInt(document.getElementById("paidLeaves"), 0, 60, 15),
     handoverDays: clampInt(document.getElementById("handoverDays"), 0, 60, 0),
-    monthlyPay, isOver40
+    monthlyPay, isOver40,
+    customWork: customWorkDays,
+    customOff:  customOffDays
   };
   render(compute(input));
 }
@@ -1769,6 +1999,15 @@ function init(){
   document.getElementById("abJump").addEventListener("click", ()=>{
     document.getElementById("report").scrollIntoView({block:"start", behavior:"smooth"});
   });
+
+  // 会社独自の休日・出勤日
+  document.getElementById("cdOffAdd").addEventListener("click", ()=>addCustomDay("off"));
+  document.getElementById("cdWorkAdd").addEventListener("click", ()=>addCustomDay("work"));
+  document.getElementById("customDays").addEventListener("click", (e)=>{
+    const btn = e.target.closest(".cd-del");
+    if(btn) removeCustomDay(btn.dataset.kind, btn.dataset.key);
+  });
+  renderCustomDays();
   ["consideredDate","nextJoinDate","bonusDate","includeHolidays","paidLeaves","handoverDays",
    "monthlyPay","isOver40"]
     .forEach(id=>{
