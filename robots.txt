@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# AI検索クローラー（AI Overviews / ChatGPT / Perplexity 等）を明示的に許可
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://taishokubi-navi.pages.dev/sitemap.xml
