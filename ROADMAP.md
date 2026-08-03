@@ -19,35 +19,40 @@
 
 ---
 
-## Phase 0 — 公開前の仕上げ ⏱ 30分／担当: Claude
+## ✅ 公開済み — https://taishokubi-navi.pages.dev/
 
-ドメインが決まる前でも進められる作業。
+**2026-08-04 公開完了。** 本番環境で全19項目の動作検証をパス。
+費用0円（Cloudflare Pages 無料プラン ＋ `.pages.dev` 無料サブドメイン）。
 
-- [ ] **favicon の追加** — インラインSVG（data URI）でファイル追加なしに実装
-- [ ] **canonical / og:url の枠を用意** — ドメイン確定後に1箇所直すだけで済む形にする
-- [ ] **og:image（SNSシェア画像）** — シェア時の見栄えに直結。1200×630pxで作成
-- [ ] **robots.txt / sitemap.xml** — クローラー向け。中身はドメイン確定後に確定
-- [ ] **`lang` / 構造化データの最終確認**
+---
+
+## Phase 0 — 公開前の仕上げ ✅ 完了
+
+- [x] **favicon の追加** — インラインSVG（data URI）でファイル追加なしに実装
+- [x] **canonical / og:url の設定** — HTML冒頭のマーカー内5行を置換すれば変更可能
+- [x] **og:image（SNSシェア画像）** — 1200×630pxで作成
+- [x] **robots.txt / sitemap.xml** — AI検索クローラーを明示的に許可
+- [x] **アプリアイコン** — apple-touch-icon（180px）／192px／512px
 
 > 💡 og:image がないとX・LINEでシェアされたとき味気ないカードになる。
 > 流入経路がSNS中心になる想定なので、ここは手を抜かない。
 
 ---
 
-## Phase 1 — GitHubに上げる ⏱ 15分／担当: 本人
+## Phase 1 — GitHubに上げる ✅ 完了
 
-- [ ] GitHubアカウントを作成（すでにあればログイン）
-- [ ] 新規リポジトリを作成
+- [x] GitHubアカウントを作成（`64Ti`）
+- [x] 新規リポジトリを作成（github.com/64Ti/taishokubi-navi）
   - リポジトリ名: `taishokubi-navi` を推奨
   - **Public / Private どちらでもよい**（Cloudflare Pagesは両対応）
   - README・.gitignore・ライセンスは**追加しない**（ローカルに既にあるため）
-- [ ] リモートを登録してpush（コマンドはこのあと案内）
+- [x] リモートを登録してpush
 
 **完了の判定**: GitHubのページで `index.html` が見えている。
 
 ---
 
-## Phase 2 — ドメインを取得する ⏱ 15分＋費用／担当: 本人
+## Phase 2 — 独自ドメイン（保留：`.pages.dev` で運用中）
 
 ### ドメイン名の候補
 
@@ -72,9 +77,9 @@
 
 ---
 
-## Phase 3 — Cloudflare Pages でデプロイ ⏱ 15分／担当: 本人
+## Phase 3 — Cloudflare Pages でデプロイ ✅ 完了
 
-- [ ] Cloudflareアカウントを作成
+- [x] Cloudflareアカウントを作成
 - [ ] ダッシュボード → **Workers & Pages** → 「作成」→ **Pages** タブ → 「Gitに接続」
 - [ ] GitHubを連携し、`taishokubi-navi` リポジトリを選択
 - [ ] **ビルド設定はすべて空のままにする**（ここが唯一の注意点）
@@ -85,7 +90,7 @@
 | ビルドコマンド | **空欄** |
 | ビルド出力ディレクトリ | `/` |
 
-- [ ] 「保存してデプロイ」
+- [x] 「保存してデプロイ」
 
 **完了の判定**: `xxxx.pages.dev` のURLでツールが動く。
 この時点で**すでにインターネット上に公開されている**。https も自動で付く。
@@ -94,7 +99,7 @@
 
 ---
 
-## Phase 4 — 独自ドメインをつなぐ ⏱ 10分＋反映待ち／担当: 本人
+## Phase 4 — 独自ドメインをつなぐ（Phase 2 と同時に保留）
 
 - [ ] Pagesプロジェクト → 「カスタムドメイン」→ 取得したドメインを追加
 - [ ] DNSの反映を待つ（Cloudflareで取得していれば**数分**。他社なら最大48時間）
