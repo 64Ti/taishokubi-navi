@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>退職日計算ナビ｜社会保険料・有休消化で損しない退職日と最終出社日の最適化シミュレーター</title>
+<meta name="description" content="【無料・個人情報不要】今考えている退職日を入力するだけ！社会保険料の資格喪失ルール・有給完全消化・ボーナス支給日を総合判定し、最も手取り額が得になる『最適退職日』と『最終出社日』を1分でリアルタイム比較試算します。">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#1d4ed8">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="退職日計算ナビ｜損しない退職日と最終出社日を1分で自動計算">
+<meta property="og:description" content="今考えている退職日を入れるだけ。社会保険料の資格喪失ルール・有給完全消化・ボーナス支給日から、手取りと休日が最大になる『最適退職日』を無料で試算します。">
+<meta property="og:site_name" content="退職日計算ナビ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="退職日計算ナビ｜損しない退職日と最終出社日を1分で自動計算">
+<meta name="twitter:description" content="社会保険料・有給消化・ボーナスを総合判定。無料・個人情報不要のシミュレーター。">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "退職日計算ナビ",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "JavaScript有効なモダンブラウザ",
+      "description": "健康保険法および厚生年金保険法に基づく『資格喪失日ルール』、有給休暇日数の営業日逆算、賞与（ボーナス）支給日を自動判定し、手取り額と休日数が最大化される最適退職日を自動算出する無料シミュレーターです。",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "featureList": [
+        "社会保険の資格喪失日ルールに基づく最適退職日の判定",
+        "有給休暇と引き継ぎ日数からの最終出社日の営業日逆算",
+        "賞与支給日をまたぐかどうかのリスク判定",
+        "退職の申し出目安日の算出と交渉用テンプレート生成",
+        "転職先入社日との空白期間・社会保険切替の判定"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "退職日は月末と月末前どちらが得ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "社会保険の資格喪失日は退職日の翌日です。保険料は資格喪失日の属する月の前月分までかかるため、月末退職なら退職月の社会保険料が給与から控除され、その半額を会社が負担します。月末前に退職すると退職月は厚生年金・健康保険の被保険者でなくなり、国民健康保険と国民年金に自分で加入して全額を自己負担することになります。転職先への入社が翌月以降になる場合は、月末退職のほうが自己負担を抑えられるのが一般的です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最終出社日と退職日は違うのですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "違います。退職日は在籍する最後の日で、最終出社日は実際に出社する最後の日です。残っている有給休暇を退職日までに消化する場合、最終出社日は退職日より前になります。最終出社日は、退職日から過去にさかのぼって『有給休暇日数＋引き継ぎ日数』分の営業日を数えた、その直前の営業日が目安になります。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "退職はいつまでに伝えればよいですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "民法第627条第1項では、期間の定めのない雇用は申し入れから2週間の経過で終了します。ただし多くの会社の就業規則では『1か月前まで』と定められているため、実務上は退職日の1か月前までに直属の上司へ申し出るのが目安です。有給休暇をすべて消化する場合は、最終出社日から逆算してさらに早めに伝える必要があります。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "ボーナス支給日の前に退職するとどうなりますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "多くの会社は賞与規程に『支給日に在籍していること』という支給日在籍要件を定めています。この場合、支給日より前に退職日が来ると賞与は支給されません。支給対象期間を勤務していても受け取れないことがあるため、退職日を賞与支給日の後ろへ動かせるかどうかは金額面で大きな差になります。"
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+:root{
+  --bg:#eef2f7;
+  --card:#ffffff;
+  --ink:#0f172a;
+  --ink-2:#475569;
+  --ink-3:#94a3b8;
+  --line:#e2e8f0;
+  --brand:#1d4ed8;
+  --brand-2:#3b82f6;
+  --brand-soft:#eff6ff;
+  --danger:#dc2626;
+  --danger-soft:#fef2f2;
+  --warn:#b45309;
+  --warn-soft:#fffbeb;
+  --good:#047857;
+  --good-soft:#ecfdf5;
+  --r:14px;
+  --shadow:0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Meiryo",sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  padding-bottom:calc(48px + env(safe-area-inset-bottom));
+  overflow-wrap:anywhere;
+}
+.wrap{
+  max-width:560px;
+  margin:0 auto;
+  padding:0 16px;
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+}
+
+/* ---------- hero ---------- */
+.hero{
+  background:linear-gradient(160deg,#1e3a8a 0%,#1d4ed8 55%,#2563eb 100%);
+  color:#fff;
+  padding:calc(28px + env(safe-area-inset-top)) 0 30px;
+}
+.hero h1{
+  font-size:1.34rem;
+  line-height:1.55;
+  margin:0 0 10px;
+  letter-spacing:.01em;
+}
+.hero h1 small{
+  display:block;
+  font-size:.8rem;
+  font-weight:600;
+  opacity:.85;
+  letter-spacing:.14em;
+  margin-bottom:8px;
+}
+.hero .lead{
+  font-size:.92rem;
+  margin:0 0 14px;
+  color:#dbeafe;
+}
+.hero .def{
+  font-size:.8rem;
+  line-height:1.85;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:12px;
+  padding:12px 14px;
+  margin:0;
+  color:#eff6ff;
+}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0;padding:0;list-style:none;}
+.badges li{
+  font-size:.72rem;font-weight:700;letter-spacing:.02em;
+  background:rgba(255,255,255,.18);border-radius:999px;padding:4px 11px;
+}
+
+/* ---------- card ---------- */
+.card{
+  background:var(--card);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  padding:18px 16px;
+  margin:16px 0;
+}
+.step-no{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.76rem;font-weight:800;letter-spacing:.08em;
+  color:var(--brand);background:var(--brand-soft);
+  border-radius:999px;padding:4px 12px;margin-bottom:12px;
+}
+.card h2{font-size:1.04rem;margin:0 0 4px;}
+.card .note{font-size:.79rem;color:var(--ink-3);margin:0 0 16px;}
+
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field label{
+  display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;
+  font-size:.88rem;font-weight:700;margin-bottom:6px;
+}
+.tag{
+  font-size:.66rem;font-weight:800;letter-spacing:.04em;
+  padding:2px 7px;border-radius:5px;
+}
+.tag.req{background:#fee2e2;color:#b91c1c;}
+.tag.opt{background:#f1f5f9;color:#64748b;}
+.hint{display:block;font-size:.75rem;font-weight:400;color:var(--ink-3);width:100%;margin-top:2px;}
+
+input[type="date"],input[type="number"]{
+  width:100%;
+  font-family:inherit;
+  font-size:1rem;
+  line-height:1.4;
+  padding:12px 13px;
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink);
+  min-height:48px;
+  appearance:none;
+}
+input[type="date"]{display:block;}
+input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(59,130,246,.16);}
+input[type="number"]{max-width:180px;}
+.pay-input{display:flex;align-items:center;gap:8px;}
+.pay-input input{max-width:200px;text-align:right;font-variant-numeric:tabular-nums;}
+.pay-input .unit{font-size:.9rem;font-weight:700;color:var(--ink-2);}
+.grade-view{
+  font-size:.76rem;line-height:1.7;color:var(--ink-2);
+  background:var(--brand-soft);border-radius:9px;
+  padding:9px 11px;margin:9px 0 0;
+}
+.grade-view b{color:var(--brand);}
+
+.dow-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dow{
+  font-family:inherit;font-size:.86rem;font-weight:700;
+  padding:11px 0;min-height:46px;
+  border:1.5px solid var(--line);border-radius:9px;
+  background:#fff;color:var(--ink-3);cursor:pointer;
+  transition:.12s;
+}
+.dow[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff;}
+.dow:focus-visible{outline:2px solid var(--brand-2);outline-offset:2px;}
+
+.check{
+  display:flex;align-items:flex-start;gap:10px;
+  background:#f8fafc;border:1px solid var(--line);border-radius:10px;
+  padding:12px 13px;cursor:pointer;
+}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--brand);flex:none;}
+.check span{font-size:.86rem;font-weight:600;}
+.check span em{display:block;font-style:normal;font-size:.75rem;font-weight:400;color:var(--ink-3);}
+
+/* ---------- report ---------- */
+.report{scroll-margin-top:12px;}
+.report-head{
+  display:flex;align-items:center;gap:8px;
+  font-size:1.04rem;font-weight:800;margin:26px 0 12px;
+}
+.report-head::before{content:"";width:4px;height:20px;background:var(--brand);border-radius:2px;}
+
+.banner{
+  border-radius:12px;padding:13px 14px;margin-bottom:14px;
+  font-size:.85rem;line-height:1.7;
+  border:1.5px solid;
+}
+.banner b{display:block;font-size:.9rem;margin-bottom:3px;}
+.banner.alert{background:var(--danger-soft);border-color:#fecaca;color:#991b1b;}
+.banner.warn{background:var(--warn-soft);border-color:#fde68a;color:#92400e;}
+.banner.ok{background:var(--good-soft);border-color:#a7f3d0;color:#065f46;}
+
+.gain{
+  background:linear-gradient(160deg,#0f766e 0%,#047857 100%);
+  color:#fff;border-radius:var(--r);padding:20px 16px;text-align:center;
+  box-shadow:var(--shadow);
+}
+.gain .cap{font-size:.79rem;font-weight:700;color:#a7f3d0;letter-spacing:.04em;}
+.gain .amt{font-size:2.35rem;font-weight:800;line-height:1.2;margin:4px 0 2px;letter-spacing:-.02em;}
+.gain .amt span{font-size:1.1rem;font-weight:700;margin-left:2px;}
+.gain .amt .plus{font-size:1.4rem;margin:0 2px 0 0;}
+.gain .brk{
+  display:flex;flex-direction:column;gap:5px;
+  margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.25);
+  font-size:.81rem;
+}
+.gain .brk div{display:flex;justify-content:space-between;gap:10px;}
+.gain .brk div b{font-variant-numeric:tabular-nums;}
+.gain .basis{
+  font-size:.74rem;line-height:1.75;text-align:left;
+  background:rgba(255,255,255,.14);border-radius:9px;
+  padding:9px 11px;margin:11px 0 0;color:#d1fae5;
+}
+.gain .basis b{color:#fff;}
+.gain .disc{font-size:.7rem;color:#a7f3d0;margin:10px 0 0;line-height:1.65;text-align:left;}
+
+.plan{display:flex;flex-direction:column;gap:10px;}
+.plan-row{
+  display:flex;align-items:center;gap:12px;
+  border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;
+}
+.plan-row .ic{
+  flex:none;width:38px;height:38px;border-radius:10px;
+  display:grid;place-items:center;font-size:1.1rem;
+  background:var(--brand-soft);
+}
+.plan-row .tx{flex:1;min-width:0;}
+.plan-row .tx .k{font-size:.76rem;font-weight:700;color:var(--ink-3);}
+.plan-row .tx .v{font-size:1.02rem;font-weight:800;}
+.plan-row .tx .s{font-size:.74rem;color:var(--ink-3);}
+.plan-row.hero-row{border-color:var(--brand);background:var(--brand-soft);}
+.plan-row.hero-row .ic{background:var(--brand);color:#fff;}
+
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:52px;
+  font-family:inherit;font-size:.94rem;font-weight:800;
+  border:none;border-radius:12px;cursor:pointer;
+  background:var(--brand);color:#fff;
+  transition:.12s;
+}
+.btn:active{transform:scale(.985);}
+.btn.sub{background:#fff;color:var(--brand);border:1.5px solid var(--brand);}
+.btn:focus-visible{outline:2px solid var(--brand-2);outline-offset:2px;}
+
+.tmpl{
+  background:#f8fafc;border:1px solid var(--line);border-radius:10px;
+  padding:13px 14px;margin:0 0 12px;
+  font-size:.82rem;line-height:1.9;white-space:pre-wrap;
+  max-height:190px;overflow:auto;color:var(--ink-2);
+  font-family:inherit;
+}
+
+.cmp{display:flex;flex-direction:column;gap:11px;}
+.cmp-item{border:1.5px solid var(--line);border-radius:12px;overflow:hidden;}
+.cmp-item .ttl{
+  font-size:.79rem;font-weight:800;color:var(--ink-2);
+  background:#f8fafc;padding:7px 13px;border-bottom:1px solid var(--line);
+}
+.cmp-item .body{display:flex;align-items:stretch;}
+.cmp-item .side{flex:1;min-width:0;padding:11px 13px;}
+.cmp-item .side .lb{font-size:.68rem;font-weight:800;letter-spacing:.06em;color:var(--ink-3);}
+.cmp-item .side .vl{font-size:.9rem;font-weight:700;line-height:1.55;}
+.cmp-item .side.before .vl{color:var(--ink-3);}
+.cmp-item .side.after{background:var(--good-soft);}
+.cmp-item .side.after .lb{color:var(--good);}
+.cmp-item .side.after .vl{color:#065f46;}
+.cmp-item .arw{
+  flex:none;width:26px;display:grid;place-items:center;
+  color:var(--ink-3);font-size:.9rem;background:#f8fafc;
+}
+.cmp-item.same .side.after{background:#f8fafc;}
+.cmp-item.same .side.after .vl{color:var(--ink-2);}
+.cmp-item.same .side.after .lb{color:var(--ink-3);}
+
+.share{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.share button{
+  min-height:48px;font-family:inherit;font-size:.85rem;font-weight:800;
+  border-radius:11px;border:1.5px solid var(--line);background:#fff;color:var(--ink);
+  cursor:pointer;
+}
+.share button.x{background:#000;border-color:#000;color:#fff;}
+.share button.line{background:#06c755;border-color:#06c755;color:#fff;}
+.share button.full{grid-column:1/-1;}
+
+details.law{
+  background:#fff;border:1px solid var(--line);border-radius:11px;
+  padding:0;margin-bottom:9px;
+}
+details.law summary{
+  font-size:.87rem;font-weight:700;padding:13px 14px;cursor:pointer;
+  list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.law summary::-webkit-details-marker{display:none;}
+details.law summary::after{content:"＋";color:var(--brand);font-weight:800;flex:none;}
+details.law[open] summary::after{content:"−";}
+details.law .in{
+  padding:0 14px 14px;font-size:.82rem;line-height:1.9;color:var(--ink-2);
+}
+details.law .in p{margin:0 0 9px;}
+details.law .in p:last-child{margin:0;}
+details.law .in .src{
+  font-size:.74rem;color:var(--ink-3);border-left:3px solid var(--line);
+  padding-left:9px;margin-top:9px;
+}
+
+footer{
+  font-size:.75rem;line-height:1.85;color:var(--ink-3);
+  padding:22px 0 10px;
+}
+footer .disc{
+  background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 14px;
+}
+footer .cr{text-align:center;margin-top:14px;}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));
+  transform:translate(-50%,14px);
+  background:#0f172a;color:#fff;font-size:.85rem;font-weight:700;
+  padding:12px 20px;border-radius:999px;
+  box-shadow:0 10px 30px rgba(15,23,42,.3);
+  opacity:0;pointer-events:none;transition:.2s;z-index:50;
+  max-width:calc(100vw - 40px);text-align:center;
+}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+
+.err{
+  background:var(--danger-soft);border:1.5px solid #fecaca;color:#991b1b;
+  border-radius:12px;padding:14px;font-size:.85rem;font-weight:600;
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1><small>無料・登録不要・個人情報なし</small>退職日計算ナビ<br>損しない退職日と最終出社日を自動計算</h1>
+    <p class="lead">今考えている退職日を入れるだけ。社会保険料・有給消化・ボーナスから逆算します。</p>
+    <p class="def">本ツールは、健康保険法および厚生年金保険法に基づく『資格喪失日ルール』、有給休暇日数の営業日逆算、賞与（ボーナス）支給日を自動判定し、手取り額と休日数が最大化される最適退職日を自動算出する無料シミュレーターです。</p>
+    <ul class="badges">
+      <li>入力1分</li><li>通信なし・端末内処理</li><li>スマホ最適化</li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- STEP 1 -->
+  <section class="card">
+    <span class="step-no">STEP 1 ／ 日付を入れる</span>
+    <h2>いつ辞めるつもりですか？</h2>
+    <p class="note">わかる範囲でOK。あとから何度でも変えられます。</p>
+
+    <div class="field">
+      <label for="consideredDate">今考えている退職日 <span class="tag req">必須</span>
+        <span class="hint">在籍する最後の日。まだ仮でかまいません。</span>
+      </label>
+      <input type="date" id="consideredDate">
+    </div>
+
+    <div class="field">
+      <label for="nextJoinDate">次の会社への入社予定日 <span class="tag opt">任意</span>
+        <span class="hint">空白期間（社会保険の切替が必要な日数）を判定します。</span>
+      </label>
+      <input type="date" id="nextJoinDate">
+    </div>
+
+    <div class="field">
+      <label for="bonusDate">次回ボーナス支給日 <span class="tag opt">任意</span>
+        <span class="hint">支給日前に辞めると受け取れないことがあります。</span>
+      </label>
+      <input type="date" id="bonusDate">
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card">
+    <span class="step-no">STEP 2 ／ 休日と有休</span>
+    <h2>会社の休みと残り有休</h2>
+    <p class="note">最終出社日を営業日ベースで逆算するために使います。</p>
+
+    <div class="field">
+      <label>会社の定休日 <span class="tag req">必須</span>
+        <span class="hint">休みの曜日をすべて選んでください（初期値：土日）。</span>
+      </label>
+      <div class="dow-grid" id="weekdayGrid" role="group" aria-label="会社の定休日"></div>
+    </div>
+
+    <div class="field">
+      <label for="includeHolidays">祝日の扱い <span class="tag req">必須</span></label>
+      <label class="check" for="includeHolidays">
+        <input type="checkbox" id="includeHolidays" checked>
+        <span>祝日も休みに含める
+          <em>国民の祝日・振替休日を営業日から除外します。</em>
+        </span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label for="paidLeaves">残り有給日数 <span class="tag req">必須</span>
+        <span class="hint">0〜60日。給与明細や勤怠システムで確認できます。</span>
+      </label>
+      <input type="number" id="paidLeaves" value="15" min="0" max="60" step="1" inputmode="numeric">
+    </div>
+
+    <div class="field">
+      <label for="handoverDays">引き継ぎ必要日数 <span class="tag req">必須</span>
+        <span class="hint">0〜60日。有休に入る前に出社して引き継ぐ日数。</span>
+      </label>
+      <input type="number" id="handoverDays" value="0" min="0" max="60" step="1" inputmode="numeric">
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card">
+    <span class="step-no">STEP 3 ／ 給与</span>
+    <h2>社会保険料を実額で計算する</h2>
+    <p class="note">額面の月給から標準報酬月額を判定し、節減額を実額で試算します。</p>
+
+    <div class="field">
+      <label for="monthlyPay">月給（額面・月額） <span class="tag req">必須</span>
+        <span class="hint">税や社会保険料を引く前の総支給額。通勤手当も含めます。</span>
+      </label>
+      <div class="pay-input">
+        <input type="number" id="monthlyPay" value="300000" min="0" max="2000000" step="10000" inputmode="numeric">
+        <span class="unit">円</span>
+      </div>
+      <p class="grade-view" id="gradeView"></p>
+    </div>
+
+    <div class="field">
+      <label for="isOver40">介護保険料 <span class="tag req">必須</span></label>
+      <label class="check" for="isOver40">
+        <input type="checkbox" id="isOver40">
+        <span>40歳以上65歳未満である
+          <em>該当すると介護保険料（介護保険第2号被保険者）が上乗せされます。</em>
+        </span>
+      </label>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="report" id="report" aria-live="polite"></section>
+
+  <!-- 制度解説 -->
+  <h2 class="report-head">制度解説ノート（法的な根拠）</h2>
+
+  <details class="law">
+    <summary>なぜ「月末退職」が得になりやすいのか</summary>
+    <div class="in">
+      <p>社会保険（健康保険・厚生年金）の<b>資格喪失日は「退職日の翌日」</b>です。そして保険料は<b>資格喪失日の属する月の前月分まで</b>徴収されます。</p>
+      <p>3月31日退職なら資格喪失日は4月1日。3月分の保険料が発生し、その<b>半額を会社が負担</b>します。一方、3月30日退職だと資格喪失日は3月31日となり、3月分の厚生年金・健康保険料は発生しません。</p>
+      <p>ただしその場合、3月は厚生年金・健康保険の被保険者ではないため、<b>国民健康保険と国民年金に自分で加入し全額を自己負担</b>することになります。翌月以降に転職先へ入社するなら、月末退職のほうが自己負担を抑えられるのが一般的です。</p>
+      <p class="src">根拠：健康保険法第36条（資格喪失の時期）／第156条第3項（保険料の徴収期間）、厚生年金保険法第14条・第19条</p>
+    </div>
+  </details>
+
+  <details class="law">
+    <summary>社会保険料はどう計算しているのか</summary>
+    <div class="in">
+      <p>保険料は月給そのものではなく、月給を等級に当てはめた<b>「標準報酬月額」</b>を基準に決まります。本ツールは協会けんぽの<b>全50等級</b>の等級表を内蔵し、入力された月給から等級を自動判定しています。</p>
+      <p>本人負担額は次のとおりです（<b>いずれも労使折半</b>のため料率の半分）。</p>
+      <p>・健康保険料＝標準報酬月額 × 10.00% ÷ 2<br>
+         ・介護保険料＝標準報酬月額 × 1.59% ÷ 2（40歳以上65歳未満のみ）<br>
+         ・厚生年金保険料＝標準報酬月額 × 18.30% ÷ 2</p>
+      <p>健康保険料率は<b>都道府県ごとに異なり</b>、概ね9.35%〜10.5%の幅があります。本ツールは全国平均の10.00%を用いているため、正確な額は自社の健康保険証に記載された保険者へご確認ください。厚生年金保険料率は全国一律18.3%で固定です。</p>
+      <p>なお厚生年金は標準報酬月額の上限が<b>650,000円</b>（健保35等級相当）、下限が<b>88,000円</b>（健保4等級相当）に設定されており、健康保険より範囲が狭くなっています。高収入の場合、厚生年金部分はこの上限で頭打ちになります。</p>
+      <p class="src">根拠：健康保険法第40条（標準報酬月額）・第160条（保険料率）、厚生年金保険法第20条・第81条（保険料率18.3%）、介護保険法第9条第2号</p>
+    </div>
+  </details>
+
+  <details class="law">
+    <summary>有給休暇は退職時に消化できるのか</summary>
+    <div class="in">
+      <p>年次有給休暇は労働基準法第39条で認められた労働者の権利で、<b>取得に会社の許可は不要</b>です（時季指定権）。会社には時季変更権がありますが、退職日以降に振り替える余地がないため、<b>退職前の有休消化に対して時季変更権は行使できない</b>と解されています。</p>
+      <p>そのため実務では、最終出社日の翌営業日から退職日までを有休消化にあてる形が一般的です。ただし引き継ぎを放り出すとトラブルになるため、引き継ぎ日数を確保したうえで逆算するのが安全です。</p>
+      <p class="src">根拠：労働基準法第39条（年次有給休暇）</p>
+    </div>
+  </details>
+
+  <details class="law">
+    <summary>退職はいつまでに伝えればいいのか</summary>
+    <div class="in">
+      <p>民法第627条第1項では、期間の定めのない雇用契約は<b>申し入れから2週間の経過</b>で終了します。一方、多くの会社の就業規則は「1か月前まで」と定めており、円満退職の実務上はこちらに合わせるのが無難です。</p>
+      <p>本ツールは<b>退職日の1か月前</b>を上司への申し出目安日として算出しています。有給をすべて消化する場合は最終出社日がさらに前倒しになるため、<b>最終出社日から逆算して早めに切り出す</b>ことをおすすめします。</p>
+      <p class="src">根拠：民法第627条第1項／各社就業規則</p>
+    </div>
+  </details>
+
+  <details class="law">
+    <summary>ボーナスは「支給日在籍」が条件のことが多い</summary>
+    <div class="in">
+      <p>多くの会社の賞与規程には<b>「支給日に在籍していること」</b>という支給日在籍要件があります。査定対象期間をまるまる働いていても、支給日の前日に退職日が来ると受け取れないケースがあります。</p>
+      <p>判例上も、賞与に功労報償的・将来の勤労意欲喚起の性格があることから、支給日在籍要件は原則として有効と扱われています。退職日を支給日の後ろへずらせるかどうかは、金額面で最も影響が大きい判断ポイントです。</p>
+      <p class="src">根拠：各社賞与規程／大和銀行事件（最高裁 昭和57年10月7日判決）ほか</p>
+    </div>
+  </details>
+
+  <details class="law">
+    <summary>退職と入社の間に空白ができたら何をするのか</summary>
+    <div class="in">
+      <p>退職日の翌日＝入社日なら社会保険は途切れず移行します。1日でも空くと、その期間は<b>国民健康保険・国民年金に加入する義務</b>が生じます（手続きは市区町村の窓口、原則14日以内）。</p>
+      <p>健康保険は、国民健康保険のかわりに<b>任意継続被保険者制度</b>（最大2年、原則20日以内に申請）を選べる場合があります。保険料はどちらが安いか人により異なるため、退職前に健康保険組合と市区町村の両方で試算しておくと確実です。</p>
+      <p class="src">根拠：国民健康保険法第5条・第6条、国民年金法第7条、健康保険法第37条（任意継続）</p>
+    </div>
+  </details>
+
+  <footer>
+    <div class="disc">
+      ※本試算は一般的な労働法規規程に基づくシミュレーションです。会社独自の就業規則（退職申し出期限や賞与支給日に限る在籍要件など）が優先される場合があるため、最終確認は自社の人事部や就業規則をご確認ください。
+    </div>
+    <div class="cr">退職日計算ナビ ／ 入力内容は端末内だけで処理され、送信・保存されません。</div>
+  </footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   国民の祝日データ（2026〜2028）
+   保守：年1回、YYYY-MM-DD 形式で新年度分を追記するだけで更新完了。
+   ========================================================= */
+/* HOLIDAYS:BEGIN */
+const nationalHolidays = [
+  // ===== 2026年（18日）=====
+  "2026-01-01", // 元日
+  "2026-01-12", // 成人の日（1月第2月曜）
+  "2026-02-11", // 建国記念の日
+  "2026-02-23", // 天皇誕生日
+  "2026-03-20", // 春分の日
+  "2026-04-29", // 昭和の日
+  "2026-05-03", // 憲法記念日（日曜）
+  "2026-05-04", // みどりの日
+  "2026-05-05", // こどもの日
+  "2026-05-06", // 振替休日（憲法記念日ぶん）
+  "2026-07-20", // 海の日（7月第3月曜）
+  "2026-08-11", // 山の日
+  "2026-09-21", // 敬老の日（9月第3月曜）
+  "2026-09-22", // 国民の休日（敬老の日と秋分の日に挟まれた平日）
+  "2026-09-23", // 秋分の日
+  "2026-10-12", // スポーツの日（10月第2月曜）
+  "2026-11-03", // 文化の日
+  "2026-11-23", // 勤労感謝の日
+  // ===== 2027年（17日）=====
+  "2027-01-01", // 元日
+  "2027-01-11", // 成人の日
+  "2027-02-11", // 建国記念の日
+  "2027-02-23", // 天皇誕生日
+  "2027-03-21", // 春分の日（日曜）
+  "2027-03-22", // 振替休日（春分の日ぶん）
+  "2027-04-29", // 昭和の日
+  "2027-05-03", // 憲法記念日
+  "2027-05-04", // みどりの日
+  "2027-05-05", // こどもの日
+  "2027-07-19", // 海の日
+  "2027-08-11", // 山の日
+  "2027-09-20", // 敬老の日
+  "2027-09-23", // 秋分の日
+  "2027-10-11", // スポーツの日
+  "2027-11-03", // 文化の日
+  "2027-11-23", // 勤労感謝の日
+  // ===== 2028年（16日）=====
+  "2028-01-01", // 元日
+  "2028-01-10", // 成人の日
+  "2028-02-11", // 建国記念の日
+  "2028-02-23", // 天皇誕生日
+  "2028-03-20", // 春分の日
+  "2028-04-29", // 昭和の日
+  "2028-05-03", // 憲法記念日
+  "2028-05-04", // みどりの日
+  "2028-05-05", // こどもの日
+  "2028-07-17", // 海の日
+  "2028-08-11", // 山の日
+  "2028-09-18", // 敬老の日
+  "2028-09-22", // 秋分の日
+  "2028-10-09", // スポーツの日
+  "2028-11-03", // 文化の日
+  "2028-11-23"  // 勤労感謝の日
+];
+/* HOLIDAYS:END */
+const HOLIDAY_SET = new Set(nationalHolidays);
+
+/* =========================================================
+   保険料率（保守：料率改定時はここだけ直す）
+   ========================================================= */
+// 健康保険料率：協会けんぽの全国平均。都道府県により概ね 9.35%〜10.5% の幅がある。
+const HEALTH_RATE  = 0.100;
+// 介護保険料率：40歳以上65歳未満（介護保険第2号被保険者）に上乗せ。
+const CARE_RATE    = 0.0159;
+// 厚生年金保険料率：全国一律で固定（平成29年9月以降 18.3%）。
+const PENSION_RATE = 0.183;
+// 厚生年金の標準報酬月額の下限・上限（健保の等級表より範囲が狭い）。
+const PENSION_MIN  = 88000;
+const PENSION_MAX  = 650000;
+// 賞与を受け取れた場合の推定獲得額の目安。
+const BONUS_ESTIMATE = 300000;
+// 上司への申し出目安（か月前）。
+const NOTICE_MONTHS = 1;
+
+/* =========================================================
+   健康保険 標準報酬月額 等級表（協会けんぽ／令和2年9月改定以降の50等級）
+   [健保等級, 標準報酬月額, 報酬月額の下限(以上), 報酬月額の上限(未満)]
+   最上位等級の上限は null（＝以上）。
+   保守：等級表が改定されたらこの配列を差し替える。
+   ========================================================= */
+/* GRADES:BEGIN */
+const STANDARD_GRADES = [
+  [ 1,   58000,       0,   63000],
+  [ 2,   68000,   63000,   73000],
+  [ 3,   78000,   73000,   83000],
+  [ 4,   88000,   83000,   93000],
+  [ 5,   98000,   93000,  101000],
+  [ 6,  104000,  101000,  107000],
+  [ 7,  110000,  107000,  114000],
+  [ 8,  118000,  114000,  122000],
+  [ 9,  126000,  122000,  130000],
+  [10,  134000,  130000,  138000],
+  [11,  142000,  138000,  146000],
+  [12,  150000,  146000,  155000],
+  [13,  160000,  155000,  165000],
+  [14,  170000,  165000,  175000],
+  [15,  180000,  175000,  185000],
+  [16,  190000,  185000,  195000],
+  [17,  200000,  195000,  210000],
+  [18,  220000,  210000,  230000],
+  [19,  240000,  230000,  250000],
+  [20,  260000,  250000,  270000],
+  [21,  280000,  270000,  290000],
+  [22,  300000,  290000,  310000],
+  [23,  320000,  310000,  330000],
+  [24,  340000,  330000,  350000],
+  [25,  360000,  350000,  370000],
+  [26,  380000,  370000,  395000],
+  [27,  410000,  395000,  425000],
+  [28,  440000,  425000,  455000],
+  [29,  470000,  455000,  485000],
+  [30,  500000,  485000,  515000],
+  [31,  530000,  515000,  545000],
+  [32,  560000,  545000,  575000],
+  [33,  590000,  575000,  605000],
+  [34,  620000,  605000,  635000],
+  [35,  650000,  635000,  665000],
+  [36,  680000,  665000,  695000],
+  [37,  710000,  695000,  730000],
+  [38,  750000,  730000,  770000],
+  [39,  790000,  770000,  810000],
+  [40,  830000,  810000,  855000],
+  [41,  880000,  855000,  905000],
+  [42,  930000,  905000,  955000],
+  [43,  980000,  955000, 1005000],
+  [44, 1030000, 1005000, 1055000],
+  [45, 1090000, 1055000, 1115000],
+  [46, 1150000, 1115000, 1175000],
+  [47, 1210000, 1175000, 1235000],
+  [48, 1270000, 1235000, 1295000],
+  [49, 1330000, 1295000, 1355000],
+  [50, 1390000, 1355000,    null]
+];
+/* GRADES:END */
+
+/** 報酬月額から等級行を引く */
+function findGrade(pay){
+  const p = Math.max(0, pay);
+  for(const row of STANDARD_GRADES){
+    if(row[3] === null || p < row[3]) return row;
+  }
+  return STANDARD_GRADES[STANDARD_GRADES.length - 1];
+}
+
+/**
+ * 月給（額面）から社会保険料の本人負担額（月額）を算出する。
+ * 労使折半のため、料率の 1/2 が本人負担。月末退職ならこの額を会社が同額負担する。
+ */
+function calcInsurance(monthlyPay, isOver40){
+  const row = findGrade(monthlyPay);
+  const grade = row[0], std = row[1];
+  const healthRate = HEALTH_RATE + (isOver40 ? CARE_RATE : 0);
+  const health  = Math.round(std * healthRate / 2);
+  const pensionStd = Math.min(Math.max(std, PENSION_MIN), PENSION_MAX);
+  const pension = Math.round(pensionStd * PENSION_RATE / 2);
+  return { grade, std, pensionStd, health, pension, total: health + pension, isOver40 };
+}
+
+/* =========================================================
+   日付ユーティリティ（時差ずれ防止：文字列を直接分解してパース）
+   ========================================================= */
+const DOW_JA = ["日","月","火","水","木","金","土"];
+
+function parseDate(str){
+  if(!str) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str.trim());
+  if(!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const dt = new Date(y, mo - 1, d);
+  dt.setHours(0,0,0,0);
+  // 2月30日などの繰り上がりを弾く
+  if(dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return dt;
+}
+function toKey(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${dd}`;
+}
+function fmtJa(d){
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DOW_JA[d.getDay()]}）`;
+}
+function fmtShort(d){
+  return `${d.getMonth()+1}/${d.getDate()}（${DOW_JA[d.getDay()]}）`;
+}
+function addDays(d, n){
+  const r = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  r.setHours(0,0,0,0);
+  return r;
+}
+function endOfMonth(d){
+  // 翌月0日 ＝ 当月末日
+  const r = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  r.setHours(0,0,0,0);
+  return r;
+}
+function isMonthEnd(d){
+  return d.getDate() === endOfMonth(d).getDate();
+}
+function subMonths(d, n){
+  // 3/31 の1か月前を 3/3 に暴走させないためのクランプ処理
+  const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+  const lastOfTarget = new Date(y, m - n + 1, 0).getDate();
+  const r = new Date(y, m - n, Math.min(day, lastOfTarget));
+  r.setHours(0,0,0,0);
+  return r;
+}
+function diffDays(a, b){
+  // DST非依存でカレンダー日数を出す
+  const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((ub - ua) / 86400000);
+}
+function today(){
+  const t = new Date();
+  t.setHours(0,0,0,0);
+  return t;
+}
+function yen(n){
+  return n.toLocaleString("ja-JP");
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* =========================================================
+   営業日判定・逆算
+   ========================================================= */
+function makeIsBusinessDay(offDays, includeHolidays){
+  const off = new Set(offDays);
+  return function(d){
+    if(off.has(d.getDay())) return false;
+    if(includeHolidays && HOLIDAY_SET.has(toKey(d))) return false;
+    return true;
+  };
+}
+
+/**
+ * 退職日から過去へ1日ずつ遡り、必要営業日数をカウントし終えた直前の営業日を最終出社日とする。
+ * needDays が 0 のときは、退職日から遡って最初の営業日（＝退職日が営業日ならその日）。
+ */
+function calcLastWorkDay(retireDate, needDays, isBusinessDay){
+  const GUARD = 3650; // 無限ループ保険（約10年分）
+  let cursor = new Date(retireDate);
+  let counted = 0, steps = 0;
+
+  while(counted < needDays){
+    if(isBusinessDay(cursor)) counted++;
+    cursor = addDays(cursor, -1);
+    if(++steps > GUARD) return null;
+  }
+  while(!isBusinessDay(cursor)){
+    cursor = addDays(cursor, -1);
+    if(++steps > GUARD) return null;
+  }
+  return cursor;
+}
+
+/**
+ * ① 最適退職日の判定
+ *    基本：検討中の日と同じ月の月末日
+ *    ボーナス補正：仮の最適日がボーナス日より前なら、ボーナス日以降の最初の月末日へ繰り下げ
+ */
+function calcOptimalDate(considered, bonus){
+  let optimal = endOfMonth(considered);
+  let shiftedForBonus = false;
+
+  if(bonus && optimal < bonus){
+    let cand = endOfMonth(bonus);
+    // ボーナス日が月末より後（＝理論上起きないが念のため）でも必ず以降になるまで送る
+    while(cand < bonus){
+      cand = endOfMonth(addDays(cand, 1));
+    }
+    optimal = cand;
+    shiftedForBonus = true;
+  }
+  return { optimal, shiftedForBonus };
+}
+
+/* =========================================================
+   メイン計算
+   ========================================================= */
+function compute(input){
+  const { considered, nextJoin, bonus, offDays, includeHolidays, paidLeaves, handoverDays,
+          monthlyPay, isOver40 } = input;
+  const isBusinessDay = makeIsBusinessDay(offDays, includeHolidays);
+  const needDays = paidLeaves + handoverDays;
+
+  // ① 最適退職日
+  const { optimal, shiftedForBonus } = calcOptimalDate(considered, bonus);
+
+  // ② 最終出社日の逆算（検討中／最適の両方）
+  const lastWorkConsidered = calcLastWorkDay(considered, needDays, isBusinessDay);
+  const lastWorkOptimal    = calcLastWorkDay(optimal,    needDays, isBusinessDay);
+
+  // ③ 上司への通知目安日
+  const noticeDate = subMonths(optimal, NOTICE_MONTHS);
+
+  // お得度
+  const consideredIsMonthEnd = isMonthEnd(considered);
+  const ins = calcInsurance(monthlyPay, isOver40);
+  const insuranceGain = consideredIsMonthEnd ? 0 : ins.total;
+  // 検討中の日ではボーナスを取り逃す（＝支給日より前）が、最適日なら受け取れる場合のみ計上
+  const bonusMissedNow = !!(bonus && considered < bonus);
+  const bonusGain = (bonusMissedNow && optimal >= bonus) ? BONUS_ESTIMATE : 0;
+  const totalGain = insuranceGain + bonusGain;
+
+  // ④ 空白期間・社会保険の切替
+  let blank = null;
+  if(nextJoin){
+    const dayAfter = addDays(optimal, 1);
+    const gap = diffDays(dayAfter, nextJoin);
+    if(gap === 0)      blank = { type:"none",    days:0 };
+    else if(gap > 0)   blank = { type:"gap",     days:gap };
+    else               blank = { type:"overlap", days:-gap };
+  }
+
+  // 日程の逼迫チェック
+  const t = today();
+  const tooLate = lastWorkOptimal ? lastWorkOptimal < t : false;
+  const noticePassed = noticeDate < t;
+  // 「1か月前」の目安日が最終出社日以降だと、出社中に切り出せない＝実務上間に合わない
+  const noticeAfterLastWork = lastWorkOptimal ? diffDays(noticeDate, lastWorkOptimal) <= 0 : false;
+
+  return {
+    considered, optimal, shiftedForBonus,
+    lastWorkConsidered, lastWorkOptimal, noticeDate,
+    needDays, paidLeaves, handoverDays,
+    consideredIsMonthEnd, insuranceGain, bonusGain, totalGain, ins, monthlyPay,
+    bonus, bonusMissedNow, blank, tooLate, noticePassed, noticeAfterLastWork,
+    sameDay: diffDays(considered, optimal) === 0
+  };
+}
+
+/* =========================================================
+   テンプレ文面
+   ========================================================= */
+function buildTemplate(r){
+  const lw = r.lastWorkOptimal ? fmtJa(r.lastWorkOptimal) : "（別途調整）";
+  const leaveLine = r.paidLeaves > 0
+    ? `\nまた、残っております有給休暇${r.paidLeaves}日分につきましても、\n最終出社日以降に取得させていただけますと幸いです。`
+    : "";
+  return [
+    "お疲れ様です。お忙しいところ恐れ入ります。",
+    "ご相談したいことがあり、一度お時間をいただけないでしょうか。",
+    "",
+    "かねてより検討してまいりましたが、一身上の都合により、",
+    `${fmtJa(r.optimal)}をもって退職させていただきたく存じます。`,
+    "",
+    `最終出社日は${lw}を予定しており、`,
+    "それまでに担当業務の引き継ぎを完了させる所存です。" + leaveLine,
+    "",
+    "業務に支障が出ないよう最大限努めてまいりますので、",
+    "ご相談のお時間をいただけますと幸いです。",
+    "何卒よろしくお願いいたします。"
+  ].join("\n");
+}
+
+/* =========================================================
+   描画
+   ========================================================= */
+const $report = document.getElementById("report");
+
+function render(r){
+  const P = [];
+
+  /* --- 1. 警告バナー --- */
+  P.push('<h2 class="report-head">あなたの診断レポート</h2>');
+
+  if(r.bonusMissedNow && r.bonusGain > 0){
+    P.push(`<div class="banner alert"><b>⚠ ボーナスを受け取れない可能性があります</b>
+今の退職日（${esc(fmtShort(r.considered))}）は、ボーナス支給日 ${esc(fmtShort(r.bonus))} より前です。多くの会社の賞与規程には「支給日に在籍していること」という条件があるため、このままだと支給対象外になるおそれがあります。退職日を <b>${esc(fmtShort(r.optimal))}</b> まで動かせないか検討してください。</div>`);
+  }else if(r.bonus && r.considered >= r.bonus){
+    P.push(`<div class="banner ok"><b>✓ ボーナス支給日はクリアしています</b>
+今の退職日はボーナス支給日 ${esc(fmtShort(r.bonus))} より後のため、支給日在籍要件は満たせる見込みです。</div>`);
+  }
+
+  if(r.tooLate){
+    P.push(`<div class="banner warn"><b>⚠ 有休を消化しきるには日程が厳しいです</b>
+逆算した最終出社日が今日より前になっています。有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を消化するには、退職日をもっと後ろに設定するか、有休の買い取り・日数の見直しが必要です。</div>`);
+  }else if(r.noticePassed){
+    P.push(`<div class="banner warn"><b>⚠ 申し出の目安日をすでに過ぎています</b>
+一般的な「1か月前まで」の目安日（${esc(fmtShort(r.noticeDate))}）を過ぎています。できるだけ早く上司に相談してください。</div>`);
+  }
+
+  if(r.noticeAfterLastWork && r.lastWorkOptimal){
+    P.push(`<div class="banner warn"><b>⚠ 「1か月前」では切り出すのが間に合いません</b>
+有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を消化すると、最終出社日（${esc(fmtShort(r.lastWorkOptimal))}）が申し出の目安日（${esc(fmtShort(r.noticeDate))}）と同じか、それより前に来ます。出社しているうちに伝える必要があるため、<b>最終出社日よりさらに前</b>に相談してください。目安として ${esc(fmtShort(subMonths(r.lastWorkOptimal, NOTICE_MONTHS)))} までに切り出すと安全です。</div>`);
+  }
+
+  if(r.blank){
+    if(r.blank.type === "none"){
+      P.push(`<div class="banner ok"><b>✓ 社会保険の空白期間なし（即時移行）</b>
+退職日の翌日が入社日のため、健康保険・厚生年金は途切れずに転職先へ移行します。国民健康保険・国民年金の手続きは不要です。</div>`);
+    }else if(r.blank.type === "gap"){
+      P.push(`<div class="banner warn"><b>⚠ 約${r.blank.days}日間の空白期間が発生します</b>
+退職日の翌日から入社日までの間、国民健康保険・国民年金への一時切り替え手続きが必要です（市区町村の窓口／原則14日以内）。健康保険は任意継続被保険者制度（原則20日以内に申請）と保険料を比較してから選んでください。</div>`);
+    }else{
+      P.push(`<div class="banner warn"><b>⚠ 在籍期間が入社日と重なっています</b>
+最適退職日（${esc(fmtShort(r.optimal))}）が入社予定日より後になっており、${r.blank.days}日分が二重在籍になります。入社日の調整、または退職日の見直しが必要です。</div>`);
+    }
+  }
+
+  /* --- 2. お得度ハイライト --- */
+  const brk = [];
+  if(r.insuranceGain > 0){
+    brk.push(`<div><span>健康保険料${r.ins.isOver40?"・介護保険料":""}（本人負担分）</span><b>+${yen(r.ins.health)} 円</b></div>`);
+    brk.push(`<div><span>厚生年金保険料（本人負担分）</span><b>+${yen(r.ins.pension)} 円</b></div>`);
+  }else{
+    brk.push(`<div><span>社会保険料の節減（会社負担分）</span><b>±0 円</b></div>`);
+  }
+  if(r.bonus) brk.push(`<div><span>賞与の獲得効果</span><b>${r.bonusGain>0?"+"+yen(r.bonusGain):"±0"} 円</b></div>`);
+
+  P.push(`<div class="card" style="padding:0;background:transparent;box-shadow:none;">
+    <div class="gain">
+      <div class="cap">最適退職日にした場合の推定お得度</div>
+      <div class="amt"><span class="plus">${r.totalGain>0?"約 +":"約 "}</span>${yen(r.totalGain)}<span>円</span></div>
+      <div class="brk">${brk.join("")}</div>
+      <p class="basis">月給 ${yen(r.monthlyPay)}円 → 標準報酬月額 <b>${yen(r.ins.std)}円</b>（健保${r.ins.grade}等級）で計算。健康保険料率 ${(HEALTH_RATE*100).toFixed(2)}%${r.ins.isOver40?` ＋ 介護 ${(CARE_RATE*100).toFixed(2)}%`:""}、厚生年金 ${(PENSION_RATE*100).toFixed(1)}%、いずれも労使折半。</p>
+      <p class="disc">※社会保険料の節減額は平均的な給与額を基にした概算目安です。健康保険料率は協会けんぽの全国平均（都道府県により概ね9.35%〜10.5%）を用いており、実際の金額は都道府県・加入している健康保険組合により変わります。賞与額も一般的な目安額であり、支給条件は自社の賞与規程が優先されます。</p>
+    </div>
+  </div>`);
+
+  /* --- 3. アクションプラン ＋ テンプレ --- */
+  P.push(`<h2 class="report-head">退職アクションプラン</h2>
+  <div class="card">
+    <div class="plan">
+      <div class="plan-row">
+        <div class="ic">🗣️</div>
+        <div class="tx">
+          <div class="k">① 上司に切り出す目安</div>
+          <div class="v">${esc(fmtJa(r.noticeDate))}</div>
+          <div class="s">退職日の${NOTICE_MONTHS}か月前。就業規則の申し出期限も確認を。</div>
+        </div>
+      </div>
+      <div class="plan-row">
+        <div class="ic">📦</div>
+        <div class="tx">
+          <div class="k">② 最終出社日（引き継ぎ完了）</div>
+          <div class="v">${r.lastWorkOptimal ? esc(fmtJa(r.lastWorkOptimal)) : "算出できません"}</div>
+          <div class="s">有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日＝営業日${r.needDays}日分を逆算。</div>
+        </div>
+      </div>
+      <div class="plan-row hero-row">
+        <div class="ic">🎉</div>
+        <div class="tx">
+          <div class="k">③ 最適退職日（在籍最終日）</div>
+          <div class="v">${esc(fmtJa(r.optimal))}</div>
+          <div class="s">${r.shiftedForBonus ? "ボーナス支給日をまたぐよう繰り下げた月末日。" : "社会保険料が最適になる月末日。"}</div>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin:16px 0 8px;">切り出し方に迷ったら、下の文面をそのまま使えます。</p>
+    <div class="tmpl" id="tmplBox">${esc(buildTemplate(r))}</div>
+    <button class="btn" id="copyBtn" type="button">📋 メッセージテンプレをコピー</button>
+  </div>`);
+
+  /* --- 4. Before / After 比較 --- */
+  const lwC = r.lastWorkConsidered ? fmtJa(r.lastWorkConsidered) : "算出できません";
+  const lwO = r.lastWorkOptimal    ? fmtJa(r.lastWorkOptimal)    : "算出できません";
+  const cmp = [
+    {
+      t:"退職日",
+      b:fmtJa(r.considered),
+      a:fmtJa(r.optimal),
+      same:r.sameDay
+    },
+    {
+      t:"最終出社日",
+      b:lwC,
+      a:lwO,
+      same:r.lastWorkConsidered && r.lastWorkOptimal && diffDays(r.lastWorkConsidered, r.lastWorkOptimal) === 0
+    },
+    {
+      t:"有休消化の状態",
+      b:r.sameDay ? `有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を確保` : "未消化リスクあり",
+      a:`100%完全消化 ＋ 引き継ぎ${r.handoverDays}日を確保`,
+      same:r.sameDay
+    },
+    {
+      t:"当月の社会保険の扱い",
+      b:r.consideredIsMonthEnd ? "会社側で一括適正化" : "自己負担／国保・国民年金の手続きが必要",
+      a:"会社側で一括適正化（保険料を労使折半）",
+      same:r.consideredIsMonthEnd
+    }
+  ];
+
+  P.push('<h2 class="report-head">今の予定と最適日の比較</h2><div class="card"><div class="cmp">');
+  cmp.forEach(c=>{
+    P.push(`<div class="cmp-item${c.same?" same":""}">
+      <div class="ttl">${esc(c.t)}</div>
+      <div class="body">
+        <div class="side before"><div class="lb">今の予定</div><div class="vl">${esc(c.b)}</div></div>
+        <div class="arw">→</div>
+        <div class="side after"><div class="lb">${c.same?"変更なし":"最適プラン"}</div><div class="vl">${esc(c.a)}</div></div>
+      </div>
+    </div>`);
+  });
+  P.push('</div></div>');
+
+  /* --- 5. シェア --- */
+  P.push(`<h2 class="report-head">結果をシェア・保存</h2>
+  <div class="card">
+    <p class="note" style="margin-bottom:12px;">シェアURLに入力内容は含まれません（診断結果はあなたの端末内だけにあります）。</p>
+    <div class="share">
+      <button class="x" id="shareX" type="button">𝕏 でシェア</button>
+      <button class="line" id="shareLine" type="button">LINE で送る</button>
+      <button class="full" id="copyUrl" type="button">🔗 URLをコピー</button>
+    </div>
+  </div>`);
+
+  $report.innerHTML = P.join("");
+
+  // イベント結線
+  document.getElementById("copyBtn").addEventListener("click", ()=>{
+    copyText(buildTemplate(r), "テンプレをコピーしました");
+  });
+  document.getElementById("copyUrl").addEventListener("click", ()=>{
+    copyText(shareUrl(), "URLをコピーしました");
+  });
+  document.getElementById("shareX").addEventListener("click", ()=>{
+    const t = `退職日計算ナビで試算したら、退職日を${fmtShort(r.optimal)}にするだけで約${yen(r.totalGain)}円お得になるらしい。最終出社日は${r.lastWorkOptimal?fmtShort(r.lastWorkOptimal):"要調整"}。`;
+    open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(t)}&url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener");
+  });
+  document.getElementById("shareLine").addEventListener("click", ()=>{
+    open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener");
+  });
+}
+
+function shareUrl(){
+  // 個人情報をURLに載せないため、クエリなしのページURLのみを共有する
+  return location.origin + location.pathname;
+}
+
+/* =========================================================
+   コピー・トースト
+   ========================================================= */
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("on"), 2200);
+}
+function copyText(text, okMsg){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>toast(okMsg)).catch(()=>fallbackCopy(text, okMsg));
+  }else{
+    fallbackCopy(text, okMsg);
+  }
+}
+function fallbackCopy(text, okMsg){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly","");
+  ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  if(ok){
+    toast(okMsg);
+  }else{
+    // 自動コピーが拒否された環境では、文面を選択状態にして手動コピーへ橋渡しする
+    selectTemplateBox();
+    toast("自動コピー不可。文面を選択したのでコピーしてください");
+  }
+}
+function selectTemplateBox(){
+  const box = document.getElementById("tmplBox");
+  if(!box) return;
+  const range = document.createRange();
+  range.selectNodeContents(box);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  box.scrollIntoView({block:"center", behavior:"smooth"});
+}
+
+/* =========================================================
+   入力UI
+   ========================================================= */
+const DEFAULT_OFF = [0, 6];
+let offDays = new Set(DEFAULT_OFF);
+
+function buildWeekdayGrid(){
+  const grid = document.getElementById("weekdayGrid");
+  DOW_JA.forEach((label, i)=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "dow";
+    b.textContent = label;
+    b.setAttribute("aria-pressed", offDays.has(i) ? "true" : "false");
+    b.setAttribute("aria-label", `${label}曜日を定休日にする`);
+    b.addEventListener("click", ()=>{
+      if(offDays.has(i)){
+        offDays.delete(i);
+      }else{
+        if(offDays.size >= 6){
+          toast("定休日は6日までです（営業日が必要です）");
+          return;
+        }
+        offDays.add(i);
+      }
+      b.setAttribute("aria-pressed", offDays.has(i) ? "true" : "false");
+      update();
+    });
+    grid.appendChild(b);
+  });
+}
+
+function clampInt(el, min, max, fallback){
+  let v = parseInt(el.value, 10);
+  if(!Number.isFinite(v)) return fallback;
+  if(v < min) v = min;
+  if(v > max) v = max;
+  return v;
+}
+
+function renderGradeView(monthlyPay, isOver40){
+  const ins = calcInsurance(monthlyPay, isOver40);
+  document.getElementById("gradeView").innerHTML =
+    `標準報酬月額 <b>${yen(ins.std)}円</b>（健保${ins.grade}等級）
+     ／ 毎月の社会保険料（本人負担）は約 <b>${yen(ins.total)}円</b>
+     <br>内訳：健康保険${isOver40?"・介護保険":""} ${yen(ins.health)}円 ＋ 厚生年金 ${yen(ins.pension)}円`;
+  return ins;
+}
+
+function update(){
+  const monthlyPay = clampInt(document.getElementById("monthlyPay"), 0, 2000000, 300000);
+  const isOver40   = document.getElementById("isOver40").checked;
+  renderGradeView(monthlyPay, isOver40);
+
+  const considered = parseDate(document.getElementById("consideredDate").value);
+  if(!considered){
+    $report.innerHTML = `<h2 class="report-head">あなたの診断レポート</h2>
+      <div class="card"><div class="err">まず STEP 1 の「今考えている退職日」を入力してください。入力した瞬間に自動で試算します。</div></div>`;
+    return;
+  }
+  const input = {
+    considered,
+    nextJoin: parseDate(document.getElementById("nextJoinDate").value),
+    bonus:    parseDate(document.getElementById("bonusDate").value),
+    offDays:  Array.from(offDays),
+    includeHolidays: document.getElementById("includeHolidays").checked,
+    paidLeaves:   clampInt(document.getElementById("paidLeaves"), 0, 60, 15),
+    handoverDays: clampInt(document.getElementById("handoverDays"), 0, 60, 0),
+    monthlyPay, isOver40
+  };
+  render(compute(input));
+}
+
+function init(){
+  document.getElementById("consideredDate").value = toKey(today());
+  buildWeekdayGrid();
+  ["consideredDate","nextJoinDate","bonusDate","includeHolidays","paidLeaves","handoverDays",
+   "monthlyPay","isOver40"]
+    .forEach(id=>{
+      const el = document.getElementById(id);
+      el.addEventListener("input", update);
+      el.addEventListener("change", update);
+    });
+  update();
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+}else{
+  init();
+}
+</script>
+</body>
+</html>
