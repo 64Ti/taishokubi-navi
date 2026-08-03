@@ -80,9 +80,9 @@
 ## Phase 3 — Cloudflare Pages でデプロイ ✅ 完了
 
 - [x] Cloudflareアカウントを作成
-- [ ] ダッシュボード → **Workers & Pages** → 「作成」→ **Pages** タブ → 「Gitに接続」
-- [ ] GitHubを連携し、`taishokubi-navi` リポジトリを選択
-- [ ] **ビルド設定はすべて空のままにする**（ここが唯一の注意点）
+- [x] ダッシュボード → **Workers & Pages** → 「作成」→ **Pages** タブ → 「Gitに接続」
+- [x] GitHubを連携し、`taishokubi-navi` リポジトリを選択
+- [x] **ビルド設定はすべて空のままにする**（ここが唯一の注意点）
 
 | 項目 | 設定値 |
 |---|---|
@@ -111,12 +111,10 @@
 
 ---
 
-## Phase 5 — 検索に載せる ⏱ 1時間／担当: Claude＋本人
+## Phase 5 — 検索に載せる ⏱ 1時間／担当: Claude＋本人 ← 👈 いまここ
 
-ドメインが確定してから行う。
-
-- [ ] `og:url` / `canonical` を確定ドメインに書き換え（Claude）
-- [ ] `sitemap.xml` / `robots.txt` を確定ドメインで生成（Claude）
+- [x] `og:url` / `canonical` を確定URLに設定（Claude）
+- [x] `sitemap.xml` / `robots.txt` を確定URLで生成（Claude）
 - [ ] **Google Search Console** にサイトを登録（本人）
   - ドメイン所有権の確認 → sitemap送信 → インデックス登録をリクエスト
 - [ ] **Bing Webmaster Tools** にも登録（本人）
