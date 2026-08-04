@@ -2,14 +2,14 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>退職日計算ナビ｜社会保険料・有休消化で損しない退職日と最終出社日の最適化シミュレーター</title>
-<meta name="description" content="【無料・個人情報不要】今考えている退職日を入力するだけ！社会保険料の資格喪失ルール・有給完全消化・ボーナス支給日を総合判定し、最も手取り額が得になる『最適退職日』と『最終出社日』を1分でリアルタイム比較試算します。">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>トク退｜退職日計算ナビ</title>
+<meta name="description" content="退職希望日・有休残日数・給与を入力するだけで、最終出社日・資格喪失日・手取り最大化効果を自動算定。登録不要、完全無料の退職日シミュレーター。">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#1d4ed8">
+<meta name="theme-color" content="#1E293B">
 
-<!-- ▼▼ 公開URL（ドメインを変えるときは、この5行の https://taishokubi-navi.pages.dev を置換するだけ）▼▼ -->
+<!-- ▼▼ 公開URL（ドメイン変更時はこの4行を置換）▼▼ -->
 <link rel="canonical" href="https://taishokubi-navi.pages.dev/">
 <meta property="og:url" content="https://taishokubi-navi.pages.dev/">
 <meta property="og:image" content="https://taishokubi-navi.pages.dev/ogp.png">
@@ -18,2011 +18,239 @@
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="退職日計算ナビ｜損しない退職日と最終出社日を1分で自動計算">
-<meta property="og:description" content="今考えている退職日を入れるだけ。社会保険料の資格喪失ルール・有給完全消化・ボーナス支給日から、手取りと休日が最大になる『最適退職日』を無料で試算します。">
-<meta property="og:site_name" content="退職日計算ナビ">
+<meta property="og:site_name" content="トク退｜退職日計算ナビ">
+<meta property="og:title" content="トク退｜退職日計算ナビ">
+<meta property="og:description" content="退職希望日・有休残日数・給与を入力するだけで、最終出社日・資格喪失日・手取り最大化効果を自動算定。登録不要、完全無料の退職日シミュレーター。">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="退職日計算ナビ｜その退職日、数十万円を損しているかもしれません。">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="退職日計算ナビ｜損しない退職日と最終出社日を1分で自動計算">
-<meta name="twitter:description" content="社会保険料・有給消化・ボーナスを総合判定。無料・個人情報不要のシミュレーター。">
+<meta name="twitter:title" content="トク退｜退職日計算ナビ">
+<meta name="twitter:description" content="社会保険料・有給消化・資格喪失日を総合判定。無料・登録不要のシミュレーター。">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232563eb'/%3E%3Ctext x='50' y='54' font-size='60' font-weight='bold' font-family='sans-serif' fill='white' text-anchor='middle' dominant-baseline='central'%3E%E9%80%80%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="退職日計算ナビ">
+<meta name="apple-mobile-web-app-title" content="トク退">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "name": "退職日計算ナビ",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "JavaScript有効なモダンブラウザ",
-      "description": "健康保険法および厚生年金保険法に基づく『資格喪失日ルール』、有給休暇日数の営業日逆算、賞与（ボーナス）支給日を自動判定し、手取り額と休日数が最大化される最適退職日を自動算出する無料シミュレーターです。",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
-      "featureList": [
-        "社会保険の資格喪失日ルールに基づく最適退職日の判定",
-        "有給休暇と引き継ぎ日数からの最終出社日の営業日逆算",
-        "賞与支給日をまたぐかどうかのリスク判定",
-        "退職の申し出目安日の算出と交渉用テンプレート生成",
-        "転職先入社日との空白期間・社会保険切替の判定"
-      ]
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "退職日は月末と月末前どちらが得ですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "社会保険の資格喪失日は退職日の翌日です。保険料は資格喪失日の属する月の前月分までかかるため、月末退職なら退職月の社会保険料が給与から控除され、その半額を会社が負担します。月末前に退職すると退職月は厚生年金・健康保険の被保険者でなくなり、国民健康保険と国民年金に自分で加入して全額を自己負担することになります。転職先への入社が翌月以降になる場合は、月末退職のほうが自己負担を抑えられるのが一般的です。"
-          }
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy:    { DEFAULT: '#1E293B', 50: '#F1F5F9' },
+          gold:    { DEFAULT: '#D97706', light: '#FEF3C7', dark: '#92400E' },
+          caution: { DEFAULT: '#F59E0B', light: '#FFFBEB', dark: '#92400E' },
+          crimson: { DEFAULT: '#DC2626', light: '#FEE2E2', dark: '#991B1B' },
+          emerald: { DEFAULT: '#059669', light: '#D1FAE5', dark: '#065F46' },
+          monetize:{ DEFAULT: '#64748B', light: '#F1F5F9' },
         },
-        {
-          "@type": "Question",
-          "name": "最終出社日と退職日は違うのですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "違います。退職日は在籍する最後の日で、最終出社日は実際に出社する最後の日です。残っている有給休暇を退職日までに消化する場合、最終出社日は退職日より前になります。最終出社日は、退職日から過去にさかのぼって『有給休暇日数＋引き継ぎ日数』分の営業日を数えた、その直前の営業日が目安になります。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "退職はいつまでに伝えればよいですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "民法第627条第1項では、期間の定めのない雇用は申し入れから2週間の経過で終了します。ただし多くの会社の就業規則では『1か月前まで』と定められているため、実務上は退職日の1か月前までに直属の上司へ申し出るのが目安です。有給休暇をすべて消化する場合は、最終出社日から逆算してさらに早めに伝える必要があります。"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "ボーナス支給日の前に退職するとどうなりますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "多くの会社は賞与規程に『支給日に在籍していること』という支給日在籍要件を定めています。この場合、支給日より前に退職日が来ると賞与は支給されません。支給対象期間を勤務していても受け取れないことがあるため、退職日を賞与支給日の後ろへ動かせるかどうかは金額面で大きな差になります。"
-          }
+        fontFamily: { sans: ['"Noto Sans JP"', '"Hiragino Sans"', 'sans-serif'] },
+        boxShadow: {
+          card: '0 2px 12px rgba(30, 41, 59, 0.08)',
+          sheet: '0 -8px 30px rgba(30, 41, 59, 0.18)',
         }
-      ]
+      }
     }
-  ]
-}
+  }
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* =========================================================
-   Design tokens
-   ========================================================= */
-:root{
-  --navy-950:#0b1120;
-  --navy-900:#0f172a;
-  --navy-800:#1e293b;
-  --brand-900:#1e3a8a;
-  --brand-700:#1d4ed8;
-  --brand-600:#2563eb;
-  --brand-500:#3b82f6;
-  --brand-100:#dbeafe;
-  --brand-50:#eff6ff;
-
-  --emerald-700:#047857;
-  --emerald-600:#059669;
-  --emerald-500:#10b981;
-  --emerald-50:#ecfdf5;
-
-  --gold-600:#d97706;
-  --gold-500:#f59e0b;
-  --gold-400:#fbbf24;
-  --gold-300:#fcd34d;
-
-  --danger:#e11d48;
-  --danger-ink:#9f1239;
-  --danger-50:#fff1f2;
-  --danger-100:#ffe4e6;
-
-  --warn:#c2410c;
-  --warn-ink:#9a3412;
-  --warn-50:#fff7ed;
-  --warn-100:#ffedd5;
-
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --ink:#0f172a;
-  --ink-2:#475569;
-  --ink-3:#8c9aad;
-  --line:#e6ebf2;
-  --line-2:#eef2f7;
-
-  --r-sm:10px;
-  --r:14px;
-  --r-md:16px;
-  --r-lg:16px;
-
-  --sh-1:0 1px 2px rgba(15,23,42,.05);
-  --sh-2:0 1px 3px rgba(15,23,42,.05), 0 10px 26px -12px rgba(15,23,42,.16);
-  --sh-3:0 6px 16px -6px rgba(15,23,42,.12), 0 22px 48px -20px rgba(15,23,42,.28);
-  --sh-gold:0 8px 20px -8px rgba(217,119,6,.55), 0 22px 44px -22px rgba(180,83,9,.5);
-
-  --ease:cubic-bezier(.16,1,.3,1);
-  --bar-h:74px;
-}
-
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Meiryo",sans-serif;
-  font-size:16px;
-  line-height:1.75;
-  font-feature-settings:"palt" 1;
-  overflow-wrap:break-word;
-  padding-bottom:calc(var(--bar-h) + 20px + env(safe-area-inset-bottom));
-}
-
-/* 日本語を文節で折り返す（非対応ブラウザは通常の折り返しにフォールバック） */
-h1,h2,h3,.lead,.def,.banner,.plan-row .v,.plan-row .s,.cmp-item .vl,
-.card .note,.hint,.grade-view,.gain .basis,.gain .disc,details.law .in,footer .disc{
-  word-break:auto-phrase;
-  line-break:strict;
-}
-
-.wrap{
-  width:100%;
-  max-width:600px;
-  margin:0 auto;
-  padding:0 16px;
-  padding-left:calc(16px + env(safe-area-inset-left));
-  padding-right:calc(16px + env(safe-area-inset-right));
-}
-
-/* =========================================================
-   Sticky app bar (glassmorphism)
-   ========================================================= */
-.appbar{
-  position:sticky;
-  top:0;
-  z-index:40;
-  background:rgba(11,17,32,.72);
-  -webkit-backdrop-filter:blur(18px) saturate(180%);
-  backdrop-filter:blur(18px) saturate(180%);
-  border-bottom:1px solid rgba(255,255,255,.09);
-  padding-top:env(safe-area-inset-top);
-}
-.appbar-in{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  height:52px;
-}
-.appbar .logo{
-  display:flex;align-items:center;gap:8px;
-  font-size:.95rem;font-weight:800;color:#fff;letter-spacing:.01em;
-}
-.appbar .logo .mark{
-  width:26px;height:26px;flex:none;
-  display:grid;place-items:center;
-  border-radius:8px;
-  background:linear-gradient(140deg,var(--brand-500),var(--brand-700));
-  font-size:.78rem;font-weight:800;color:#fff;
-  box-shadow:0 2px 8px rgba(37,99,235,.5);
-}
-.appbar .pill{
-  font-size:.68rem;font-weight:800;letter-spacing:.03em;
-  color:#c7d9fb;
-  background:rgba(59,130,246,.18);
-  border:1px solid rgba(147,197,253,.28);
-  border-radius:999px;
-  padding:4px 10px;
-  white-space:nowrap;
-}
-
-/* =========================================================
-   Hero
-   ========================================================= */
-.hero{
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(120% 80% at 82% -6%, rgba(59,130,246,.42) 0%, transparent 58%),
-    radial-gradient(90% 70% at 6% 8%, rgba(16,185,129,.20) 0%, transparent 52%),
-    linear-gradient(168deg,#0f172a 0%,#152249 46%,#1e3a8a 100%);
-  color:#fff;
-  padding:34px 0 38px;
-}
-.hero::after{
-  content:"";
-  position:absolute;left:0;right:0;bottom:-1px;height:26px;
-  background:linear-gradient(to bottom,transparent,rgba(248,250,252,.9));
-  pointer-events:none;
-}
-.hero .eyebrow{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:.7rem;font-weight:800;letter-spacing:.1em;
-  color:#bfdbfe;
-  background:rgba(255,255,255,.09);
-  border:1px solid rgba(191,219,254,.25);
-  border-radius:999px;
-  padding:5px 12px;
-  margin-bottom:16px;
-}
-.hero h1{
-  font-size:1.62rem;
-  line-height:1.42;
-  letter-spacing:-.01em;
-  font-weight:800;
-  margin:0 0 12px;
-}
-.hero h1 .accent{
-  background:linear-gradient(100deg,var(--gold-300),var(--gold-500));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.hero .lead{
-  font-size:.93rem;
-  line-height:1.85;
-  color:#c9d8f0;
-  margin:0 0 18px;
-}
-.hero .def{
-  position:relative;
-  font-size:.775rem;
-  line-height:1.9;
-  color:#dbeafe;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:var(--r);
-  padding:13px 15px;
-  margin:0;
-}
-.badges{
-  display:flex;flex-wrap:wrap;gap:7px;
-  margin:16px 0 0;padding:0;list-style:none;
-}
-.badges li{
-  display:flex;align-items:center;gap:5px;
-  font-size:.72rem;font-weight:700;
-  color:#e0edff;
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:999px;
-  padding:5px 12px;
-}
-.badges li::before{
-  content:"";width:5px;height:5px;border-radius:50%;
-  background:var(--emerald-500);
-  box-shadow:0 0 0 3px rgba(16,185,129,.22);
-}
-
-/* =========================================================
-   Card / form
-   ========================================================= */
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--r-lg);
-  box-shadow:var(--sh-2);
-  padding:20px 17px;
-  margin:16px 0;
-}
-.step-no{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:.72rem;font-weight:800;letter-spacing:.07em;
-  color:var(--brand-700);
-  background:var(--brand-50);
-  border:1px solid var(--brand-100);
-  border-radius:999px;
-  padding:5px 13px;
-  margin-bottom:13px;
-}
-.card h2{
-  font-size:1.14rem;
-  font-weight:800;
-  letter-spacing:-.01em;
-  margin:0 0 5px;
-}
-.card .note{
-  font-size:.79rem;
-  color:var(--ink-3);
-  margin:0 0 18px;
-}
-
-.field{margin-bottom:18px;}
-.field:last-child{margin-bottom:0;}
-.field label{
-  display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;
-  font-size:.89rem;font-weight:700;
-  margin-bottom:7px;
-}
-.tag{
-  font-size:.64rem;font-weight:800;letter-spacing:.04em;
-  padding:2px 7px;border-radius:5px;
-  transform:translateY(-1px);
-}
-.tag.req{background:var(--danger-50);color:var(--danger-ink);border:1px solid var(--danger-100);}
-.tag.opt{background:var(--line-2);color:var(--ink-3);border:1px solid var(--line);}
-.hint{
-  display:block;width:100%;
-  font-size:.755rem;font-weight:400;line-height:1.7;
-  color:var(--ink-3);
-  margin-top:3px;
-}
-
-input[type="date"],input[type="number"]{
-  width:100%;
-  font-family:inherit;
-  font-size:1rem;
-  font-weight:600;
-  line-height:1.4;
-  padding:13px 14px;
-  min-height:50px;
-  color:var(--ink);
-  background:#fcfdff;
-  border:1.5px solid var(--line);
-  border-radius:var(--r-sm);
-  appearance:none;
-  transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .22s var(--ease);
-}
-input[type="date"]{display:block;}
-input[type="number"]{max-width:180px;}
-input[type="date"]:hover,input[type="number"]:hover{border-color:#cbd5e1;}
-input[type="date"]:focus,input[type="number"]:focus{
-  outline:none;
-  background:#fff;
-  border-color:var(--brand-500);
-  box-shadow:0 0 0 4px rgba(59,130,246,.16), var(--sh-1);
-}
-
-.pay-input{
-  display:flex;align-items:center;gap:9px;
-  border:1.5px solid var(--line);
-  border-radius:var(--r-sm);
-  background:#fcfdff;
-  padding-right:14px;
-  transition:border-color .18s var(--ease), box-shadow .22s var(--ease), background .18s var(--ease);
-}
-.pay-input:focus-within{
-  background:#fff;
-  border-color:var(--brand-500);
-  box-shadow:0 0 0 4px rgba(59,130,246,.16), var(--sh-1);
-}
-.pay-input input{
-  border:none;background:transparent;box-shadow:none;
-  max-width:none;flex:1;min-width:0;
-  text-align:right;
-  font-variant-numeric:tabular-nums;
-  font-size:1.14rem;font-weight:800;
-  letter-spacing:.01em;
-}
-.pay-input input:hover,.pay-input input:focus{border:none;box-shadow:none;background:transparent;}
-.pay-input .unit{font-size:.9rem;font-weight:700;color:var(--ink-2);flex:none;}
-
-.grade-view{
-  font-size:.775rem;line-height:1.85;
-  color:var(--ink-2);
-  background:linear-gradient(140deg,var(--brand-50),#f6f9ff);
-  border:1px solid var(--brand-100);
-  border-radius:var(--r-sm);
-  padding:11px 13px;
-  margin:11px 0 0;
-}
-.grade-view b{color:var(--brand-700);font-weight:800;}
-
-.dow-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.dow{
-  position:relative;
-  font-family:inherit;
-  font-size:.87rem;font-weight:800;
-  padding:12px 0;min-height:48px;
-  color:var(--ink-3);
-  background:#fcfdff;
-  border:1.5px solid var(--line);
-  border-radius:var(--r-sm);
-  cursor:pointer;
-  transition:transform .16s var(--ease), background .18s var(--ease),
-             border-color .18s var(--ease), color .18s var(--ease), box-shadow .2s var(--ease);
-}
-.dow:active{transform:scale(.9);}
-.dow[aria-pressed="true"]{
-  color:#fff;
-  border-color:var(--brand-600);
-  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
-  box-shadow:0 3px 10px -3px rgba(37,99,235,.6);
-}
-.dow[aria-pressed="true"]:active{transform:scale(.9);}
-.dow:focus-visible{outline:2px solid var(--brand-500);outline-offset:2px;}
-
-.check{
-  display:flex;align-items:flex-start;gap:11px;
-  background:#fcfdff;
-  border:1.5px solid var(--line);
-  border-radius:var(--r-sm);
-  padding:13px 14px;
-  cursor:pointer;
-  transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .22s var(--ease);
-}
-.check:focus-within{
-  border-color:var(--brand-500);
-  background:#fff;
-  box-shadow:0 0 0 4px rgba(59,130,246,.16);
-}
-.check:has(input:checked){border-color:var(--brand-500);background:var(--brand-50);}
-.check input{width:21px;height:21px;margin:2px 0 0;flex:none;accent-color:var(--brand-600);cursor:pointer;}
-.check span{font-size:.87rem;font-weight:700;line-height:1.65;}
-.check span em{
-  display:block;font-style:normal;
-  font-size:.755rem;font-weight:400;line-height:1.7;
-  color:var(--ink-3);margin-top:2px;
-}
-
-/* =========================================================
-   会社独自の休日・出勤日（アコーディオン）
-   ========================================================= */
-details.cd{
-  border:1.5px solid var(--line);
-  border-radius:var(--r-sm);
-  background:#fcfdff;
-  overflow:hidden;
-}
-details.cd[open]{background:#fff;border-color:var(--brand-100);}
-details.cd summary{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:13px 14px;
-  cursor:pointer;
-  list-style:none;
-  font-size:.87rem;font-weight:700;line-height:1.6;
-}
-details.cd summary::-webkit-details-marker{display:none;}
-details.cd summary .cd-t{flex:1 1 auto;min-width:0;}
-details.cd summary .cd-t em{
-  display:inline-block;font-style:normal;
-  font-size:.64rem;font-weight:800;letter-spacing:.04em;
-  color:var(--ink-3);background:var(--line-2);border:1px solid var(--line);
-  border-radius:5px;padding:2px 7px;margin-left:7px;transform:translateY(-1px);
-}
-details.cd summary::after{
-  content:"";
-  flex:0 0 22px;
-  align-self:center;
-  width:22px;height:22px;
-  line-height:0;
-  border-radius:50%;
-  border:1px solid var(--brand-100);
-  background:var(--brand-50)
-    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M2.6%204.6L6%208L9.4%204.6'%20fill='none'%20stroke='%232563eb'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / 12px 12px no-repeat;
-}
-details.cd[open] summary::after{transform:rotate(180deg);}
-.cd-badge{
-  flex:none;
-  font-size:.68rem;font-weight:800;letter-spacing:.02em;
-  color:#fff;background:var(--brand-600);
-  border-radius:999px;padding:3px 9px;white-space:nowrap;
-}
-.cd-in{padding:2px 14px 15px;border-top:1px solid var(--line-2);padding-top:13px;}
-.cd-note{font-size:.755rem;line-height:1.75;color:var(--ink-3);margin:0 0 14px;}
-
-.cd-block{margin-bottom:16px;}
-.cd-h{
-  display:flex;align-items:center;gap:7px;
-  font-size:.815rem;font-weight:800;margin-bottom:8px;
-}
-.cd-tag{
-  flex:none;
-  width:22px;height:22px;border-radius:7px;
-  display:grid;place-items:center;
-  font-size:.7rem;font-weight:800;color:#fff;
-}
-.cd-tag.off{background:var(--danger);}
-.cd-tag.work{background:var(--emerald-600);}
-
-.cd-add{display:flex;gap:8px;align-items:stretch;}
-.cd-add input[type="date"]{flex:1 1 auto;min-width:0;min-height:46px;padding:10px 12px;font-size:.94rem;}
-.cd-add-btn{
-  flex:none;
-  min-height:46px;padding:0 16px;
-  font-family:inherit;font-size:.85rem;font-weight:800;
-  color:#fff;border:none;border-radius:var(--r-sm);
-  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
-  box-shadow:0 3px 10px -4px rgba(37,99,235,.7);
-  cursor:pointer;
-  transition:transform .16s var(--ease), filter .18s var(--ease);
-}
-.cd-add-btn:active{transform:scale(.96);}
-.cd-add-btn:focus-visible{outline:2px solid var(--brand-500);outline-offset:2px;}
-
-.cd-list{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:7px;}
-.cd-empty{
-  font-size:.745rem;color:var(--ink-3);
-  background:var(--line-2);border-radius:7px;padding:7px 11px;width:100%;
-}
-.cd-chip{
-  display:inline-flex;align-items:center;gap:2px;
-  font-size:.78rem;font-weight:700;
-  border-radius:999px;
-  padding:5px 5px 5px 12px;
-  border:1px solid;
-}
-.cd-chip.off{background:var(--danger-50);border-color:var(--danger-100);color:var(--danger-ink);}
-.cd-chip.work{background:var(--emerald-50);border-color:#a7f3d0;color:var(--emerald-700);}
-.cd-del{
-  flex:none;
-  width:26px;height:26px;
-  display:grid;place-items:center;
-  font-family:inherit;font-size:1rem;font-weight:800;line-height:1;
-  color:inherit;background:transparent;border:none;border-radius:50%;
-  cursor:pointer;opacity:.65;
-  transition:opacity .16s var(--ease), background .16s var(--ease);
-}
-.cd-del:hover{opacity:1;background:rgba(0,0,0,.07);}
-.cd-del:active{transform:scale(.9);}
-.cd-del:focus-visible{outline:2px solid currentColor;outline-offset:1px;opacity:1;}
-
-.cd-pri{
-  font-size:.745rem;line-height:1.8;color:var(--ink-2);
-  background:var(--brand-50);border:1px solid var(--brand-100);
-  border-radius:var(--r-sm);padding:10px 12px;margin:0;
-}
-.cd-pri b{color:var(--brand-700);}
-
-/* =========================================================
-   Report
-   ========================================================= */
-.report{scroll-margin-top:74px;}
-.report-head{
-  display:flex;align-items:center;gap:9px;
-  font-size:1.06rem;font-weight:800;letter-spacing:-.01em;
-  margin:30px 0 13px;
-}
-.report-head::before{
-  content:"";width:4px;height:19px;border-radius:2px;
-  background:linear-gradient(to bottom,var(--brand-500),var(--brand-700));
-}
-
-.banner{
-  border-radius:var(--r-md);
-  padding:14px 15px;
-  margin-bottom:12px;
-  font-size:.845rem;
-  line-height:1.8;
-  border:1px solid;
-}
-.banner b{display:block;font-size:.9rem;font-weight:800;margin-bottom:4px;}
-.banner.alert{background:var(--danger-50);border-color:var(--danger-100);color:var(--danger-ink);}
-.banner.warn{background:var(--warn-50);border-color:var(--warn-100);color:var(--warn-ink);}
-.banner.ok{background:var(--emerald-50);border-color:#a7f3d0;color:var(--emerald-700);}
-
-/* --- Gain box (gold) --- */
-.gain{
-  position:relative;
-  overflow:hidden;
-  border-radius:var(--r-lg);
-  padding:24px 18px 20px;
-  text-align:center;
-  color:#fff;
-  background:
-    radial-gradient(120% 90% at 88% -12%, rgba(255,255,255,.42) 0%, transparent 56%),
-    linear-gradient(150deg,var(--gold-500) 0%,var(--gold-600) 46%,#b45309 100%);
-  box-shadow:var(--sh-gold);
-}
-.gain::before{
-  content:"";position:absolute;inset:0;
-  background:radial-gradient(70% 55% at 50% 0%, rgba(255,255,255,.3), transparent 72%);
-  pointer-events:none;
-}
-.gain > *{position:relative;}
-.gain .cap{
-  display:inline-block;
-  font-size:.74rem;font-weight:800;letter-spacing:.06em;
-  color:#fff;
-  background:rgba(0,0,0,.16);
-  border-radius:999px;
-  padding:4px 13px;
-  margin-bottom:8px;
-}
-.gain .amt{
-  font-size:2.7rem;
-  font-weight:800;
-  line-height:1.16;
-  letter-spacing:-.03em;
-  margin:2px 0 0;
-  font-variant-numeric:tabular-nums;
-  text-shadow:0 2px 10px rgba(120,53,15,.3);
-}
-.gain .amt .plus{font-size:1.24rem;font-weight:800;margin-right:2px;letter-spacing:0;}
-.gain .amt span:not(.plus){font-size:1.16rem;font-weight:800;margin-left:3px;}
-.gain .brk{
-  display:flex;flex-direction:column;gap:7px;
-  margin-top:15px;padding-top:13px;
-  border-top:1px solid rgba(255,255,255,.3);
-  font-size:.82rem;
-}
-.gain .brk div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;text-align:left;}
-.gain .brk div span{color:#fef3c7;}
-.gain .brk div b{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;}
-.gain .basis{
-  font-size:.745rem;line-height:1.8;text-align:left;
-  background:rgba(0,0,0,.16);
-  border-radius:var(--r-sm);
-  padding:10px 12px;
-  margin:13px 0 0;
-  color:#fff7e6;
-}
-.gain .basis b{color:#fff;font-weight:800;}
-.gain .disc{
-  font-size:.695rem;line-height:1.72;text-align:left;
-  color:#fde9bd;
-  margin:10px 0 0;
-}
-
-/* --- Action plan (checklist) --- */
-.plan{display:flex;flex-direction:column;gap:0;}
-.plan-row{
-  position:relative;
-  display:flex;align-items:flex-start;gap:13px;
-  padding:15px 4px;
-  border-bottom:1px dashed var(--line);
-}
-.plan-row:last-child{border-bottom:none;padding-bottom:6px;}
-.plan-row .ic{
-  position:relative;z-index:1;
-  flex:none;width:38px;height:38px;
-  display:grid;place-items:center;
-  font-size:1.06rem;
-  border-radius:12px;
-  background:var(--brand-50);
-  border:1px solid var(--brand-100);
-}
-.plan-row::before{
-  content:"";
-  position:absolute;left:18px;top:44px;bottom:-2px;
-  width:2px;border-radius:1px;
-  background:linear-gradient(to bottom,var(--line),transparent);
-}
-.plan-row:last-child::before{display:none;}
-.plan-row .tx{flex:1;min-width:0;}
-.plan-row .tx .k{
-  font-size:.735rem;font-weight:800;letter-spacing:.02em;
-  color:var(--ink-3);
-}
-.plan-row .tx .v{
-  font-size:1.06rem;font-weight:800;letter-spacing:-.01em;
-  line-height:1.5;margin:1px 0 2px;
-}
-.plan-row .tx .s{font-size:.755rem;line-height:1.7;color:var(--ink-3);}
-.plan-row.hero-row{
-  border-bottom:none;
-  background:linear-gradient(140deg,var(--brand-50),#f5f9ff);
-  border:1.5px solid var(--brand-100);
-  border-radius:var(--r-md);
-  padding:15px 14px;
-  margin-top:6px;
-}
-.plan-row.hero-row::before{display:none;}
-.plan-row.hero-row .ic{
-  color:#fff;border-color:transparent;
-  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
-  box-shadow:0 4px 12px -4px rgba(37,99,235,.65);
-}
-.plan-row.hero-row .tx .v{color:var(--brand-900);}
-
-/* --- Buttons --- */
-.btn{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  width:100%;min-height:54px;
-  font-family:inherit;font-size:.95rem;font-weight:800;letter-spacing:.01em;
-  color:#fff;
-  border:none;border-radius:var(--r-md);
-  cursor:pointer;
-  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
-  box-shadow:0 4px 14px -5px rgba(37,99,235,.7), inset 0 1px 0 rgba(255,255,255,.22);
-  transition:transform .16s var(--ease), box-shadow .22s var(--ease), filter .18s var(--ease);
-}
-.btn:hover{filter:brightness(1.06);box-shadow:0 8px 22px -7px rgba(37,99,235,.75), inset 0 1px 0 rgba(255,255,255,.28);}
-.btn:active{transform:translateY(1px) scale(.988);box-shadow:0 2px 8px -3px rgba(37,99,235,.7);}
-.btn.sub{
-  color:var(--brand-700);
-  background:#fff;
-  border:1.5px solid var(--brand-100);
-  box-shadow:var(--sh-1);
-}
-.btn:focus-visible{outline:2px solid var(--brand-500);outline-offset:3px;}
-
-.tmpl{
-  background:#f9fbfd;
-  border:1px solid var(--line);
-  border-radius:var(--r-sm);
-  padding:14px 15px;
-  margin:0 0 13px;
-  font-family:inherit;
-  font-size:.815rem;
-  line-height:1.95;
-  white-space:pre-wrap;
-  max-height:190px;
-  overflow:auto;
-  color:var(--ink-2);
-  -webkit-overflow-scrolling:touch;
-}
-
-/* --- Before / After --- */
-.cmp{display:flex;flex-direction:column;gap:12px;}
-.cmp-item{
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  overflow:hidden;
-  box-shadow:var(--sh-1);
-}
-.cmp-item .ttl{
-  font-size:.775rem;font-weight:800;letter-spacing:.02em;
-  color:var(--ink-2);
-  background:#f9fbfd;
-  padding:8px 14px;
-  border-bottom:1px solid var(--line);
-}
-.cmp-item .body{display:flex;align-items:stretch;}
-.cmp-item .side{flex:1;min-width:0;padding:12px 13px;}
-.cmp-item .side .lb{
-  font-size:.66rem;font-weight:800;letter-spacing:.08em;
-  color:var(--ink-3);margin-bottom:1px;
-}
-.cmp-item .side .vl{font-size:.895rem;font-weight:700;line-height:1.6;}
-.cmp-item .side.before .vl{color:var(--ink-3);}
-.cmp-item .side.after{background:linear-gradient(140deg,var(--emerald-50),#f2fdf8);}
-.cmp-item .side.after .lb{color:var(--emerald-600);}
-.cmp-item .side.after .vl{color:var(--emerald-700);font-weight:800;}
-.cmp-item .arw{
-  flex:none;width:30px;
-  display:grid;place-items:center;
-  font-size:.82rem;font-weight:800;
-  color:#fff;
-  background:linear-gradient(to bottom,var(--emerald-500),var(--emerald-600));
-}
-.cmp-item.same .side.after{background:#f9fbfd;}
-.cmp-item.same .side.after .vl{color:var(--ink-2);font-weight:700;}
-.cmp-item.same .side.after .lb{color:var(--ink-3);}
-.cmp-item.same .arw{background:var(--line);color:var(--ink-3);}
-
-/* --- Share --- */
-.share{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.share button{
-  min-height:50px;
-  font-family:inherit;font-size:.86rem;font-weight:800;
-  color:var(--ink);
-  background:#fff;
-  border:1.5px solid var(--line);
-  border-radius:var(--r-md);
-  cursor:pointer;
-  box-shadow:var(--sh-1);
-  transition:transform .16s var(--ease), box-shadow .2s var(--ease), filter .18s var(--ease);
-}
-.share button:active{transform:scale(.975);}
-.share button:hover{filter:brightness(.99);box-shadow:var(--sh-2);}
-.share button.x{background:#000;border-color:#000;color:#fff;}
-.share button.line{background:#06c755;border-color:#06c755;color:#fff;}
-.share button.full{grid-column:1/-1;}
-.share button:focus-visible{outline:2px solid var(--brand-500);outline-offset:2px;}
-
-/* =========================================================
-   制度解説
-   ========================================================= */
-details.law{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  margin-bottom:10px;
-  box-shadow:var(--sh-1);
-  overflow:hidden;
-}
-details.law summary{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;          /* 〇をテキストブロックの上下中央に置く */
-  gap:10px;
-  font-size:.875rem;font-weight:700;line-height:1.65;
-  padding:14px 15px;
-  cursor:pointer;
-  list-style:none;
-  transition:background .18s var(--ease);
-}
-/* 折り返して複数行になっても、テキスト側だけが伸びて〇は中央を保つ */
-details.law summary > span{flex:1 1 auto;min-width:0;}
-details.law summary::-webkit-details-marker{display:none;}
-details.law summary:hover{background:#f9fbfd;}
-/* 〇と矢印を1つの要素にまとめ、開閉時は円ごと180度回す（ズレようがない構造） */
-details.law summary::after{
-  content:"";
-  flex:0 0 22px;          /* 狭い画面でも縮まない */
-  align-self:center;      /* 親の align-items に依存せず自身で中央を確定させる */
-  width:22px;height:22px;
-  line-height:0;          /* 行ボックスの影響を受けないようにする */
-  border-radius:50%;
-  border:1px solid var(--brand-100);
-  background:var(--brand-50)
-    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2012'%3E%3Cpath%20d='M2.6%204.6L6%208L9.4%204.6'%20fill='none'%20stroke='%232563eb'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / 12px 12px no-repeat;
-  /* transform はトランジションしない：details の開閉では発火せず開始値で固まるため */
-  transition:background-color .2s var(--ease);
-}
-details.law[open] summary::after{transform:rotate(180deg);}
-details.law[open] summary{background:#f9fbfd;}
-details.law .in{
-  padding:2px 15px 16px;
-  font-size:.825rem;line-height:1.95;
-  color:var(--ink-2);
-  border-top:1px solid var(--line-2);
-  padding-top:13px;
-}
-details.law .in p{margin:0 0 10px;}
-details.law .in p:last-child{margin:0;}
-details.law .in b{color:var(--ink);font-weight:800;}
-details.law .in .src{
-  font-size:.735rem;line-height:1.8;
-  color:var(--ink-3);
-  border-left:3px solid var(--brand-100);
-  padding-left:11px;
-  margin-top:11px;
-}
-
-/* =========================================================
-   Footer
-   ========================================================= */
-footer{
-  font-size:.755rem;line-height:1.9;
-  color:var(--ink-3);
-  padding:26px 0 12px;
-}
-footer .disc{
-  background:#fff;
-  border:1px solid var(--line);
-  border-left:3px solid var(--warn);
-  border-radius:var(--r-sm);
-  padding:14px 15px;
-}
-footer .cr{text-align:center;margin-top:16px;font-size:.72rem;}
-
-/* =========================================================
-   Bottom action bar
-   ========================================================= */
-.actionbar{
-  position:fixed;
-  left:0;right:0;bottom:0;
-  z-index:45;
-  background:rgba(255,255,255,.82);
-  -webkit-backdrop-filter:blur(18px) saturate(180%);
-  backdrop-filter:blur(18px) saturate(180%);
-  border-top:1px solid var(--line);
-  box-shadow:0 -6px 26px -14px rgba(15,23,42,.3);
-  padding-bottom:env(safe-area-inset-bottom);
-  transform:translateY(110%);
-  transition:transform .34s var(--ease);
-}
-.actionbar.on{transform:translateY(0);}
-.actionbar-in{
-  display:flex;align-items:center;gap:12px;
-  height:var(--bar-h);
-}
-.ab-tx{flex:1;min-width:0;line-height:1.35;}
-.ab-tx .ab-k{
-  display:block;
-  font-size:.68rem;font-weight:800;letter-spacing:.04em;
-  color:var(--ink-3);
-}
-.ab-tx .ab-v{
-  display:block;
-  font-size:1.32rem;font-weight:800;letter-spacing:-.02em;
-  font-variant-numeric:tabular-nums;
-  background:linear-gradient(100deg,var(--gold-600),var(--gold-500));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.ab-btn{
-  flex:none;
-  min-height:48px;
-  padding:0 20px;
-  font-family:inherit;font-size:.9rem;font-weight:800;letter-spacing:.01em;
-  color:#fff;
-  border:none;border-radius:999px;
-  cursor:pointer;
-  background:linear-gradient(150deg,var(--brand-500),var(--brand-700));
-  box-shadow:0 5px 16px -6px rgba(37,99,235,.8), inset 0 1px 0 rgba(255,255,255,.24);
-  transition:transform .16s var(--ease), box-shadow .2s var(--ease), filter .18s var(--ease);
-  white-space:nowrap;
-}
-.ab-btn:hover{filter:brightness(1.06);}
-.ab-btn:active{transform:scale(.96);}
-.ab-btn:focus-visible{outline:2px solid var(--brand-700);outline-offset:3px;}
-
-/* =========================================================
-   Toast / error
-   ========================================================= */
-#toast{
-  position:fixed;
-  left:50%;
-  bottom:calc(var(--bar-h) + 18px + env(safe-area-inset-bottom));
-  transform:translate(-50%,14px) scale(.97);
-  z-index:60;
-  max-width:calc(100vw - 40px);
-  text-align:center;
-  font-size:.85rem;font-weight:700;line-height:1.6;
-  color:#fff;
-  background:rgba(15,23,42,.95);
-  -webkit-backdrop-filter:blur(10px);
-  backdrop-filter:blur(10px);
-  border-radius:999px;
-  padding:12px 22px;
-  box-shadow:0 12px 34px -10px rgba(15,23,42,.6);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .22s var(--ease), transform .28s var(--ease);
-}
-#toast.on{opacity:1;transform:translate(-50%,0) scale(1);}
-
-.err{
-  background:var(--brand-50);
-  border:1.5px dashed var(--brand-100);
-  color:var(--brand-900);
-  border-radius:var(--r-md);
-  padding:16px;
-  font-size:.86rem;font-weight:700;line-height:1.8;
-}
-
-/* =========================================================
-   Responsive / motion
-   ========================================================= */
-@media (max-width:380px){
-  .hero h1{font-size:1.45rem;}
-  .gain .amt{font-size:2.3rem;}
-  .ab-tx .ab-v{font-size:1.18rem;}
-  .ab-btn{padding:0 16px;font-size:.85rem;}
-  .dow{font-size:.8rem;}
-}
-@media (min-width:601px){
-  .hero{padding:44px 0 48px;}
-  .hero h1{font-size:1.86rem;}
-  .card{padding:24px 22px;}
-}
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto;}
-  /* * は疑似要素にマッチしないため ::before / ::after も明示的に指定する */
-  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important;}
-}
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: #F1F5F9; color: #1E293B; }
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: fadeUp .35s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform: translateY(0);} }
+  .bottom-sheet { transform: translateY(100%); transition: transform .32s cubic-bezier(.32,.72,0,1); }
+  .bottom-sheet.open { transform: translateY(0); }
+  .sheet-backdrop { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(20%); }
+  .snippet-fuel { font-weight: 900; }
+  .toggle-track { transition: background-color .2s ease; }
+  .toggle-thumb { transition: transform .2s ease; }
+  .toggle-on .toggle-track { background-color: #059669; }
+  .toggle-on .toggle-thumb { transform: translateX(18px); }
+  @media (prefers-reduced-motion: reduce) {
+    .step-panel.active, .bottom-sheet { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
-<body>
+<body class="pb-28">
 
-<div class="appbar">
-  <div class="wrap appbar-in">
-    <div class="logo"><span class="mark" aria-hidden="true">退</span>退職日計算ナビ</div>
-    <span class="pill">無料・登録不要</span>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="wrap">
-    <span class="eyebrow">個人情報の入力なし／ぜんぶ端末内で計算</span>
-    <h1>その退職日、<span class="accent">数十万円</span>損しているかもしれません。</h1>
-    <p class="lead">今考えている退職日を入れるだけ。社会保険料の資格喪失ルール・有給消化・ボーナス支給日から、<b>手取りが最大になる退職日と最終出社日</b>を自動で計算します。</p>
-    <p class="def">本ツールは、健康保険法および厚生年金保険法に基づく『資格喪失日ルール』、有給休暇日数の営業日逆算、賞与（ボーナス）支給日を自動判定し、手取り額と休日数が最大化される最適退職日を自動算出する無料シミュレーターです。</p>
-    <ul class="badges">
-      <li>入力およそ1分</li><li>サーバー送信なし</li><li>スマホ最適化</li>
-    </ul>
+<!-- 進捗バー -->
+<header class="sticky top-0 z-40 bg-navy-50/90 backdrop-blur border-b border-slate-200">
+  <div class="max-w-lg mx-auto px-4 pt-3 pb-2">
+    <div class="flex items-center justify-between mb-1.5">
+      <span class="text-[11px] font-bold tracking-widest text-navy/60">トク退｜退職日計算ナビ</span>
+      <span id="stepLabel" class="text-[11px] font-bold text-emerald">STEP 1 / 3</span>
+    </div>
+    <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+      <div id="progressBar" class="h-full bg-emerald rounded-full transition-all duration-500" style="width:33%"></div>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
+<main class="max-w-lg mx-auto px-4 pt-6">
 
-  <!-- STEP 1 -->
-  <section class="card">
-    <span class="step-no">STEP 1 ／ 日付を入れる</span>
-    <h2>いつ辞めるつもりですか？</h2>
-    <p class="note">わかる範囲でOK。あとから何度でも変えられます。</p>
+  <!-- ============ STEP 1: 予定日入力 ============ -->
+  <section id="step1" class="step-panel active">
+    <h1 class="text-xl font-black leading-snug mb-1 text-navy">損しない退職日、逆算します。</h1>
+    <p class="text-sm text-slate-500 mb-6">3つの入力だけで、最終出社日・資格喪失日・手取り最大化効果がわかります。</p>
 
-    <div class="field">
-      <label for="consideredDate">今考えている退職日 <span class="tag req">必須</span>
-        <span class="hint">在籍する最後の日。まだ仮でかまいません。</span>
-      </label>
-      <input type="date" id="consideredDate">
-    </div>
-
-    <div class="field">
-      <label for="nextJoinDate">次の会社への入社予定日 <span class="tag opt">任意</span>
-        <span class="hint">空白期間（社会保険の切替が必要な日数）を判定します。</span>
-      </label>
-      <input type="date" id="nextJoinDate">
-    </div>
-
-    <div class="field">
-      <label for="bonusDate">次回ボーナス支給日 <span class="tag opt">任意</span>
-        <span class="hint">支給日前に辞めると受け取れないことがあります。</span>
-      </label>
-      <input type="date" id="bonusDate">
+    <div>
+      <label class="block text-xs font-bold text-slate-500 mb-1.5">退職を希望する日</label>
+      <input id="inputResignDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <p class="text-[11px] text-slate-400 mt-1.5">未入力の場合、当月末日を自動セットします。過去日付は選択できません。</p>
     </div>
   </section>
 
-  <!-- STEP 2 -->
-  <section class="card">
-    <span class="step-no">STEP 2 ／ 休日と有休</span>
-    <h2>会社の休みと残り有休</h2>
-    <p class="note">最終出社日を営業日ベースで逆算するために使います。</p>
+  <!-- ============ STEP 2: 休日・有休設定 ============ -->
+  <section id="step2" class="step-panel">
+    <h2 class="text-lg font-black text-navy mb-1">休日・有休の設定</h2>
+    <p class="text-sm text-slate-500 mb-6">会社の定休日と有休残日数から、最終出社日を営業日ベースで即時算定します。</p>
 
-    <div class="field">
-      <label>会社の定休日 <span class="tag req">必須</span>
-        <span class="hint">休みの曜日をすべて選んでください（初期値：土日）。</span>
-      </label>
-      <div class="dow-grid" id="weekdayGrid" role="group" aria-label="会社の定休日"></div>
-    </div>
-
-    <div class="field">
-      <label for="includeHolidays">祝日の扱い <span class="tag req">必須</span></label>
-      <label class="check" for="includeHolidays">
-        <input type="checkbox" id="includeHolidays" checked>
-        <span>祝日も休みに含める
-          <em>国民の祝日・振替休日を営業日から除外します。</em>
-        </span>
-      </label>
-    </div>
-
-    <div class="field">
-      <label for="paidLeaves">残り有給日数 <span class="tag req">必須</span>
-        <span class="hint">0〜60日。給与明細や勤怠システムで確認できます。</span>
-      </label>
-      <input type="number" id="paidLeaves" value="15" min="0" max="60" step="1" inputmode="numeric">
-    </div>
-
-    <div class="field">
-      <label for="handoverDays">引き継ぎ必要日数 <span class="tag req">必須</span>
-        <span class="hint">0〜60日。有休に入る前に出社して引き継ぐ日数。</span>
-      </label>
-      <input type="number" id="handoverDays" value="0" min="0" max="60" step="1" inputmode="numeric">
-    </div>
-
-    <div class="field">
-      <details class="cd" id="customDays">
-        <summary>
-          <span class="cd-t">会社独自の休日・出勤日を設定する<em>任意</em></span>
-          <span class="cd-badge" id="cdBadge" hidden></span>
-        </summary>
-        <div class="cd-in">
-          <p class="cd-note">夏季休暇・創立記念日・年末年始などの独自の休みや、祝日出勤・土曜出勤を日付ごとに指定できます。設定するとその場で再計算されます。</p>
-
-          <div class="cd-block">
-            <div class="cd-h"><span class="cd-tag off">休</span>会社独自の休み</div>
-            <div class="cd-add">
-              <input type="date" id="cdOffInput" aria-label="会社独自の休みの日付">
-              <button type="button" class="cd-add-btn" id="cdOffAdd">追加</button>
-            </div>
-            <ul class="cd-list" id="cdOffList"></ul>
+    <div class="space-y-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-bold">土曜日は休日扱い</p>
+            <p class="text-[11px] text-slate-400">OFFの場合、土曜も出勤日として計算します</p>
           </div>
-
-          <div class="cd-block">
-            <div class="cd-h"><span class="cd-tag work">出</span>会社独自の出勤日</div>
-            <div class="cd-add">
-              <input type="date" id="cdWorkInput" aria-label="会社独自の出勤日の日付">
-              <button type="button" class="cd-add-btn" id="cdWorkAdd">追加</button>
-            </div>
-            <ul class="cd-list" id="cdWorkList"></ul>
-          </div>
-
-          <p class="cd-pri">判定の優先順位：<b>① 独自の出勤日</b>（土日祝でも出勤）→ ② 独自の休み（平日でも休み）→ ③ 定休日・国民の祝日</p>
+          <button id="toggleSaturday" class="toggle-on shrink-0 w-11 h-6 rounded-full relative" aria-pressed="true">
+            <span class="toggle-track absolute inset-0 rounded-full bg-emerald"></span>
+            <span class="toggle-thumb absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"></span>
+          </button>
         </div>
-      </details>
-    </div>
-  </section>
-
-  <!-- STEP 3 -->
-  <section class="card">
-    <span class="step-no">STEP 3 ／ 給与</span>
-    <h2>社会保険料を実額で計算する</h2>
-    <p class="note">額面の月給から標準報酬月額を判定し、節減額を実額で試算します。</p>
-
-    <div class="field">
-      <label for="monthlyPay">月給（額面・月額） <span class="tag req">必須</span>
-        <span class="hint">税や社会保険料を引く前の総支給額。通勤手当も含めます。</span>
-      </label>
-      <div class="pay-input">
-        <input type="number" id="monthlyPay" value="300000" min="0" max="2000000" step="10000" inputmode="numeric">
-        <span class="unit">円</span>
+        <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+          <div>
+            <p class="text-sm font-bold">祝日は休日扱い</p>
+            <p class="text-[11px] text-slate-400">OFFの場合、祝日も出勤日として計算します</p>
+          </div>
+          <button id="toggleHoliday" class="toggle-on shrink-0 w-11 h-6 rounded-full relative" aria-pressed="true">
+            <span class="toggle-track absolute inset-0 rounded-full bg-emerald"></span>
+            <span class="toggle-thumb absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"></span>
+          </button>
+        </div>
       </div>
-      <p class="grade-view" id="gradeView"></p>
-    </div>
 
-    <div class="field">
-      <label for="isOver40">介護保険料 <span class="tag req">必須</span></label>
-      <label class="check" for="isOver40">
-        <input type="checkbox" id="isOver40">
-        <span>40歳以上65歳未満である
-          <em>該当すると介護保険料（介護保険第2号被保険者）が上乗せされます。</em>
-        </span>
-      </label>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">現在の有給残日数（0〜40日）</label>
+        <input id="inputPaidLeave" type="number" min="0" max="40" placeholder="例：12" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">独自の休業予定日（任意・最大3件）</label>
+        <div id="extraDatesList" class="space-y-2 mb-2"></div>
+        <div class="flex gap-2">
+          <input id="extraDateInput" type="date" class="flex-1 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+          <button id="btnAddExtraDate" type="button" class="px-4 rounded-xl border border-slate-300 text-sm font-bold text-navy">追加</button>
+        </div>
+      </div>
+
+      <div id="livePreview" class="rounded-xl border-2 border-emerald bg-emerald-light p-4 hidden">
+        <p class="text-[11px] font-black tracking-wider text-emerald mb-1">試算プレビュー</p>
+        <p class="text-sm font-bold text-emerald-dark">最終出社日：<span id="previewLastWorkDay">-</span></p>
+      </div>
     </div>
   </section>
 
-  <!-- REPORT -->
-  <section class="report" id="report" aria-live="polite"></section>
+  <!-- ============ STEP 3: 条件・進路設定 ============ -->
+  <section id="step3" class="step-panel">
+    <h2 class="text-lg font-black text-navy mb-1">給与・進路の設定</h2>
+    <p class="text-sm text-slate-500 mb-6">最後に、給与と退職後の進路を教えてください。</p>
 
-  <!-- 制度解説 -->
-  <h2 class="report-head">制度解説ノート（法的な根拠）</h2>
+    <div class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">額面月給（総支給・概算）</label>
+        <input id="inputSalary" type="number" min="0" step="1000" placeholder="例：280000" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      </div>
 
-  <details class="law">
-    <summary><span>なぜ「月末退職」が得になりやすいのか</span></summary>
-    <div class="in">
-      <p>社会保険（健康保険・厚生年金）の<b>資格喪失日は「退職日の翌日」</b>です。そして保険料は<b>資格喪失日の属する月の前月分まで</b>徴収されます。</p>
-      <p>3月31日退職なら資格喪失日は4月1日。3月分の保険料が発生し、その<b>半額を会社が負担</b>します。一方、3月30日退職だと資格喪失日は3月31日となり、3月分の厚生年金・健康保険料は発生しません。</p>
-      <p>ただしその場合、3月は厚生年金・健康保険の被保険者ではないため、<b>国民健康保険と国民年金に自分で加入し全額を自己負担</b>することになります。翌月以降に転職先へ入社するなら、月末退職のほうが自己負担を抑えられるのが一般的です。</p>
-      <p class="src">根拠：健康保険法第36条（資格喪失の時期）／第156条第3項（保険料の徴収期間）、厚生年金保険法第14条・第19条</p>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">退職後の健康保険の希望</label>
+        <select id="inputInsuranceContinuation" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white">
+          <option value="kokuho">国民健康保険に加入する</option>
+          <option value="ninikeizoku">任意継続被保険者になる（最大2年）</option>
+          <option value="fuyou">家族の扶養に入る</option>
+        </select>
+      </div>
+
+      <label class="flex items-center gap-2.5 bg-white rounded-xl border border-slate-200 p-4 shadow-card">
+        <input id="inputUnionKenpo" type="checkbox" class="w-4 h-4 accent-emerald">
+        <span class="text-sm font-bold">現在の健康保険は「健康保険組合」に加入している</span>
+      </label>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-2">退職後の進路</label>
+        <div class="grid grid-cols-3 gap-2" id="branchSelector">
+          <button data-branch="transfer" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
+            <div class="text-2xl mb-1">💼</div>
+            <div class="text-xs font-bold">①転職</div>
+          </button>
+          <button data-branch="recuperation" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
+            <div class="text-2xl mb-1">🩺</div>
+            <div class="text-xs font-bold">②療養・無職</div>
+          </button>
+          <button data-branch="independence" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
+            <div class="text-2xl mb-1">🚀</div>
+            <div class="text-xs font-bold">③独立</div>
+          </button>
+        </div>
+      </div>
     </div>
-  </details>
+  </section>
 
-  <details class="law">
-    <summary><span>社会保険料はどう計算しているのか</span></summary>
-    <div class="in">
-      <p>保険料は月給そのものではなく、月給を等級に当てはめた<b>「標準報酬月額」</b>を基準に決まります。本ツールは協会けんぽの<b>全50等級</b>の等級表を内蔵し、入力された月給から等級を自動判定しています。</p>
-      <p>本人負担額は次のとおりです（<b>いずれも労使折半</b>のため料率の半分）。</p>
-      <p>・健康保険料＝標準報酬月額 × 10.00% ÷ 2<br>
-         ・介護保険料＝標準報酬月額 × 1.59% ÷ 2（40歳以上65歳未満のみ）<br>
-         ・厚生年金保険料＝標準報酬月額 × 18.30% ÷ 2</p>
-      <p>健康保険料率は<b>都道府県ごとに異なり</b>、概ね9.35%〜10.5%の幅があります。本ツールは全国平均の10.00%を用いているため、正確な額は自社の健康保険証に記載された保険者へご確認ください。厚生年金保険料率は全国一律18.3%で固定です。</p>
-      <p>なお厚生年金は標準報酬月額の上限が<b>650,000円</b>（健保35等級相当）、下限が<b>88,000円</b>（健保4等級相当）に設定されており、健康保険より範囲が狭くなっています。高収入の場合、厚生年金部分はこの上限で頭打ちになります。</p>
-      <p class="src">根拠：健康保険法第40条（標準報酬月額）・第160条（保険料率）、厚生年金保険法第20条・第81条（保険料率18.3%）、介護保険法第9条第2号</p>
-    </div>
-  </details>
+  <!-- ============ 結果画面：ToDoタイムライン ============ -->
+  <section id="stepResult" class="step-panel">
+    <h2 class="text-lg font-black text-navy mb-1">診断完了：退職ToDoタイムライン</h2>
+    <p class="text-sm text-slate-500 mb-5">上から順に進めれば、損なく退職準備ができます。</p>
 
-  <details class="law">
-    <summary><span>有給休暇は退職時に消化できるのか</span></summary>
-    <div class="in">
-      <p>年次有給休暇は労働基準法第39条で認められた労働者の権利で、<b>取得に会社の許可は不要</b>です（時季指定権）。会社には時季変更権がありますが、退職日以降に振り替える余地がないため、<b>退職前の有休消化に対して時季変更権は行使できない</b>と解されています。</p>
-      <p>そのため実務では、最終出社日の翌営業日から退職日までを有休消化にあてる形が一般的です。ただし引き継ぎを放り出すとトラブルになるため、引き継ぎ日数を確保したうえで逆算するのが安全です。</p>
-      <p class="src">根拠：労働基準法第39条（年次有給休暇）</p>
-    </div>
-  </details>
+    <!-- 手取り最大化インパクトカード -->
+    <div id="impactCard" class="rounded-2xl p-5 text-white shadow-card mb-6" style="background:linear-gradient(135deg,#D97706,#92400E);"></div>
 
-  <details class="law">
-    <summary><span>退職はいつまでに伝えればいいのか</span></summary>
-    <div class="in">
-      <p>民法第627条第1項では、期間の定めのない雇用契約は<b>申し入れから2週間の経過</b>で終了します。一方、多くの会社の就業規則は「1か月前まで」と定めており、円満退職の実務上はこちらに合わせるのが無難です。</p>
-      <p>本ツールは<b>退職日の1か月前</b>を上司への申し出目安日として算出しています。有給をすべて消化する場合は最終出社日がさらに前倒しになるため、<b>最終出社日から逆算して早めに切り出す</b>ことをおすすめします。</p>
-      <p class="src">根拠：民法第627条第1項／各社就業規則</p>
-    </div>
-  </details>
+    <div id="timeline" class="space-y-5 mb-6"></div>
 
-  <details class="law">
-    <summary><span>ボーナスは「支給日在籍」が条件のことが多い</span></summary>
-    <div class="in">
-      <p>多くの会社の賞与規程には<b>「支給日に在籍していること」</b>という支給日在籍要件があります。査定対象期間をまるまる働いていても、支給日の前日に退職日が来ると受け取れないケースがあります。</p>
-      <p>判例上も、賞与に功労報償的・将来の勤労意欲喚起の性格があることから、支給日在籍要件は原則として有効と扱われています。退職日を支給日の後ろへずらせるかどうかは、金額面で最も影響が大きい判断ポイントです。</p>
-      <p class="src">根拠：各社賞与規程／大和銀行事件（最高裁 昭和57年10月7日判決）ほか</p>
-    </div>
-  </details>
+    <button id="btnShareX" class="w-full flex items-center justify-center gap-2 bg-navy text-white rounded-xl py-3.5 font-bold text-sm mb-3">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      診断結果をXでシェアする
+    </button>
+    <button id="btnRestart" class="w-full text-center text-xs text-slate-400 underline py-2 mb-6">最初からやり直す</button>
 
-  <details class="law">
-    <summary><span>退職と入社の間に空白ができたら何をするのか</span></summary>
-    <div class="in">
-      <p>退職日の翌日＝入社日なら社会保険は途切れず移行します。1日でも空くと、その期間は<b>国民健康保険・国民年金に加入する義務</b>が生じます（手続きは市区町村の窓口、原則14日以内）。</p>
-      <p>健康保険は、国民健康保険のかわりに<b>任意継続被保険者制度</b>（最大2年、原則20日以内に申請）を選べる場合があります。保険料はどちらが安いか人により異なるため、退職前に健康保険組合と市区町村の両方で試算しておくと確実です。</p>
-      <p class="src">根拠：国民健康保険法第5条・第6条、国民年金法第7条、健康保険法第37条（任意継続）</p>
+    <!-- コンプライアンス常時掲載事項 -->
+    <div class="border-t border-slate-200 pt-4 space-y-2">
+      <p class="text-[11px] text-slate-400 leading-relaxed">
+        ※本シミュレーション結果は一般的な法令に基づく目安であり、個別の最終判定は管轄のハローワーク・年金事務所・健康保険組合が行います。
+      </p>
+      <p class="text-[11px] text-slate-400 leading-relaxed">
+        ※本ページはプロモーション（PR）を含みます。提携リンク経由のお申し込みにより、当サイトに紹介料が発生する場合があります。
+      </p>
     </div>
-  </details>
+  </section>
 
-  <footer>
-    <div class="disc">
-      ※本試算は一般的な労働法規規程に基づくシミュレーションです。会社独自の就業規則（退職申し出期限や賞与支給日に限る在籍要件など）が優先される場合があるため、最終確認は自社の人事部や就業規則をご確認ください。
-    </div>
-    <div class="cr">退職日計算ナビ ／ 入力内容は端末内だけで処理され、送信・保存されません。</div>
-  </footer>
 </main>
 
-<div class="actionbar" id="actionBar">
-  <div class="wrap actionbar-in">
-    <div class="ab-tx">
-      <span class="ab-k">最適退職日にした場合のお得度</span>
-      <span class="ab-v" id="abAmount">—</span>
-    </div>
-    <button class="ab-btn" id="abJump" type="button">結果を見る</button>
+<!-- ============ ボトムバー ============ -->
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_16px_rgba(30,41,59,.06)]">
+  <div class="max-w-lg mx-auto px-4 py-3 flex gap-3">
+    <button id="btnBack" class="hidden shrink-0 px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold text-slate-500">戻る</button>
+    <button id="btnNext" class="flex-1 bg-emerald text-white rounded-xl py-3 text-sm font-bold shadow-card disabled:opacity-40" disabled>次へ進む</button>
+  </div>
+</nav>
+
+<!-- ============ ボトムシート（詳細解説・PR詳細） ============ -->
+<div id="sheetBackdrop" class="sheet-backdrop fixed inset-0 bg-navy/50 z-50"></div>
+<div id="bottomSheet" class="bottom-sheet fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-sheet max-w-lg mx-auto">
+  <div class="px-5 pt-3 pb-6 max-h-[75vh] overflow-y-auto">
+    <div class="w-10 h-1.5 bg-slate-300 rounded-full mx-auto mb-4"></div>
+    <div id="sheetContent" class="text-sm leading-relaxed text-slate-700"></div>
   </div>
 </div>
 
-<div id="toast" role="status" aria-live="polite"></div>
-
-<script>
-"use strict";
-
-/* =========================================================
-   国民の祝日データ（2026〜2028）
-   保守：年1回、YYYY-MM-DD 形式で新年度分を追記するだけで更新完了。
-   ========================================================= */
-/* HOLIDAYS:BEGIN */
-const nationalHolidays = [
-  // ===== 2026年（18日）=====
-  "2026-01-01", // 元日
-  "2026-01-12", // 成人の日（1月第2月曜）
-  "2026-02-11", // 建国記念の日
-  "2026-02-23", // 天皇誕生日
-  "2026-03-20", // 春分の日
-  "2026-04-29", // 昭和の日
-  "2026-05-03", // 憲法記念日（日曜）
-  "2026-05-04", // みどりの日
-  "2026-05-05", // こどもの日
-  "2026-05-06", // 振替休日（憲法記念日ぶん）
-  "2026-07-20", // 海の日（7月第3月曜）
-  "2026-08-11", // 山の日
-  "2026-09-21", // 敬老の日（9月第3月曜）
-  "2026-09-22", // 国民の休日（敬老の日と秋分の日に挟まれた平日）
-  "2026-09-23", // 秋分の日
-  "2026-10-12", // スポーツの日（10月第2月曜）
-  "2026-11-03", // 文化の日
-  "2026-11-23", // 勤労感謝の日
-  // ===== 2027年（17日）=====
-  "2027-01-01", // 元日
-  "2027-01-11", // 成人の日
-  "2027-02-11", // 建国記念の日
-  "2027-02-23", // 天皇誕生日
-  "2027-03-21", // 春分の日（日曜）
-  "2027-03-22", // 振替休日（春分の日ぶん）
-  "2027-04-29", // 昭和の日
-  "2027-05-03", // 憲法記念日
-  "2027-05-04", // みどりの日
-  "2027-05-05", // こどもの日
-  "2027-07-19", // 海の日
-  "2027-08-11", // 山の日
-  "2027-09-20", // 敬老の日
-  "2027-09-23", // 秋分の日
-  "2027-10-11", // スポーツの日
-  "2027-11-03", // 文化の日
-  "2027-11-23", // 勤労感謝の日
-  // ===== 2028年（16日）=====
-  "2028-01-01", // 元日
-  "2028-01-10", // 成人の日
-  "2028-02-11", // 建国記念の日
-  "2028-02-23", // 天皇誕生日
-  "2028-03-20", // 春分の日
-  "2028-04-29", // 昭和の日
-  "2028-05-03", // 憲法記念日
-  "2028-05-04", // みどりの日
-  "2028-05-05", // こどもの日
-  "2028-07-17", // 海の日
-  "2028-08-11", // 山の日
-  "2028-09-18", // 敬老の日
-  "2028-09-22", // 秋分の日
-  "2028-10-09", // スポーツの日
-  "2028-11-03", // 文化の日
-  "2028-11-23"  // 勤労感謝の日
-];
-/* HOLIDAYS:END */
-const HOLIDAY_SET = new Set(nationalHolidays);
-
-/* =========================================================
-   保険料率（保守：料率改定時はここだけ直す）
-   ========================================================= */
-// 健康保険料率：協会けんぽの全国平均。都道府県により概ね 9.35%〜10.5% の幅がある。
-const HEALTH_RATE  = 0.100;
-// 介護保険料率：40歳以上65歳未満（介護保険第2号被保険者）に上乗せ。
-const CARE_RATE    = 0.0159;
-// 厚生年金保険料率：全国一律で固定（平成29年9月以降 18.3%）。
-const PENSION_RATE = 0.183;
-// 厚生年金の標準報酬月額の下限・上限（健保の等級表より範囲が狭い）。
-const PENSION_MIN  = 88000;
-const PENSION_MAX  = 650000;
-// 賞与を受け取れた場合の推定獲得額の目安。
-const BONUS_ESTIMATE = 300000;
-// 上司への申し出目安（か月前）。
-const NOTICE_MONTHS = 1;
-
-/* =========================================================
-   健康保険 標準報酬月額 等級表（協会けんぽ／令和2年9月改定以降の50等級）
-   [健保等級, 標準報酬月額, 報酬月額の下限(以上), 報酬月額の上限(未満)]
-   最上位等級の上限は null（＝以上）。
-   保守：等級表が改定されたらこの配列を差し替える。
-   ========================================================= */
-/* GRADES:BEGIN */
-const STANDARD_GRADES = [
-  [ 1,   58000,       0,   63000],
-  [ 2,   68000,   63000,   73000],
-  [ 3,   78000,   73000,   83000],
-  [ 4,   88000,   83000,   93000],
-  [ 5,   98000,   93000,  101000],
-  [ 6,  104000,  101000,  107000],
-  [ 7,  110000,  107000,  114000],
-  [ 8,  118000,  114000,  122000],
-  [ 9,  126000,  122000,  130000],
-  [10,  134000,  130000,  138000],
-  [11,  142000,  138000,  146000],
-  [12,  150000,  146000,  155000],
-  [13,  160000,  155000,  165000],
-  [14,  170000,  165000,  175000],
-  [15,  180000,  175000,  185000],
-  [16,  190000,  185000,  195000],
-  [17,  200000,  195000,  210000],
-  [18,  220000,  210000,  230000],
-  [19,  240000,  230000,  250000],
-  [20,  260000,  250000,  270000],
-  [21,  280000,  270000,  290000],
-  [22,  300000,  290000,  310000],
-  [23,  320000,  310000,  330000],
-  [24,  340000,  330000,  350000],
-  [25,  360000,  350000,  370000],
-  [26,  380000,  370000,  395000],
-  [27,  410000,  395000,  425000],
-  [28,  440000,  425000,  455000],
-  [29,  470000,  455000,  485000],
-  [30,  500000,  485000,  515000],
-  [31,  530000,  515000,  545000],
-  [32,  560000,  545000,  575000],
-  [33,  590000,  575000,  605000],
-  [34,  620000,  605000,  635000],
-  [35,  650000,  635000,  665000],
-  [36,  680000,  665000,  695000],
-  [37,  710000,  695000,  730000],
-  [38,  750000,  730000,  770000],
-  [39,  790000,  770000,  810000],
-  [40,  830000,  810000,  855000],
-  [41,  880000,  855000,  905000],
-  [42,  930000,  905000,  955000],
-  [43,  980000,  955000, 1005000],
-  [44, 1030000, 1005000, 1055000],
-  [45, 1090000, 1055000, 1115000],
-  [46, 1150000, 1115000, 1175000],
-  [47, 1210000, 1175000, 1235000],
-  [48, 1270000, 1235000, 1295000],
-  [49, 1330000, 1295000, 1355000],
-  [50, 1390000, 1355000,    null]
-];
-/* GRADES:END */
-
-/** 報酬月額から等級行を引く */
-function findGrade(pay){
-  const p = Math.max(0, pay);
-  for(const row of STANDARD_GRADES){
-    if(row[3] === null || p < row[3]) return row;
-  }
-  return STANDARD_GRADES[STANDARD_GRADES.length - 1];
-}
-
-/**
- * 月給（額面）から社会保険料の本人負担額（月額）を算出する。
- * 労使折半のため、料率の 1/2 が本人負担。月末退職ならこの額を会社が同額負担する。
- */
-function calcInsurance(monthlyPay, isOver40){
-  const row = findGrade(monthlyPay);
-  const grade = row[0], std = row[1];
-  const healthRate = HEALTH_RATE + (isOver40 ? CARE_RATE : 0);
-  const health  = Math.round(std * healthRate / 2);
-  const pensionStd = Math.min(Math.max(std, PENSION_MIN), PENSION_MAX);
-  const pension = Math.round(pensionStd * PENSION_RATE / 2);
-  return { grade, std, pensionStd, health, pension, total: health + pension, isOver40 };
-}
-
-/* =========================================================
-   日付ユーティリティ（時差ずれ防止：文字列を直接分解してパース）
-   ========================================================= */
-const DOW_JA = ["日","月","火","水","木","金","土"];
-
-function parseDate(str){
-  if(!str) return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str.trim());
-  if(!m) return null;
-  const y = +m[1], mo = +m[2], d = +m[3];
-  const dt = new Date(y, mo - 1, d);
-  dt.setHours(0,0,0,0);
-  // 2月30日などの繰り上がりを弾く
-  if(dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
-  return dt;
-}
-function toKey(d){
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${y}-${m}-${dd}`;
-}
-function fmtJa(d){
-  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DOW_JA[d.getDay()]}）`;
-}
-function fmtShort(d){
-  return `${d.getMonth()+1}/${d.getDate()}（${DOW_JA[d.getDay()]}）`;
-}
-function addDays(d, n){
-  const r = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-  r.setHours(0,0,0,0);
-  return r;
-}
-function endOfMonth(d){
-  // 翌月0日 ＝ 当月末日
-  const r = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-  r.setHours(0,0,0,0);
-  return r;
-}
-function isMonthEnd(d){
-  return d.getDate() === endOfMonth(d).getDate();
-}
-function subMonths(d, n){
-  // 3/31 の1か月前を 3/3 に暴走させないためのクランプ処理
-  const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
-  const lastOfTarget = new Date(y, m - n + 1, 0).getDate();
-  const r = new Date(y, m - n, Math.min(day, lastOfTarget));
-  r.setHours(0,0,0,0);
-  return r;
-}
-function diffDays(a, b){
-  // DST非依存でカレンダー日数を出す
-  const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.round((ub - ua) / 86400000);
-}
-function today(){
-  const t = new Date();
-  t.setHours(0,0,0,0);
-  return t;
-}
-function yen(n){
-  return n.toLocaleString("ja-JP");
-}
-function esc(s){
-  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-
-/* =========================================================
-   営業日判定・逆算
-   ========================================================= */
-/**
- * 営業日判定。優先順位は次のとおり。
- *   ① 会社独自の出勤日 … 土日祝でも営業日
- *   ② 会社独自の休み   … 平日でも休み
- *   ③ 定休日（曜日）・国民の祝日
- */
-function makeIsBusinessDay(offDays, includeHolidays, customWork, customOff){
-  const off  = new Set(offDays);
-  const work = customWork instanceof Set ? customWork : new Set(customWork || []);
-  const rest = customOff  instanceof Set ? customOff  : new Set(customOff  || []);
-  return function(d){
-    const key = toKey(d);
-    if(work.has(key)) return true;   // ① 最優先
-    if(rest.has(key)) return false;  // ② 第2優先
-    if(off.has(d.getDay())) return false;
-    if(includeHolidays && HOLIDAY_SET.has(key)) return false;
-    return true;
-  };
-}
-
-/**
- * 退職日から過去へ1日ずつ遡り、必要営業日数をカウントし終えた直前の営業日を最終出社日とする。
- * needDays が 0 のときは、退職日から遡って最初の営業日（＝退職日が営業日ならその日）。
- */
-function calcLastWorkDay(retireDate, needDays, isBusinessDay){
-  const GUARD = 3650; // 無限ループ保険（約10年分）
-  let cursor = new Date(retireDate);
-  let counted = 0, steps = 0;
-
-  while(counted < needDays){
-    if(isBusinessDay(cursor)) counted++;
-    cursor = addDays(cursor, -1);
-    if(++steps > GUARD) return null;
-  }
-  while(!isBusinessDay(cursor)){
-    cursor = addDays(cursor, -1);
-    if(++steps > GUARD) return null;
-  }
-  return cursor;
-}
-
-/**
- * ① 最適退職日の判定
- *    基本：検討中の日と同じ月の月末日
- *    ボーナス補正：仮の最適日がボーナス日より前なら、ボーナス日以降の最初の月末日へ繰り下げ
- */
-function calcOptimalDate(considered, bonus){
-  let optimal = endOfMonth(considered);
-  let shiftedForBonus = false;
-
-  if(bonus && optimal < bonus){
-    let cand = endOfMonth(bonus);
-    // ボーナス日が月末より後（＝理論上起きないが念のため）でも必ず以降になるまで送る
-    while(cand < bonus){
-      cand = endOfMonth(addDays(cand, 1));
-    }
-    optimal = cand;
-    shiftedForBonus = true;
-  }
-  return { optimal, shiftedForBonus };
-}
-
-/* =========================================================
-   メイン計算
-   ========================================================= */
-function compute(input){
-  const { considered, nextJoin, bonus, offDays, includeHolidays, paidLeaves, handoverDays,
-          monthlyPay, isOver40, customWork, customOff } = input;
-  const isBusinessDay = makeIsBusinessDay(offDays, includeHolidays, customWork, customOff);
-  const needDays = paidLeaves + handoverDays;
-
-  // ① 最適退職日
-  const { optimal, shiftedForBonus } = calcOptimalDate(considered, bonus);
-
-  // ② 最終出社日の逆算（検討中／最適の両方）
-  const lastWorkConsidered = calcLastWorkDay(considered, needDays, isBusinessDay);
-  const lastWorkOptimal    = calcLastWorkDay(optimal,    needDays, isBusinessDay);
-
-  // ③ 上司への通知目安日
-  const noticeDate = subMonths(optimal, NOTICE_MONTHS);
-
-  // お得度
-  const consideredIsMonthEnd = isMonthEnd(considered);
-  const ins = calcInsurance(monthlyPay, isOver40);
-  const insuranceGain = consideredIsMonthEnd ? 0 : ins.total;
-  // 検討中の日ではボーナスを取り逃す（＝支給日より前）が、最適日なら受け取れる場合のみ計上
-  const bonusMissedNow = !!(bonus && considered < bonus);
-  const bonusGain = (bonusMissedNow && optimal >= bonus) ? BONUS_ESTIMATE : 0;
-  const totalGain = insuranceGain + bonusGain;
-
-  // ④ 空白期間・社会保険の切替
-  let blank = null;
-  if(nextJoin){
-    const dayAfter = addDays(optimal, 1);
-    const gap = diffDays(dayAfter, nextJoin);
-    if(gap === 0)      blank = { type:"none",    days:0 };
-    else if(gap > 0)   blank = { type:"gap",     days:gap };
-    else               blank = { type:"overlap", days:-gap };
-  }
-
-  // 日程の逼迫チェック
-  const t = today();
-  const tooLate = lastWorkOptimal ? lastWorkOptimal < t : false;
-  const noticePassed = noticeDate < t;
-  // 「1か月前」の目安日が最終出社日以降だと、出社中に切り出せない＝実務上間に合わない
-  const noticeAfterLastWork = lastWorkOptimal ? diffDays(noticeDate, lastWorkOptimal) <= 0 : false;
-
-  return {
-    considered, optimal, shiftedForBonus,
-    lastWorkConsidered, lastWorkOptimal, noticeDate,
-    needDays, paidLeaves, handoverDays,
-    consideredIsMonthEnd, insuranceGain, bonusGain, totalGain, ins, monthlyPay,
-    customWorkCount: customWork ? customWork.size : 0,
-    customOffCount:  customOff  ? customOff.size  : 0,
-    bonus, bonusMissedNow, blank, tooLate, noticePassed, noticeAfterLastWork,
-    sameDay: diffDays(considered, optimal) === 0
-  };
-}
-
-/* =========================================================
-   テンプレ文面
-   ========================================================= */
-function buildTemplate(r){
-  const lw = r.lastWorkOptimal ? fmtJa(r.lastWorkOptimal) : "（別途調整）";
-  const leaveLine = r.paidLeaves > 0
-    ? `\nまた、残っております有給休暇${r.paidLeaves}日分につきましても、\n最終出社日以降に取得させていただけますと幸いです。`
-    : "";
-  return [
-    "お疲れ様です。お忙しいところ恐れ入ります。",
-    "ご相談したいことがあり、一度お時間をいただけないでしょうか。",
-    "",
-    "かねてより検討してまいりましたが、一身上の都合により、",
-    `${fmtJa(r.optimal)}をもって退職させていただきたく存じます。`,
-    "",
-    `最終出社日は${lw}を予定しており、`,
-    "それまでに担当業務の引き継ぎを完了させる所存です。" + leaveLine,
-    "",
-    "業務に支障が出ないよう最大限努めてまいりますので、",
-    "ご相談のお時間をいただけますと幸いです。",
-    "何卒よろしくお願いいたします。"
-  ].join("\n");
-}
-
-/* =========================================================
-   描画
-   ========================================================= */
-const $report = document.getElementById("report");
-
-function render(r){
-  const P = [];
-
-  /* --- 1. 警告バナー --- */
-  P.push('<h2 class="report-head">あなたの診断レポート</h2>');
-
-  if(r.bonusMissedNow && r.bonusGain > 0){
-    P.push(`<div class="banner alert"><b>⚠ ボーナスを受け取れない可能性があります</b>
-今の退職日（${esc(fmtShort(r.considered))}）は、ボーナス支給日 ${esc(fmtShort(r.bonus))} より前です。多くの会社の賞与規程には「支給日に在籍していること」という条件があるため、このままだと支給対象外になるおそれがあります。退職日を <b>${esc(fmtShort(r.optimal))}</b> まで動かせないか検討してください。</div>`);
-  }else if(r.bonus && r.considered >= r.bonus){
-    P.push(`<div class="banner ok"><b>✓ ボーナス支給日はクリアしています</b>
-今の退職日はボーナス支給日 ${esc(fmtShort(r.bonus))} より後のため、支給日在籍要件は満たせる見込みです。</div>`);
-  }
-
-  if(r.tooLate){
-    P.push(`<div class="banner warn"><b>⚠ 有休を消化しきるには日程が厳しいです</b>
-逆算した最終出社日が今日より前になっています。有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を消化するには、退職日をもっと後ろに設定するか、有休の買い取り・日数の見直しが必要です。</div>`);
-  }else if(r.noticePassed){
-    P.push(`<div class="banner warn"><b>⚠ 申し出の目安日をすでに過ぎています</b>
-一般的な「1か月前まで」の目安日（${esc(fmtShort(r.noticeDate))}）を過ぎています。できるだけ早く上司に相談してください。</div>`);
-  }
-
-  if(r.noticeAfterLastWork && r.lastWorkOptimal){
-    P.push(`<div class="banner warn"><b>⚠ 「1か月前」では切り出すのが間に合いません</b>
-有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を消化すると、最終出社日（${esc(fmtShort(r.lastWorkOptimal))}）が申し出の目安日（${esc(fmtShort(r.noticeDate))}）と同じか、それより前に来ます。出社しているうちに伝える必要があるため、<b>最終出社日よりさらに前</b>に相談してください。目安として ${esc(fmtShort(subMonths(r.lastWorkOptimal, NOTICE_MONTHS)))} までに切り出すと安全です。</div>`);
-  }
-
-  if(r.blank){
-    if(r.blank.type === "none"){
-      P.push(`<div class="banner ok"><b>✓ 社会保険の空白期間なし（即時移行）</b>
-退職日の翌日が入社日のため、健康保険・厚生年金は途切れずに転職先へ移行します。国民健康保険・国民年金の手続きは不要です。</div>`);
-    }else if(r.blank.type === "gap"){
-      P.push(`<div class="banner warn"><b>⚠ 約${r.blank.days}日間の空白期間が発生します</b>
-退職日の翌日から入社日までの間、国民健康保険・国民年金への一時切り替え手続きが必要です（市区町村の窓口／原則14日以内）。健康保険は任意継続被保険者制度（原則20日以内に申請）と保険料を比較してから選んでください。</div>`);
-    }else{
-      P.push(`<div class="banner warn"><b>⚠ 在籍期間が入社日と重なっています</b>
-最適退職日（${esc(fmtShort(r.optimal))}）が入社予定日より後になっており、${r.blank.days}日分が二重在籍になります。入社日の調整、または退職日の見直しが必要です。</div>`);
-    }
-  }
-
-  /* --- 2. お得度ハイライト --- */
-  const brk = [];
-  if(r.insuranceGain > 0){
-    brk.push(`<div><span>健康保険料${r.ins.isOver40?"・介護保険料":""}（本人負担分）</span><b>+${yen(r.ins.health)} 円</b></div>`);
-    brk.push(`<div><span>厚生年金保険料（本人負担分）</span><b>+${yen(r.ins.pension)} 円</b></div>`);
-  }else{
-    brk.push(`<div><span>社会保険料の節減（会社負担分）</span><b>±0 円</b></div>`);
-  }
-  if(r.bonus) brk.push(`<div><span>賞与の獲得効果</span><b>${r.bonusGain>0?"+"+yen(r.bonusGain):"±0"} 円</b></div>`);
-
-  P.push(`<div class="card" style="padding:0;background:transparent;box-shadow:none;">
-    <div class="gain">
-      <div class="cap">最適退職日にした場合の推定お得度</div>
-      <div class="amt"><span class="plus">${r.totalGain>0?"約 +":"約 "}</span>${yen(r.totalGain)}<span>円</span></div>
-      <div class="brk">${brk.join("")}</div>
-      <p class="basis">月給 ${yen(r.monthlyPay)}円 → 標準報酬月額 <b>${yen(r.ins.std)}円</b>（健保${r.ins.grade}等級）で計算。健康保険料率 ${(HEALTH_RATE*100).toFixed(2)}%${r.ins.isOver40?` ＋ 介護 ${(CARE_RATE*100).toFixed(2)}%`:""}、厚生年金 ${(PENSION_RATE*100).toFixed(1)}%、いずれも労使折半。</p>
-      <p class="disc">※社会保険料の節減額は平均的な給与額を基にした概算目安です。健康保険料率は協会けんぽの全国平均（都道府県により概ね9.35%〜10.5%）を用いており、実際の金額は都道府県・加入している健康保険組合により変わります。賞与額も一般的な目安額であり、支給条件は自社の賞与規程が優先されます。</p>
-    </div>
-  </div>`);
-
-  /* --- 3. アクションプラン ＋ テンプレ --- */
-  P.push(`<h2 class="report-head">退職アクションプラン</h2>
-  <div class="card">
-    <div class="plan">
-      <div class="plan-row">
-        <div class="ic">🗣️</div>
-        <div class="tx">
-          <div class="k">① 上司に切り出す目安</div>
-          <div class="v">${esc(fmtJa(r.noticeDate))}</div>
-          <div class="s">退職日の${NOTICE_MONTHS}か月前。就業規則の申し出期限も確認を。</div>
-        </div>
-      </div>
-      <div class="plan-row">
-        <div class="ic">📦</div>
-        <div class="tx">
-          <div class="k">② 最終出社日（引き継ぎ完了）</div>
-          <div class="v">${r.lastWorkOptimal ? esc(fmtJa(r.lastWorkOptimal)) : "算出できません"}</div>
-          <div class="s">有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日＝営業日${r.needDays}日分を逆算。${
-            (r.customWorkCount || r.customOffCount)
-              ? `<br>会社独自の${[r.customOffCount?`休み${r.customOffCount}日`:"", r.customWorkCount?`出勤日${r.customWorkCount}日`:""].filter(Boolean).join("・")}を反映済み。`
-              : ""
-          }</div>
-        </div>
-      </div>
-      <div class="plan-row hero-row">
-        <div class="ic">🎉</div>
-        <div class="tx">
-          <div class="k">③ 最適退職日（在籍最終日）</div>
-          <div class="v">${esc(fmtJa(r.optimal))}</div>
-          <div class="s">${r.shiftedForBonus ? "ボーナス支給日をまたぐよう繰り下げた月末日。" : "社会保険料が最適になる月末日。"}</div>
-        </div>
-      </div>
-    </div>
-    <p class="note" style="margin:16px 0 8px;">切り出し方に迷ったら、下の文面をそのまま使えます。</p>
-    <div class="tmpl" id="tmplBox">${esc(buildTemplate(r))}</div>
-    <button class="btn" id="copyBtn" type="button">📋 メッセージテンプレをコピー</button>
-  </div>`);
-
-  /* --- 4. Before / After 比較 --- */
-  const lwC = r.lastWorkConsidered ? fmtJa(r.lastWorkConsidered) : "算出できません";
-  const lwO = r.lastWorkOptimal    ? fmtJa(r.lastWorkOptimal)    : "算出できません";
-  const cmp = [
-    {
-      t:"退職日",
-      b:fmtJa(r.considered),
-      a:fmtJa(r.optimal),
-      same:r.sameDay
-    },
-    {
-      t:"最終出社日",
-      b:lwC,
-      a:lwO,
-      same:r.lastWorkConsidered && r.lastWorkOptimal && diffDays(r.lastWorkConsidered, r.lastWorkOptimal) === 0
-    },
-    {
-      t:"有休消化の状態",
-      b:r.sameDay ? `有給${r.paidLeaves}日＋引き継ぎ${r.handoverDays}日を確保` : "未消化リスクあり",
-      a:`100%完全消化 ＋ 引き継ぎ${r.handoverDays}日を確保`,
-      same:r.sameDay
-    },
-    {
-      t:"当月の社会保険の扱い",
-      b:r.consideredIsMonthEnd ? "会社側で一括適正化" : "自己負担／国保・国民年金の手続きが必要",
-      a:"会社側で一括適正化（保険料を労使折半）",
-      same:r.consideredIsMonthEnd
-    }
-  ];
-
-  P.push('<h2 class="report-head">今の予定と最適日の比較</h2><div class="card"><div class="cmp">');
-  cmp.forEach(c=>{
-    P.push(`<div class="cmp-item${c.same?" same":""}">
-      <div class="ttl">${esc(c.t)}</div>
-      <div class="body">
-        <div class="side before"><div class="lb">今の予定</div><div class="vl">${esc(c.b)}</div></div>
-        <div class="arw">→</div>
-        <div class="side after"><div class="lb">${c.same?"変更なし":"最適プラン"}</div><div class="vl">${esc(c.a)}</div></div>
-      </div>
-    </div>`);
-  });
-  P.push('</div></div>');
-
-  /* --- 5. シェア --- */
-  P.push(`<h2 class="report-head">結果をシェア・保存</h2>
-  <div class="card">
-    <p class="note" style="margin-bottom:12px;">シェアURLに入力内容は含まれません（診断結果はあなたの端末内だけにあります）。</p>
-    <div class="share">
-      <button class="x" id="shareX" type="button">𝕏 でシェア</button>
-      <button class="line" id="shareLine" type="button">LINE で送る</button>
-      <button class="full" id="copyUrl" type="button">🔗 URLをコピー</button>
-    </div>
-  </div>`);
-
-  $report.innerHTML = P.join("");
-
-  // イベント結線
-  document.getElementById("copyBtn").addEventListener("click", ()=>{
-    copyText(buildTemplate(r), "テンプレをコピーしました");
-  });
-  document.getElementById("copyUrl").addEventListener("click", ()=>{
-    copyText(shareUrl(), "URLをコピーしました");
-  });
-  document.getElementById("shareX").addEventListener("click", ()=>{
-    const t = `退職日計算ナビで試算したら、退職日を${fmtShort(r.optimal)}にするだけで約${yen(r.totalGain)}円お得になるらしい。最終出社日は${r.lastWorkOptimal?fmtShort(r.lastWorkOptimal):"要調整"}。`;
-    open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(t)}&url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener");
-  });
-  document.getElementById("shareLine").addEventListener("click", ()=>{
-    open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener");
-  });
-
-  showActionBar(r.totalGain);
-}
-
-function shareUrl(){
-  // 個人情報をURLに載せないため、クエリなしのページURLのみを共有する
-  return location.origin + location.pathname;
-}
-
-/* =========================================================
-   ボトムアクションバー（表示のみ。計算には関与しない）
-   ========================================================= */
-function showActionBar(totalGain){
-  const bar = document.getElementById("actionBar");
-  document.getElementById("abAmount").textContent = (totalGain > 0 ? "＋" : "") + yen(totalGain) + "円";
-  bar.classList.add("on");
-}
-function hideActionBar(){
-  document.getElementById("actionBar").classList.remove("on");
-}
-
-/* =========================================================
-   コピー・トースト
-   ========================================================= */
-let toastTimer = null;
-function toast(msg){
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("on");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.classList.remove("on"), 2200);
-}
-function copyText(text, okMsg){
-  if(navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(text).then(()=>toast(okMsg)).catch(()=>fallbackCopy(text, okMsg));
-  }else{
-    fallbackCopy(text, okMsg);
-  }
-}
-function fallbackCopy(text, okMsg){
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  ta.setAttribute("readonly","");
-  ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
-  document.body.appendChild(ta);
-  ta.select();
-  ta.setSelectionRange(0, text.length);
-  let ok = false;
-  try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
-  document.body.removeChild(ta);
-  if(ok){
-    toast(okMsg);
-  }else{
-    // 自動コピーが拒否された環境では、文面を選択状態にして手動コピーへ橋渡しする
-    selectTemplateBox();
-    toast("自動コピー不可。文面を選択したのでコピーしてください");
-  }
-}
-function selectTemplateBox(){
-  const box = document.getElementById("tmplBox");
-  if(!box) return;
-  const range = document.createRange();
-  range.selectNodeContents(box);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-  box.scrollIntoView({block:"center", behavior:"smooth"});
-}
-
-/* =========================================================
-   入力UI
-   ========================================================= */
-const DEFAULT_OFF = [0, 6];
-let offDays = new Set(DEFAULT_OFF);
-
-function buildWeekdayGrid(){
-  const grid = document.getElementById("weekdayGrid");
-  DOW_JA.forEach((label, i)=>{
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "dow";
-    b.textContent = label;
-    b.setAttribute("aria-pressed", offDays.has(i) ? "true" : "false");
-    b.setAttribute("aria-label", `${label}曜日を定休日にする`);
-    b.addEventListener("click", ()=>{
-      if(offDays.has(i)){
-        offDays.delete(i);
-      }else{
-        if(offDays.size >= 6){
-          toast("定休日は6日までです（営業日が必要です）");
-          return;
-        }
-        offDays.add(i);
-      }
-      b.setAttribute("aria-pressed", offDays.has(i) ? "true" : "false");
-      update();
-    });
-    grid.appendChild(b);
-  });
-}
-
-/* =========================================================
-   会社独自の休日・出勤日
-   ========================================================= */
-const customOffDays  = new Set();  // 会社独自の休み
-const customWorkDays = new Set();  // 会社独自の出勤日
-
-function fmtChip(d){
-  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${DOW_JA[d.getDay()]}）`;
-}
-
-function addCustomDay(kind){
-  const input = document.getElementById(kind === "work" ? "cdWorkInput" : "cdOffInput");
-  const d = parseDate(input.value);
-  if(!d){ toast("日付を選んでから「追加」を押してください"); return; }
-  const key    = toKey(d);
-  const target = kind === "work" ? customWorkDays : customOffDays;
-  const other  = kind === "work" ? customOffDays  : customWorkDays;
-
-  if(target.has(key)){ toast(`${fmtChip(d)} はすでに登録されています`); return; }
-  if(other.has(key)){
-    // 同じ日を両方には登録できないので、後から指定したほうへ移す
-    other.delete(key);
-    toast(kind === "work" ? "独自の休みから出勤日へ移しました" : "独自の出勤日から休みへ移しました");
-  }else{
-    toast(`${fmtChip(d)} を${kind === "work" ? "出勤日" : "休み"}に追加しました`);
-  }
-  target.add(key);
-  input.value = "";
-  renderCustomDays();
-  update();
-}
-
-function removeCustomDay(kind, key){
-  (kind === "work" ? customWorkDays : customOffDays).delete(key);
-  renderCustomDays();
-  update();
-}
-
-function renderCustomDays(){
-  [["off", customOffDays, "cdOffList"], ["work", customWorkDays, "cdWorkList"]].forEach(([kind, set, listId])=>{
-    const ul = document.getElementById(listId);
-    const keys = Array.from(set).sort();
-    if(!keys.length){
-      ul.innerHTML = `<li class="cd-empty">まだ登録がありません</li>`;
-      return;
-    }
-    ul.innerHTML = keys.map(k=>{
-      const label = fmtChip(parseDate(k));
-      return `<li class="cd-chip ${kind}"><span>${esc(label)}</span>` +
-             `<button type="button" class="cd-del" data-kind="${kind}" data-key="${k}" ` +
-             `aria-label="${esc(label)}を削除">×</button></li>`;
-    }).join("");
-  });
-
-  const n = customOffDays.size + customWorkDays.size;
-  const badge = document.getElementById("cdBadge");
-  badge.textContent = n ? `${n}件 設定中` : "";
-  badge.hidden = !n;
-}
-
-function clampInt(el, min, max, fallback){
-  let v = parseInt(el.value, 10);
-  if(!Number.isFinite(v)) return fallback;
-  if(v < min) v = min;
-  if(v > max) v = max;
-  return v;
-}
-
-function renderGradeView(monthlyPay, isOver40){
-  const ins = calcInsurance(monthlyPay, isOver40);
-  document.getElementById("gradeView").innerHTML =
-    `標準報酬月額 <b>${yen(ins.std)}円</b>（健保${ins.grade}等級）
-     ／ 毎月の社会保険料（本人負担）は約 <b>${yen(ins.total)}円</b>
-     <br>内訳：健康保険${isOver40?"・介護保険":""} ${yen(ins.health)}円 ＋ 厚生年金 ${yen(ins.pension)}円`;
-  return ins;
-}
-
-function update(){
-  const monthlyPay = clampInt(document.getElementById("monthlyPay"), 0, 2000000, 300000);
-  const isOver40   = document.getElementById("isOver40").checked;
-  renderGradeView(monthlyPay, isOver40);
-
-  const considered = parseDate(document.getElementById("consideredDate").value);
-  if(!considered){
-    $report.innerHTML = `<h2 class="report-head">あなたの診断レポート</h2>
-      <div class="card"><div class="err">まず STEP 1 の「今考えている退職日」を入力してください。入力した瞬間に自動で試算します。</div></div>`;
-    hideActionBar();
-    return;
-  }
-  const input = {
-    considered,
-    nextJoin: parseDate(document.getElementById("nextJoinDate").value),
-    bonus:    parseDate(document.getElementById("bonusDate").value),
-    offDays:  Array.from(offDays),
-    includeHolidays: document.getElementById("includeHolidays").checked,
-    paidLeaves:   clampInt(document.getElementById("paidLeaves"), 0, 60, 15),
-    handoverDays: clampInt(document.getElementById("handoverDays"), 0, 60, 0),
-    monthlyPay, isOver40,
-    customWork: customWorkDays,
-    customOff:  customOffDays
-  };
-  render(compute(input));
-}
-
-function init(){
-  document.getElementById("consideredDate").value = toKey(today());
-  buildWeekdayGrid();
-  document.getElementById("abJump").addEventListener("click", ()=>{
-    document.getElementById("report").scrollIntoView({block:"start", behavior:"smooth"});
-  });
-
-  // 会社独自の休日・出勤日
-  document.getElementById("cdOffAdd").addEventListener("click", ()=>addCustomDay("off"));
-  document.getElementById("cdWorkAdd").addEventListener("click", ()=>addCustomDay("work"));
-  document.getElementById("customDays").addEventListener("click", (e)=>{
-    const btn = e.target.closest(".cd-del");
-    if(btn) removeCustomDay(btn.dataset.kind, btn.dataset.key);
-  });
-  renderCustomDays();
-  ["consideredDate","nextJoinDate","bonusDate","includeHolidays","paidLeaves","handoverDays",
-   "monthlyPay","isOver40"]
-    .forEach(id=>{
-      const el = document.getElementById(id);
-      el.addEventListener("input", update);
-      el.addEventListener("change", update);
-    });
-  update();
-}
-
-if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", init);
-}else{
-  init();
-}
-</script>
+<script src="js/holidays.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/schema_generator.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
