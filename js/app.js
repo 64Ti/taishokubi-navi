@@ -1,6 +1,6 @@
 /**
  * app.js
- * トク退：UI制御本体 Ver.4.0.0
+ * トク退：UI制御本体 Ver.6.0
  * STEP1(退職希望日) → STEP2(休日・有休設定) → STEP3(給与・進路3分岐) → 結果(ToDoタイムライン)
  */
 (function () {
@@ -10,7 +10,7 @@
   const H = window.HolidaysJP;
   const Schema = window.SchemaGenerator;
 
-  const STORAGE_KEY = 'tokutai_navi_state_v4';
+  const STORAGE_KEY = 'tokutai_form_state';
   const STEPS = ['step1', 'step2', 'step3', 'stepResult'];
   const STEP_LABELS = ['STEP 1 / 3', 'STEP 2 / 3', 'STEP 3 / 3', '診断結果'];
   let currentStepIndex = 0;
@@ -28,7 +28,7 @@
     handoverDays: 0,       // 引き継ぎ必要日数
     annualIncome: null,    // 選択した年収帯の代表額（円）
     salary: null,          // annualIncome から換算した月給概算（円）
-    isUnionKenpo: false,
+    insuranceType: 'kyokai', // 加入中の健康保険 'kyokai'|'kumiai'|'kyosai'
     branch: null,
     result: null,
   };
@@ -62,6 +62,7 @@
     document.getElementById('btnBack').addEventListener('click', onBack);
     document.getElementById('btnRestart').addEventListener('click', onRestart);
     document.getElementById('btnShareX').addEventListener('click', onShareX);
+    document.getElementById('btnLineCV').addEventListener('click', onLineCV);
     document.getElementById('sheetBackdrop').addEventListener('click', closeSheet);
     document.getElementById('customDaysAccordion').addEventListener('click', e => {
       const btn = e.target.closest('.cd-del');
@@ -79,6 +80,10 @@
     document.getElementById('inputNextJoinDate').addEventListener('change', e => {
       state.nextJoinDate = e.target.value || null;
       saveToStorage();
+    });
+    document.getElementById('resignDateChips').addEventListener('click', e => {
+      const chip = e.target.closest('.qc-chip');
+      if (chip) applyQuickDate(chip.dataset.quick);
     });
     document.getElementById('inputBonusDate').addEventListener('change', e => {
       state.bonusDate = e.target.value || null;
@@ -117,8 +122,8 @@
       saveToStorage();
       validateStep3();
     });
-    document.getElementById('inputUnionKenpo').addEventListener('change', e => {
-      state.isUnionKenpo = e.target.checked;
+    document.getElementById('inputInsuranceType').addEventListener('change', e => {
+      state.insuranceType = e.target.value;
       saveToStorage();
     });
     document.querySelectorAll('#branchSelector .branch-btn').forEach(btn => {
@@ -134,6 +139,30 @@
         validateStep3();
       });
     });
+  }
+
+  // ---------------------------------------------------------------
+  // STEP1：退職希望日のクイック選択チップ（EFO改善）
+  // ---------------------------------------------------------------
+  function applyQuickDate(kind) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let target;
+    if (kind === '2weeks') {
+      target = Calc.addDays(today, 14);
+    } else if (kind === 'thisMonthEnd') {
+      target = Calc.lastDayOfMonth(today);
+    } else if (kind === 'nextMonthEnd') {
+      target = Calc.lastDayOfMonth(Calc.addDays(Calc.lastDayOfMonth(today), 1));
+    } else {
+      return;
+    }
+    const iso = Calc.fmtISO(target);
+    const input = document.getElementById('inputResignDate');
+    input.value = iso;
+    state.resignDate = iso;
+    saveToStorage();
+    validateStep1();
   }
 
   // 祝日の扱い：ON/OFFの抽象的なトグルではなく、選んだボタンの文言そのものが
@@ -389,7 +418,7 @@
       resignDate: null, nextJoinDate: null, bonusDate: null, bonusAmount: null,
       offDays: [0, 6], closedOnHolidays: true,
       extraOffDates: [], extraWorkDates: [],
-      paidLeave: null, handoverDays: 0, annualIncome: null, salary: null, isUnionKenpo: false,
+      paidLeave: null, handoverDays: 0, annualIncome: null, salary: null, insuranceType: 'kyokai',
       branch: null, result: null,
     });
     document.getElementById('inputNextJoinDate').value = '';
@@ -399,7 +428,7 @@
     document.getElementById('inputPaidLeave').value = '';
     document.getElementById('inputHandoverDays').value = '0';
     document.getElementById('inputAnnualIncome').value = '';
-    document.getElementById('inputUnionKenpo').checked = false;
+    document.getElementById('inputInsuranceType').value = 'kyokai';
     document.getElementById('holidayOnBtn').setAttribute('aria-pressed', 'true');
     document.getElementById('holidayOffBtn').setAttribute('aria-pressed', 'false');
     document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {
@@ -421,7 +450,8 @@
     const checker = buildBusinessDayChecker();
     const paidLeaveResult = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     const gradeResult = Calc.calcStandardRemunerationGrade(state.salary);
-    const qualification = Calc.calcQualificationLossDate(resignDate, state.isUnionKenpo);
+    const qualification = Calc.calcQualificationLossDate(resignDate, state.insuranceType);
+    const noticeAdvice = Calc.buildResignationNoticeAdvice();
     const insuranceOptimization = Calc.calcInsuranceOptimization(resignDate, gradeResult);
     const branchContext = Calc.getBranchContext(state.branch);
     const recommendation = Calc.calcRecommendedResignDate(resignDate, state.nextJoinDate, insuranceOptimization, state.bonusDate);
@@ -443,6 +473,7 @@
       paidLeaveStartLabel: paidLeaveResult.paidLeaveStartDay ? Calc.fmtJP(paidLeaveResult.paidLeaveStartDay) : null,
       grade: gradeResult,
       qualification,
+      noticeAdvice,
       insuranceOptimization,
       recommendation,
       insuranceGap,
@@ -477,8 +508,10 @@
     const gapNote = buildGapNote(r);
     const bonusNote = buildBonusNote(r);
     const gainLossBlock = buildGainLossBlock(r);
+    const lossAversionHeadline = buildLossAversionHeadline(r);
 
     impactCard.innerHTML = `
+      ${lossAversionHeadline}
       <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">あなたの理想の退職日</p>
       <p class="text-3xl font-black mb-2">${escapeHtml(r.recommendation.dateLabel)}</p>
       <p class="text-xs opacity-90 leading-relaxed mb-2">${escapeHtml(headline)}</p>
@@ -491,6 +524,16 @@
 
     const timeline = document.getElementById('timeline');
     timeline.innerHTML = '';
+
+    // --- タイムライン項目0：就業規則アドバイス（民法2週間 vs 就業規則の申し出期限） ---
+    timeline.appendChild(buildTimelineCard({
+      heading: r.noticeAdvice.title,
+      snippetFuel: '結論：就業規則の定めがあれば、民法の2週間より就業規則の期限を優先しましょう。',
+      body: r.noticeAdvice.body,
+      colorClass: 'border-slate-200 bg-white',
+      labelClass: 'text-navy/60',
+      labelText: 'TASK',
+    }));
 
     // --- タイムライン項目1：離職票タイムラグ注記（STEP1文脈・常設Caution） ---
     timeline.appendChild(buildTimelineCard({
@@ -539,7 +582,7 @@
       <p class="text-[11px] font-black tracking-wider text-crimson mb-1">社会保険 資格喪失日</p>
       <p class="snippet-fuel text-sm text-crimson-dark leading-snug mb-2">結論：資格喪失日は退職日の翌日（${r.qualification.lossDateLabel}）。月末退職なら保険料は労使折半で済みます。</p>
       <p class="text-xs text-crimson-dark/80 leading-relaxed">${escapeHtml(r.qualification.note)}</p>
-      ${r.qualification.unionKenpoNote ? `<p class="text-xs text-crimson-dark/80 leading-relaxed mt-2 border-t border-crimson/20 pt-2">※${escapeHtml(r.qualification.unionKenpoNote)}</p>` : ''}
+      ${r.qualification.insuranceTypeNote ? `<p class="text-xs text-crimson-dark/80 leading-relaxed mt-2 border-t border-crimson/20 pt-2">※${escapeHtml(r.qualification.insuranceTypeNote)}</p>` : ''}
     `;
     timeline.appendChild(qualCard);
 
@@ -563,6 +606,19 @@
         labelText: 'CAUTION',
       }));
     }
+  }
+
+  // ---------------------------------------------------------------
+  // 損失回避コピー（プロスペクト理論：得より損失の方が強く響く）
+  // 差額があるときだけ警告として提示し、差がなければ安心コピーに切り替える
+  // ---------------------------------------------------------------
+  function buildLossAversionHeadline(r) {
+    const delta = r.gainLoss.totalDelta;
+    if (delta === 0) {
+      return `<p class="loss-aversion-safe">✓ 今の退職日のままで問題ありません。損はしていません。</p>`;
+    }
+    const yen = Math.abs(delta).toLocaleString();
+    return `<p class="loss-aversion-warn"><b>【注意】</b>退職日を1日間違えるだけで、最大<b>${yen}円</b>をドブに捨てることになります。</p>`;
   }
 
   // ---------------------------------------------------------------
@@ -719,9 +775,28 @@
       </div>
       <p class="text-sm font-bold text-navy leading-snug mb-1.5">${escapeHtml(monetize.message)}</p>
       <span class="inline-flex items-center gap-1 text-xs font-bold text-gold">${escapeHtml(monetize.ctaLabel)} →</span>
+      ${monetize.offerCategory ? `<p class="text-[10px] text-slate-400 mt-1.5">取扱カテゴリ：${escapeHtml(monetize.offerCategory)}</p>` : ''}
     `;
     el.addEventListener('click', () => openSheet(monetize.ctaLabel, monetize.message));
     return el;
+  }
+
+  // ---------------------------------------------------------------
+  // LINE公式アカウント案内（マイクロCV）
+  // 実際のLINE公式アカウントは未接続のため、外部リンクは開かず案内のみ表示する。
+  // ---------------------------------------------------------------
+  function onLineCV() {
+    document.getElementById('sheetContent').innerHTML = `
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>
+        <h4 class="text-base font-black text-navy">診断結果の保存・個別カレンダー作成</h4>
+      </div>
+      <p class="text-sm text-slate-600 leading-relaxed mb-4">LINE公式アカウントで、診断結果の保存や個別の退職スケジュールカレンダーを受け取れる機能を準備中です。公開までもうしばらくお待ちください。</p>
+      <button id="sheetCloseBtn" class="w-full mt-1 bg-navy text-white rounded-xl py-3 text-sm font-bold">閉じる</button>
+    `;
+    document.getElementById('sheetCloseBtn').addEventListener('click', closeSheet);
+    document.getElementById('bottomSheet').classList.add('open');
+    document.getElementById('sheetBackdrop').classList.add('open');
   }
 
   // ---------------------------------------------------------------
@@ -791,7 +866,7 @@
         handoverDays: state.handoverDays,
         annualIncome: state.annualIncome,
         salary: state.salary,
-        isUnionKenpo: state.isUnionKenpo,
+        insuranceType: state.insuranceType,
         branch: state.branch,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
@@ -804,19 +879,19 @@
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      Object.assign(state, JSON.parse(raw));
+      const parsed = JSON.parse(raw);
+      Object.assign(state, parsed);
 
       if (!Array.isArray(state.extraOffDates)) state.extraOffDates = [];
       if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
       if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
 
-      // 旧データ互換：closedOnSaturday(boolean) しかない場合は offDays へ変換する
-      if (!Array.isArray(state.offDays) || !state.offDays.length) {
-        if (state.closedOnSaturday !== undefined) {
-          state.offDays = state.closedOnSaturday === false ? [0] : [0, 6];
-        } else {
-          state.offDays = [0, 6];
-        }
+      // 旧データ互換：closedOnSaturday(boolean) しかない場合は offDays へ変換する。
+      // state側は初期値[0,6]が既に入っているため、判定は必ず parsed（保存されていた生データ）で行う。
+      if (!Array.isArray(parsed.offDays) || !parsed.offDays.length) {
+        state.offDays = parsed.closedOnSaturday !== undefined
+          ? (parsed.closedOnSaturday === false ? [0] : [0, 6])
+          : [0, 6];
       }
       delete state.closedOnSaturday;
 
@@ -833,7 +908,13 @@
         // 旧データ互換：salary が未保存の場合は annualIncome から再計算する
         if (!state.salary) state.salary = Calc.estimateMonthlyFromAnnual(state.annualIncome);
       }
-      document.getElementById('inputUnionKenpo').checked = !!state.isUnionKenpo;
+      // 旧データ互換：insuranceType が保存データに無く isUnionKenpo(boolean) しかない場合に変換。
+      // state側は初期値'kyokai'が既に入っているため、判定は必ず parsed で行う。
+      if (parsed.insuranceType === undefined) {
+        state.insuranceType = parsed.isUnionKenpo ? 'kumiai' : 'kyokai';
+      }
+      delete state.isUnionKenpo;
+      document.getElementById('inputInsuranceType').value = state.insuranceType;
       document.getElementById('holidayOnBtn').setAttribute('aria-pressed', String(state.closedOnHolidays !== false));
       document.getElementById('holidayOffBtn').setAttribute('aria-pressed', String(state.closedOnHolidays === false));
       if (state.branch) {

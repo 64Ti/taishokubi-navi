@@ -24,11 +24,11 @@
     document.head.appendChild(script);
   }
 
-  /** WebApplication スキーマ：サイト全体の性質をAIに伝える基礎スキーマ。ページロード時に常時挿入。 */
+  /** SoftwareApplication スキーマ：サイト全体の性質をAIに伝える基礎スキーマ。ページロード時に常時挿入。 */
   function generateWebApplicationSchema() {
     const schema = {
       '@context': 'https://schema.org',
-      '@type': 'WebApplication',
+      '@type': 'SoftwareApplication',
       name: SITE_NAME,
       url: SITE_URL,
       applicationCategory: 'BusinessApplication',
@@ -47,6 +47,12 @@
    */
   function generateHowToSchema(result) {
     const steps = [];
+
+    steps.push({
+      '@type': 'HowToStep',
+      name: '退職の申し出タイミングを確認する',
+      text: '民法上は申し出から2週間で退職できますが（民法第627条第1項）、就業規則に「1か月前まで」等の定めがある場合は、就業規則を優先して早めに直属の上司へ相談します。',
+    });
 
     steps.push({
       '@type': 'HowToStep',
@@ -123,7 +129,23 @@
         q: '月末退職と月末より前の退職、どちらが得ですか？',
         a: '月末退職の場合、当月分の社会保険料は会社との労使折半（自己負担50%）で済みます。月末より前に退職すると、当月分は国民健康保険・国民年金へ自己全額負担（100%）で加入する必要が生じる場合があります。',
       },
+      {
+        q: '退職の申し出はいつまでにすればいいですか？',
+        a: '民法上は申し出から2週間の経過で退職できます（民法第627条第1項）。ただし多くの会社の就業規則には「1か月前まで」等の独自ルールがあり、円満退職のためには就業規則を確認したうえで早めに直属の上司へ相談するのが実務上の目安です。',
+      },
     ];
+
+    if (result.qualification && result.qualification.insuranceType === 'kyosai') {
+      baseFaqs.push({
+        q: '公務員の共済組合の場合も同じ計算でいいですか？',
+        a: '共済組合（公務員等）は健康保険組合とは異なる独自の規定・手続きが優先されるため、本ツールの試算はあくまで一般的な目安です。退職・保険の切り替えの詳細は、必ず所属先の共済組合窓口にご確認ください。',
+      });
+    } else if (result.qualification && result.qualification.insuranceType === 'kumiai') {
+      baseFaqs.push({
+        q: '健康保険組合に加入している場合、何か違いはありますか？',
+        a: '健康保険組合（組合健保）は、協会けんぽとは別に独自の付加給付や任意継続時の保険料上限額を設けている場合があります。詳細は加入している組合の規約をご確認ください。',
+      });
+    }
 
     if (result.insuranceGap) {
       if (result.insuranceGap.type === 'gap') {

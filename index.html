@@ -54,11 +54,17 @@
   <!-- ============ STEP 1: 予定日入力 ============ -->
   <section id="step1" class="step-panel active">
     <h1 class="text-xl font-black leading-snug mb-1 text-navy">損しない退職日、逆算します。</h1>
-    <p class="text-sm text-slate-500 mb-6">3つの入力だけで、最終出社日・資格喪失日・手取り最大化効果がわかります。</p>
+    <p class="text-sm text-slate-500 mb-3">3つの入力だけで、最終出社日・資格喪失日・手取り最大化効果がわかります。</p>
+    <p class="aio-answer">トク退｜退職日計算ナビは、退職希望日・有給残日数・年収・賞与支給日を入力するだけで、社会保険料の負担が最も少なく賞与も受け取れる「理想の退職日」を無料で自動算出するツールです。登録不要、入力内容は端末内だけで処理されサーバーには送信されません。</p>
 
-    <div>
+    <div class="mt-5">
       <label class="block text-xs font-bold text-slate-500 mb-1.5">退職を希望する日</label>
       <input id="inputResignDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <div class="quick-chip-row" id="resignDateChips">
+        <button type="button" class="qc-chip" data-quick="2weeks">2週間後</button>
+        <button type="button" class="qc-chip" data-quick="thisMonthEnd">今月末</button>
+        <button type="button" class="qc-chip" data-quick="nextMonthEnd">来月末</button>
+      </div>
       <p class="text-[11px] text-slate-400 mt-1.5">未入力の場合、当月末日を自動セットします。過去日付は選択できません。</p>
     </div>
 
@@ -207,12 +213,15 @@
         <p class="text-[11px] text-slate-400 mt-1.5">前回の明細やだいたいの相場でOKです。支給日に在籍しているかどうかの判定に使います。</p>
       </div>
 
-      <label class="flex items-center gap-2.5 bg-white rounded-xl border border-slate-200 p-4 shadow-card">
-        <input id="inputUnionKenpo" type="checkbox" class="w-4 h-4 accent-emerald">
-        <span class="text-sm font-bold">健康保険証に「〇〇健康保険組合」と書かれている
-          <span class="block text-[11px] font-normal text-slate-400 mt-0.5">わからなければチェック不要です（結果への影響は補足情報のみです）</span>
-        </span>
-      </label>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">加入中の健康保険</label>
+        <select id="inputInsuranceType" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+          <option value="kyokai" selected>協会けんぽ</option>
+          <option value="kumiai">健康保険組合（組合健保）</option>
+          <option value="kyosai">共済組合（公務員等）</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-1.5">健康保険証に記載されています。わからなければ「協会けんぽ」のままでOKです（結果への影響は補足情報のみです）。</p>
+      </div>
 
       <div>
         <label class="block text-xs font-bold text-slate-500 mb-2">退職後の進路</label>
@@ -244,20 +253,22 @@
 
     <div id="timeline" class="space-y-5 mb-6"></div>
 
+    <button id="btnLineCV" type="button" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-navy rounded-xl py-3.5 font-bold text-sm mb-3">
+      <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>
+      診断結果の保存・個別カレンダー作成はLINEで受け取る
+    </button>
+
     <button id="btnShareX" class="w-full flex items-center justify-center gap-2 bg-navy text-white rounded-xl py-3.5 font-bold text-sm mb-3">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       診断結果をXでシェアする
     </button>
     <button id="btnRestart" class="w-full text-center text-xs text-slate-400 underline py-2 mb-6">最初からやり直す</button>
 
-    <!-- コンプライアンス常時掲載事項 -->
-    <div class="border-t border-slate-200 pt-4 space-y-2">
-      <p class="text-[11px] text-slate-400 leading-relaxed">
-        ※本シミュレーション結果は一般的な法令に基づく目安であり、個別の最終判定は管轄のハローワーク・年金事務所・健康保険組合が行います。
-      </p>
-      <p class="text-[11px] text-slate-400 leading-relaxed">
-        ※本ページはプロモーション（PR）を含みます。提携リンク経由のお申し込みにより、当サイトに紹介料が発生する場合があります。
-      </p>
+    <!-- コンプライアンス常時掲載事項（v6.0仕様書 6.免責事項） -->
+    <div class="legal-disclaimer">
+      <p class="ld-title">【免責事項・注意事項】</p>
+      <p>本シミュレーションによる試算結果は、労働基準法、民法、健康保険法および厚生年金保険法等の関係法令に基づき算出された<b>概算値</b>であり、個別の雇用契約内容、就業規則、労使協定、または所轄労働基準監督署・年金事務所の判断により異なる場合があります。本ツールの利用により生じた直接的・間接的トラブルや損害について、当サービス運営者は一切の法的責任を負いません。最終的な退職日および社会保険の引き継ぎ手続きについては、必ず勤務先の労務担当者または管轄の年金事務所・ハローワークへご確認ください。</p>
+      <p class="ld-pr">※本ページはプロモーション（PR）を含みます。提携リンク経由のお申し込みにより、当サイトに紹介料が発生する場合があります。</p>
     </div>
   </section>
 

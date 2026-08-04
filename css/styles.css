@@ -174,6 +174,46 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 
 .branch-btn{background:#fff;cursor:pointer;transition:border-color .15s ease,background-color .15s ease;}
 
+/* ---------- AIOアンサーファースト・ブロック ---------- */
+.aio-answer{
+  font-size:.78rem;line-height:1.85;color:var(--slate-600);
+  background:var(--navy-50);border:1px solid var(--slate-200);border-radius:.7rem;
+  padding:.75rem .9rem;margin:0;
+}
+
+/* ---------- クイック日付チップ ---------- */
+.quick-chip-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.qc-chip{
+  font-family:inherit;font-weight:800;font-size:.76rem;
+  padding:7px 12px;border-radius:999px;
+  border:1.5px solid var(--emerald);background:var(--emerald-light);color:var(--emerald-dark);
+  cursor:pointer;transition:transform .12s ease,background-color .12s ease;
+}
+.qc-chip:active{transform:scale(.94);background:var(--emerald);color:#fff;}
+
+/* ---------- 法務：免責事項 ---------- */
+.legal-disclaimer{
+  background:var(--slate-50);border:1px solid var(--slate-200);border-radius:.75rem;
+  padding:14px 15px;margin-top:8px;
+}
+.legal-disclaimer p{font-size:.7rem;line-height:1.9;color:var(--slate-500);margin:0 0 8px;}
+.legal-disclaimer p:last-child{margin-bottom:0;}
+.legal-disclaimer .ld-title{font-size:.72rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.legal-disclaimer .ld-pr{color:var(--slate-400);}
+
+/* ---------- 損失回避コピー（結果画面トップ） ---------- */
+.loss-aversion-warn{
+  font-size:.85rem;font-weight:700;line-height:1.8;color:#fff;
+  background:rgba(153,27,27,.32);border:1.5px solid rgba(254,202,202,.6);
+  border-radius:.7rem;padding:10px 13px;margin:0 0 12px;
+}
+.loss-aversion-warn b{font-weight:900;}
+.loss-aversion-safe{
+  font-size:.85rem;font-weight:700;line-height:1.8;color:#fff;
+  background:rgba(6,95,70,.32);border:1.5px solid rgba(167,243,208,.6);
+  border-radius:.7rem;padding:10px 13px;margin:0 0 12px;
+}
+
 /* ---------- 祝日の扱い（明示的な2択ボタン） ---------- */
 .holiday-toggle-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .ht-btn{

@@ -1,6 +1,6 @@
 /**
  * calculator.js
- * 「トク退」社労士実務試算エンジン Ver.4.0.0
+ * 「トク退」社労士実務試算エンジン Ver.6.0
  * 資格喪失日／標準報酬月額等級／有休消化逆算／社会保険料の月末最適化／
  * 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア、一般Caution）を提供する。
  * window.TokutaiCalculator として公開。
@@ -14,10 +14,24 @@
   const H = global.HolidaysJP;
 
   // ---- 日付ユーティリティ ----
-  function parseDate(dateStr) {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return new Date(y, m - 1, d);
+  /**
+   * iOS Safari等での時差・NaNバグを防ぐため、日付文字列を数値へ分解してから
+   * ローカルタイムゾーンの Date を安全に生成する。
+   * 不正な入力（空文字・区切り不足など）の場合は現在時刻の Date を返す。
+   * @param {string} dateString 'YYYY-MM-DD' または 'YYYY/MM/DD'
+   */
+  function parseSafeDate(dateString) {
+    if (!dateString) return new Date();
+    const parts = String(dateString).split(/[-/]/);
+    if (parts.length !== 3) return new Date();
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const d = parseInt(parts[2], 10);
+    if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return new Date();
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
   }
+  // 旧名 parseDate は既存コード全体との互換のため parseSafeDate のエイリアスとして残す
+  const parseDate = parseSafeDate;
   function fmtJP(date) {
     return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
   }
@@ -40,11 +54,22 @@
   // ① 社会保険料資格喪失日（健康保険法第36条）
   // ---------------------------------------------------------------
   /**
+   * 加入中の健康保険の種類ごとの注記。
+   *   kyokai: 協会けんぽ（デフォルト）
+   *   kumiai: 健康保険組合（組合健保）
+   *   kyosai: 共済組合（公務員等）
+   */
+  const INSURANCE_TYPE_NOTES = {
+    kumiai: 'ご加入の健康保険が「健康保険組合」の場合、独自のお得な付加給付や任意継続時の保険料上限額が設定されている場合があります。組合の規約をご確認ください。',
+    kyosai: '共済組合（公務員等）は健康保険組合とは異なる独自の規定・手続きが優先されます。退職・保険の切り替えについては、必ず所属先の共済組合窓口にご確認ください。',
+  };
+
+  /**
    * 資格喪失日 = 退職日の翌日。
    * @param {Date} lastWorkDate 退職日（雇用契約上の最終在籍日）
-   * @param {boolean} isUnionKenpo 健康保険組合（組合健保）加入者か
+   * @param {string} insuranceType 加入中の健康保険種別 'kyokai'|'kumiai'|'kyosai'
    */
-  function calcQualificationLossDate(lastWorkDate, isUnionKenpo) {
+  function calcQualificationLossDate(lastWorkDate, insuranceType) {
     const lossDate = addDays(lastWorkDate, 1);
     const isMonthEnd = isLastDayOfMonth(lastWorkDate);
     return {
@@ -54,9 +79,18 @@
       note: isMonthEnd
         ? '月末退職のため、当月分の社会保険料は会社と労使折半（自己負担50%）で済みます。'
         : '月末より前の退職のため、当月分の社会保険料は徴収されない一方、当月分は国民健康保険・国民年金へ自己全額負担（100%）で加入する必要があります。',
-      unionKenpoNote: isUnionKenpo
-        ? 'ご加入の健康保険が「健康保険組合」の場合、独自のお得な付加給付や任意継続時の保険料上限額が設定されている場合があります。組合の規約をご確認ください。'
-        : null,
+      insuranceType: insuranceType || 'kyokai',
+      insuranceTypeNote: INSURANCE_TYPE_NOTES[insuranceType] || null,
+    };
+  }
+
+  // ---------------------------------------------------------------
+  // ⓪ 就業規則アドバイス（民法627条 と 就業規則の申し出期限の関係）
+  // ---------------------------------------------------------------
+  function buildResignationNoticeAdvice() {
+    return {
+      title: '退職の申し出はいつまでにすべき？',
+      body: '民法上は、期間の定めのない雇用契約であれば申し出から2週間の経過で退職できます（民法第627条第1項）。ただし多くの会社の就業規則には「1か月前まで」等の独自ルールがあり、円満退職のためには法律より就業規則を優先して早めに相談するのが実務上の目安です。まずは会社の就業規則を確認し、直属の上司に事前相談しましょう。',
     };
   }
 
@@ -363,10 +397,15 @@
   // ⑧ 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア／一般Caution）
   // ---------------------------------------------------------------
   /**
-   * 仕様書 4.1 の文脈型マネタイズ導線テーブルに準拠。
+   * v6.0仕様書 5. の「進路別動的パーソナライズ・オファーマトリクス」に準拠。
    * critical: Crimson Red 警告。存在する場合は必ず Emerald Green の solution とペアで返す。
    * caution: Amber Yellow の一般注意（住民税一括徴収・空白期間・離職票タイムラグ等）。
-   * monetize: 進路の文脈に調和したPR導線（タスクコンテキスト付き）。
+   * monetize: 進路の文脈に調和したPR導線（taskContext/message/ctaLabel/offerCategory を持つ）。
+   *
+   * 注：仕様書原案の療養・無職向けコピーには「国から最大28ヶ月の給付金」という記載があったが、
+   * 傷病手当金の上限は最長1年6ヶ月（18ヶ月）、雇用保険の基本手当は所定給付日数（最大でも
+   * 数百日単位）であり、単純合算しても28ヶ月には届かない根拠不明な数値だったため、
+   * 誇張のない表現に修正して実装している。
    */
   function getBranchContext(branch) {
     const CONTEXT = {
@@ -379,8 +418,9 @@
         critical: null,
         monetize: {
           taskContext: 'STEP2: 有休消化期間',
-          message: '有休消化中の引き継ぎ完了後、時間を有効活用して次のキャリアのスカウトを受け取る',
+          message: '有休消化中の2週間で次のキャリアのスカウトを受け取る',
           ctaLabel: '無料スカウト登録・転職エージェントを見る',
+          offerCategory: '転職スカウト・退職代行',
         },
       },
       recuperation: {
@@ -394,8 +434,9 @@
         },
         monetize: {
           taskContext: 'STEP1: 退職手続き',
-          message: '体調不良で会社との退職交渉や手続きが困難な場合、無理をせず専門家に委任する',
+          message: '自己都合退職でも、条件を満たせば傷病手当金や失業給付などの公的な給付金を受け取れる場合があります',
           ctaLabel: '退職代行・退職給付金サポート相談窓口を見る',
+          offerCategory: '傷病手当金・給付金サポート',
         },
       },
       independence: {
@@ -409,8 +450,9 @@
         },
         monetize: {
           taskContext: 'STEP3: 開業届提出',
-          message: '受給資格決定から1か月経過後以降、スマホで10分・提出日を指定して無料で開業届を作成する',
+          message: '国保より安くなる？個人事業主の社会保険料を見直しつつ、無料で開業届を作成する',
           ctaLabel: '無料で開業届を作成する（freee開業 / マネーフォワード開業）',
+          offerCategory: 'freee開業 / マネーフォワード開業',
         },
       },
     };
@@ -426,12 +468,14 @@
 
   global.TokutaiCalculator = {
     parseDate,
+    parseSafeDate,
     fmtJP,
     fmtISO,
     addDays,
     lastDayOfMonth,
     isLastDayOfMonth,
     calcQualificationLossDate,
+    buildResignationNoticeAdvice,
     calcStandardRemunerationGrade,
     calcPaidLeaveBackward,
     calcLastWorkDayByCount,
