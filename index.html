@@ -61,6 +61,12 @@
       <input id="inputResignDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
       <p class="text-[11px] text-slate-400 mt-1.5">未入力の場合、当月末日を自動セットします。過去日付は選択できません。</p>
     </div>
+
+    <div class="mt-5">
+      <label class="block text-xs font-bold text-slate-500 mb-1.5">次の会社への入社予定日（決まっていれば）</label>
+      <input id="inputNextJoinDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れないおすすめの退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
+    </div>
   </section>
 
   <!-- ============ STEP 2: 休日・有休設定 ============ -->
@@ -144,26 +150,36 @@
   <!-- ============ STEP 3: 条件・進路設定 ============ -->
   <section id="step3" class="step-panel">
     <h2 class="text-lg font-black text-navy mb-1">給与・進路の設定</h2>
-    <p class="text-sm text-slate-500 mb-6">最後に、給与と退職後の進路を教えてください。</p>
+    <p class="text-sm text-slate-500 mb-6">最後に、おおよその年収と退職後の進路を教えてください。</p>
 
     <div class="space-y-5">
       <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">額面月給（総支給・概算）</label>
-        <input id="inputSalary" type="number" min="0" step="1000" placeholder="例：280000" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">退職後の健康保険の希望</label>
-        <select id="inputInsuranceContinuation" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white">
-          <option value="kokuho">国民健康保険に加入する</option>
-          <option value="ninikeizoku">任意継続被保険者になる（最大2年）</option>
-          <option value="fuyou">家族の扶養に入る</option>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">去年1年間の年収（総支給・概算でOK）</label>
+        <select id="inputAnnualIncome" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+          <option value="" disabled selected>選択してください</option>
+          <option value="2400000">250万円未満</option>
+          <option value="2750000">250万円台</option>
+          <option value="3250000">300万円台</option>
+          <option value="3750000">350万円台</option>
+          <option value="4250000">400万円台</option>
+          <option value="4750000">450万円台</option>
+          <option value="5250000">500万円台</option>
+          <option value="5750000">550万円台</option>
+          <option value="6250000">600万円台</option>
+          <option value="6750000">650万円台</option>
+          <option value="7500000">700万円台</option>
+          <option value="8500000">800万円台</option>
+          <option value="9500000">900万円台</option>
+          <option value="11000000">1000万円以上</option>
         </select>
+        <p class="text-[11px] text-slate-400 mt-1.5">源泉徴収票や去年の手取りから、だいたいの帯で選んでください。賞与を含む年収を12等分して社会保険料の等級を概算します。</p>
       </div>
 
       <label class="flex items-center gap-2.5 bg-white rounded-xl border border-slate-200 p-4 shadow-card">
         <input id="inputUnionKenpo" type="checkbox" class="w-4 h-4 accent-emerald">
-        <span class="text-sm font-bold">現在の健康保険は「健康保険組合」に加入している</span>
+        <span class="text-sm font-bold">健康保険証に「〇〇健康保険組合」と書かれている
+          <span class="block text-[11px] font-normal text-slate-400 mt-0.5">わからなければチェック不要です（結果への影響は補足情報のみです）</span>
+        </span>
       </label>
 
       <div>

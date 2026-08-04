@@ -213,7 +213,79 @@
   }
 
   // ---------------------------------------------------------------
-  // ⑤ 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア／一般Caution）
+  // ⑤ 年収→月給の簡易換算（標準報酬月額の推定に使う）
+  // ---------------------------------------------------------------
+  /**
+   * 年収（賞与込み）を12等分して月給の概算値を出す。
+   * 標準報酬月額は本来「賞与を除いた月々の固定給」で決まるため、
+   * 賞与の割合が大きい人ほどこの概算は実額より高めに出る点に注意。
+   */
+  function estimateMonthlyFromAnnual(annualIncomeYen) {
+    const annual = Math.max(0, Number(annualIncomeYen) || 0);
+    return Math.round(annual / 12);
+  }
+
+  // ---------------------------------------------------------------
+  // ⑥ 社会保険の空白期間判定（次の入社日が分かっている場合）
+  // ---------------------------------------------------------------
+  /**
+   * @param {Date} resignDateForGap 空白期間の起点とする退職日（推奨退職日など）
+   * @param {string|null} nextJoinDateStr 次の入社予定日 'YYYY-MM-DD'（未入力ならnull）
+   */
+  function calcInsuranceGap(resignDateForGap, nextJoinDateStr) {
+    if (!nextJoinDateStr) return null;
+    const nextJoin = parseDate(nextJoinDateStr);
+    const lossDate = addDays(resignDateForGap, 1); // 資格喪失日 = 退職日の翌日
+    const gapDays = Math.round((nextJoin.getTime() - lossDate.getTime()) / 86400000);
+
+    if (gapDays === 0) {
+      return { type: 'none', days: 0, nextJoinLabel: fmtJP(nextJoin) };
+    }
+    if (gapDays > 0) {
+      return { type: 'gap', days: gapDays, nextJoinLabel: fmtJP(nextJoin) };
+    }
+    return { type: 'overlap', days: Math.abs(gapDays), nextJoinLabel: fmtJP(nextJoin) };
+  }
+
+  // ---------------------------------------------------------------
+  // ⑦ おすすめ退職日の統合判定
+  // ---------------------------------------------------------------
+  /**
+   * 「結局いつ辞めればいいか」への単一の結論を返す。
+   * 次の入社日が未定の場合は、社会保険料が最適な月末退職日を推奨する。
+   * 次の入社日が確定している場合は、それより後ろの月末退職を勧めても
+   * 実行不可能なため、空白期間が生じない「入社日の前日」を優先して推奨する
+   * （月末がその前日以前に収まるなら、両方の条件を満たせる）。
+   *
+   * @param {Date} resignDate 今考えている退職日
+   * @param {string|null} nextJoinDateStr 次の入社予定日
+   * @param {object} insuranceOptimization calcInsuranceOptimization() の結果
+   */
+  function calcRecommendedResignDate(resignDate, nextJoinDateStr, insuranceOptimization) {
+    if (!nextJoinDateStr) {
+      return {
+        date: insuranceOptimization.optimalDate,
+        dateLabel: insuranceOptimization.optimalDateLabel,
+        limitedByNextJob: false,
+        isSameAsUserPlan: isLastDayOfMonth(resignDate) && insuranceOptimization.isOptimal,
+      };
+    }
+
+    const nextJoin = parseDate(nextJoinDateStr);
+    const dayBeforeNextJoin = addDays(nextJoin, -1);
+    const monthEndFitsBeforeNextJoin = dayBeforeNextJoin.getTime() >= insuranceOptimization.optimalDate.getTime();
+
+    const date = monthEndFitsBeforeNextJoin ? insuranceOptimization.optimalDate : dayBeforeNextJoin;
+    return {
+      date,
+      dateLabel: fmtJP(date),
+      limitedByNextJob: !monthEndFitsBeforeNextJoin,
+      isSameAsUserPlan: fmtISO(date) === fmtISO(resignDate),
+    };
+  }
+
+  // ---------------------------------------------------------------
+  // ⑧ 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア／一般Caution）
   // ---------------------------------------------------------------
   /**
    * 仕様書 4.1 の文脈型マネタイズ導線テーブルに準拠。
@@ -288,6 +360,9 @@
     calcStandardRemunerationGrade,
     calcPaidLeaveBackward,
     calcLastWorkDayByCount,
+    estimateMonthlyFromAnnual,
+    calcInsuranceGap,
+    calcRecommendedResignDate,
     calcInsuranceOptimization,
     calcTakeHomeImpact,
     getBranchContext,

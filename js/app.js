@@ -17,14 +17,15 @@
 
   const state = {
     resignDate: null,      // 'YYYY-MM-DD'
+    nextJoinDate: null,    // 'YYYY-MM-DD'（次の会社への入社予定日・任意）
     closedOnSaturday: true,
     closedOnHolidays: true,
     extraOffDates: [],     // ['YYYY-MM-DD', ...] 会社独自の休み
     extraWorkDates: [],    // ['YYYY-MM-DD', ...] 会社独自の出勤日
     paidLeave: null,
     handoverDays: 0,       // 引き継ぎ必要日数
-    salary: null,
-    insuranceContinuation: 'kokuho',
+    annualIncome: null,    // 選択した年収帯の代表額（円）
+    salary: null,          // annualIncome から換算した月給概算（円）
     isUnionKenpo: false,
     branch: null,
     result: null,
@@ -72,6 +73,10 @@
       saveToStorage();
       validateStep1();
     });
+    document.getElementById('inputNextJoinDate').addEventListener('change', e => {
+      state.nextJoinDate = e.target.value || null;
+      saveToStorage();
+    });
 
     // STEP2
     document.getElementById('toggleSaturday').addEventListener('click', () => toggleSwitch('closedOnSaturday'));
@@ -91,14 +96,11 @@
     document.getElementById('btnAddExtraWorkDate').addEventListener('click', () => onAddExtraDate('work'));
 
     // STEP3
-    document.getElementById('inputSalary').addEventListener('input', e => {
-      state.salary = e.target.value;
+    document.getElementById('inputAnnualIncome').addEventListener('change', e => {
+      state.annualIncome = e.target.value || null;
+      state.salary = state.annualIncome ? Calc.estimateMonthlyFromAnnual(state.annualIncome) : null;
       saveToStorage();
       validateStep3();
-    });
-    document.getElementById('inputInsuranceContinuation').addEventListener('change', e => {
-      state.insuranceContinuation = e.target.value;
-      saveToStorage();
     });
     document.getElementById('inputUnionKenpo').addEventListener('change', e => {
       state.isUnionKenpo = e.target.checked;
@@ -244,7 +246,7 @@
     return valid;
   }
   function validateStep3() {
-    const valid = !!state.salary && !!state.branch;
+    const valid = !!state.annualIncome && !!state.branch;
     document.getElementById('btnNext').disabled = !valid;
     return valid;
   }
@@ -271,15 +273,15 @@
   function onRestart() {
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state, {
-      resignDate: null, closedOnSaturday: true, closedOnHolidays: true,
+      resignDate: null, nextJoinDate: null, closedOnSaturday: true, closedOnHolidays: true,
       extraOffDates: [], extraWorkDates: [],
-      paidLeave: null, handoverDays: 0, salary: null, insuranceContinuation: 'kokuho', isUnionKenpo: false,
+      paidLeave: null, handoverDays: 0, annualIncome: null, salary: null, isUnionKenpo: false,
       branch: null, result: null,
     });
+    document.getElementById('inputNextJoinDate').value = '';
     document.getElementById('inputPaidLeave').value = '';
     document.getElementById('inputHandoverDays').value = '0';
-    document.getElementById('inputSalary').value = '';
-    document.getElementById('inputInsuranceContinuation').value = 'kokuho';
+    document.getElementById('inputAnnualIncome').value = '';
     document.getElementById('inputUnionKenpo').checked = false;
     document.getElementById('toggleSaturday').classList.add('toggle-on');
     document.getElementById('toggleHoliday').classList.add('toggle-on');
@@ -303,12 +305,22 @@
     const gradeResult = Calc.calcStandardRemunerationGrade(state.salary);
     const qualification = Calc.calcQualificationLossDate(resignDate, state.isUnionKenpo);
     const insuranceOptimization = Calc.calcInsuranceOptimization(resignDate, gradeResult);
-    const impact = Calc.calcTakeHomeImpact(state.salary, state.paidLeave, insuranceOptimization);
     const branchContext = Calc.getBranchContext(state.branch);
+    const recommendation = Calc.calcRecommendedResignDate(resignDate, state.nextJoinDate, insuranceOptimization);
+    const insuranceGap = Calc.calcInsuranceGap(recommendation.date, state.nextJoinDate);
+
+    // 入社日の制約で月末退職を選べない場合、社会保険料の最適化は実際には達成されない。
+    // 「参考」欄の金額が推奨アクションと矛盾しないよう、そのケースは節約額を0にする。
+    const impactRaw = Calc.calcTakeHomeImpact(state.salary, state.paidLeave, insuranceOptimization);
+    const recommendationAchievesMonthEnd = Calc.isLastDayOfMonth(recommendation.date);
+    const impact = recommendationAchievesMonthEnd
+      ? impactRaw
+      : { ...impactRaw, insuranceSavings: 0, totalImpact: impactRaw.paidLeaveValue };
 
     state.result = {
       resignDate,
       resignDateLabel: Calc.fmtJP(resignDate),
+      nextJoinDate: state.nextJoinDate,
       lastWorkDay: paidLeaveResult.lastWorkDay,
       lastWorkDayLabel: Calc.fmtJP(paidLeaveResult.lastWorkDay),
       paidLeaveStartDay: paidLeaveResult.paidLeaveStartDay,
@@ -316,6 +328,8 @@
       grade: gradeResult,
       qualification,
       insuranceOptimization,
+      recommendation,
+      insuranceGap,
       impact,
       branch: state.branch,
       branchContext,
@@ -332,19 +346,29 @@
   function renderResult() {
     const r = state.result;
 
-    // 手取り最大化インパクトカード（Gold Amber）
+    // ヘッダーカード：まず「結局いつ辞めればいいか」の結論を最上段に出す（Gold Amber）
     const impactCard = document.getElementById('impactCard');
-    const optimalNote = r.insuranceOptimization.isOptimal
-      ? '現在の退職希望日はすでに社会保険料の観点で最適な「月末退職」です。'
-      : `退職日を${r.insuranceOptimization.optimalDateLabel}（月末）に変更すると、社会保険料の自己負担を約${r.insuranceOptimization.potentialSavings.toLocaleString()}円抑えられる可能性があります。`;
+    const headline = buildHeadline(r);
+    const compareRow = r.recommendation.isSameAsUserPlan ? '' : `
+      <p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">
+        今考えていた日：${escapeHtml(r.resignDateLabel)}　→　おすすめ：${escapeHtml(r.recommendation.dateLabel)}
+      </p>`;
+    const gapNote = buildGapNote(r);
+
     impactCard.innerHTML = `
-      <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">手取り最大化インパクト</p>
-      <p class="text-3xl font-black mb-1">${r.impact.totalImpact.toLocaleString()}円</p>
-      <p class="text-xs opacity-90 leading-relaxed mb-2">
-        有休消化価値 約${r.impact.paidLeaveValue.toLocaleString()}円（日給概算${r.impact.dailyWage.toLocaleString()}円×${r.impact.days}日）
-        ${r.impact.insuranceSavings > 0 ? `＋ 社会保険料最適化 約${r.impact.insuranceSavings.toLocaleString()}円` : ''}
-      </p>
-      <p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed">最適退職日：${r.insuranceOptimization.optimalDateLabel}／${escapeHtml(optimalNote)}</p>
+      <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">あなたにおすすめの退職日</p>
+      <p class="text-3xl font-black mb-2">${escapeHtml(r.recommendation.dateLabel)}</p>
+      <p class="text-xs opacity-90 leading-relaxed mb-2">${escapeHtml(headline)}</p>
+      ${compareRow}
+      ${gapNote}
+      <div class="border-t pt-3 mt-3" style="border-color:rgba(255,255,255,.25);">
+        <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">手取り最大化インパクト（参考）</p>
+        <p class="text-xl font-black mb-1">約${r.impact.totalImpact.toLocaleString()}円</p>
+        <p class="text-xs opacity-90 leading-relaxed">
+          有休消化価値 約${r.impact.paidLeaveValue.toLocaleString()}円（日給概算${r.impact.dailyWage.toLocaleString()}円×${r.impact.days}日）
+          ${r.impact.insuranceSavings > 0 ? `＋ 社会保険料最適化 約${r.impact.insuranceSavings.toLocaleString()}円` : ''}
+        </p>
+      </div>
     `;
 
     const timeline = document.getElementById('timeline');
@@ -423,6 +447,48 @@
     }
   }
 
+  // ---------------------------------------------------------------
+  // 結論の見出し文言（「結局いつ辞めればいいか」への一言回答）
+  // ---------------------------------------------------------------
+  function buildHeadline(r) {
+    const rec = r.recommendation;
+
+    if (!r.nextJoinDate) {
+      if (rec.isSameAsUserPlan) {
+        return `今考えている退職日（${r.resignDateLabel}）のままで大丈夫です。社会保険料の観点でも最適な月末退職になっています。`;
+      }
+      return `社会保険料の自己負担を約${r.insuranceOptimization.potentialSavings.toLocaleString()}円抑えられるため、退職日を${rec.dateLabel}（月末）に変更することをおすすめします。`;
+    }
+
+    if (rec.limitedByNextJob) {
+      let msg = `次の入社日（${r.insuranceGap ? r.insuranceGap.nextJoinLabel : ''}）の前日が、社会保険を途切れさせずに退職できる最終日です。`;
+      if (!r.insuranceOptimization.isOptimal) {
+        msg += `本来は${r.insuranceOptimization.optimalDateLabel}（月末）まで在籍すると社会保険料がさらにお得ですが、入社日に間に合わないためおすすめできません。`;
+      }
+      return msg;
+    }
+
+    if (r.insuranceGap && r.insuranceGap.type === 'gap') {
+      return `退職日を${rec.dateLabel}（月末）にすると社会保険料はお得になりますが、次の入社日までの間に約${r.insuranceGap.days}日間、健康保険の空白期間が生じます。`;
+    }
+    return `退職日を${rec.dateLabel}（月末）にすると、社会保険料がお得になり、次の入社日まで健康保険が途切れることもありません。`;
+  }
+
+  // ---------------------------------------------------------------
+  // 空白期間（社会保険の切れ目）の注記
+  // ---------------------------------------------------------------
+  function buildGapNote(r) {
+    if (!r.insuranceGap) return '';
+    const g = r.insuranceGap;
+    if (g.type === 'none') {
+      return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">✓ 社会保険の空白期間なし：退職日の翌日＝入社日（${escapeHtml(g.nextJoinLabel)}）なので、手続きなしで新しい健康保険・厚生年金にそのまま移行できます。</p>`;
+    }
+    if (g.type === 'gap') {
+      return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">⚠ 約${g.days}日間の空白期間が発生：入社日（${escapeHtml(g.nextJoinLabel)}）までの間、国民健康保険・国民年金への一時加入、または任意継続被保険者制度の手続きが必要です。</p>`;
+    }
+    return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">⚠ 退職日と入社日が重なっています：入社日（${escapeHtml(g.nextJoinLabel)}）が退職日より前になっているため、日程を見直してください。</p>`;
+  }
+
   function buildTimelineCard({ heading, snippetFuel, body, colorClass, labelClass, labelText }) {
     const el = document.createElement('div');
     el.className = `rounded-2xl border-2 p-4 shadow-card ${colorClass}`;
@@ -493,7 +559,7 @@
     if (!r) return;
     const text = [
       `【退職日シミュレーション結果】`,
-      `最適退職日：${r.insuranceOptimization.optimalDateLabel}`,
+      `おすすめの退職日：${r.recommendation.dateLabel}`,
       `最終出社日：${r.lastWorkDayLabel}`,
       `資格喪失日：${r.qualification.lossDateLabel}`,
       `手取り最大化インパクト：約${r.impact.totalImpact.toLocaleString()}円`,
@@ -538,14 +604,15 @@
     try {
       const persistable = {
         resignDate: state.resignDate,
+        nextJoinDate: state.nextJoinDate,
         closedOnSaturday: state.closedOnSaturday,
         closedOnHolidays: state.closedOnHolidays,
         extraOffDates: state.extraOffDates,
         extraWorkDates: state.extraWorkDates,
         paidLeave: state.paidLeave,
         handoverDays: state.handoverDays,
+        annualIncome: state.annualIncome,
         salary: state.salary,
-        insuranceContinuation: state.insuranceContinuation,
         isUnionKenpo: state.isUnionKenpo,
         branch: state.branch,
       };
@@ -565,10 +632,14 @@
       if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
       if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
 
+      if (state.nextJoinDate) document.getElementById('inputNextJoinDate').value = state.nextJoinDate;
       if (state.paidLeave !== null && state.paidLeave !== undefined) document.getElementById('inputPaidLeave').value = state.paidLeave;
       document.getElementById('inputHandoverDays').value = state.handoverDays;
-      if (state.salary) document.getElementById('inputSalary').value = state.salary;
-      document.getElementById('inputInsuranceContinuation').value = state.insuranceContinuation || 'kokuho';
+      if (state.annualIncome) {
+        document.getElementById('inputAnnualIncome').value = state.annualIncome;
+        // 旧データ互換：salary が未保存の場合は annualIncome から再計算する
+        if (!state.salary) state.salary = Calc.estimateMonthlyFromAnnual(state.annualIncome);
+      }
       document.getElementById('inputUnionKenpo').checked = !!state.isUnionKenpo;
       document.getElementById('toggleSaturday').classList.toggle('toggle-on', state.closedOnSaturday !== false);
       document.getElementById('toggleHoliday').classList.toggle('toggle-on', state.closedOnHolidays !== false);

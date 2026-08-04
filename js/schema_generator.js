@@ -68,11 +68,11 @@
         text: `${result.paidLeaveStartLabel}から有給休暇の消化期間に入ります。`,
       });
     }
-    if (result.resignDateLabel) {
+    if (result.recommendation && result.recommendation.dateLabel) {
       steps.push({
         '@type': 'HowToStep',
         name: '退職日を迎える',
-        text: `${result.resignDateLabel}が雇用契約上の最終在籍日（退職日）です。${result.qualification.note}`,
+        text: `おすすめの退職日は${result.recommendation.dateLabel}です。${result.qualification.note}`,
       });
     }
     if (result.qualification && result.qualification.lossDateLabel) {
@@ -80,6 +80,13 @@
         '@type': 'HowToStep',
         name: '社会保険の資格喪失日を把握する',
         text: `健康保険・厚生年金の資格喪失日は${result.qualification.lossDateLabel}です。`,
+      });
+    }
+    if (result.insuranceGap && result.insuranceGap.type === 'gap') {
+      steps.push({
+        '@type': 'HowToStep',
+        name: '空白期間の健康保険を手続きする',
+        text: `次の入社日（${result.insuranceGap.nextJoinLabel}）までの約${result.insuranceGap.days}日間は、国民健康保険・国民年金への一時加入、または任意継続被保険者制度の手続きが必要です。`,
       });
     }
 
@@ -117,6 +124,20 @@
         a: '月末退職の場合、当月分の社会保険料は会社との労使折半（自己負担50%）で済みます。月末より前に退職すると、当月分は国民健康保険・国民年金へ自己全額負担（100%）で加入する必要が生じる場合があります。',
       },
     ];
+
+    if (result.insuranceGap) {
+      if (result.insuranceGap.type === 'gap') {
+        baseFaqs.push({
+          q: '次の会社の入社日までに健康保険が途切れる期間ができました。どうすればいいですか？',
+          a: `退職日の翌日から次の入社日（${result.insuranceGap.nextJoinLabel}）までの約${result.insuranceGap.days}日間は、健康保険・厚生年金の被保険者ではなくなります。この間は国民健康保険・国民年金への一時加入（原則14日以内に市区町村で手続き）、または健康保険の任意継続被保険者制度（原則20日以内に申請、最大2年）のいずれかを選ぶ必要があります。`,
+        });
+      } else if (result.insuranceGap.type === 'none') {
+        baseFaqs.push({
+          q: '転職先が決まっている場合、社会保険の手続きは必要ですか？',
+          a: '退職日の翌日と次の入社日が同じであれば、健康保険・厚生年金は途切れることなく転職先へ引き継がれるため、国民健康保険や任意継続被保険者制度の手続きは不要です。',
+        });
+      }
+    }
 
     const ctx = result.branchContext;
     if (ctx) {
