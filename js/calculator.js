@@ -116,22 +116,56 @@
   // ② 有休消化逆算（holidays.js の営業日チェッカーと連携）
   // ---------------------------------------------------------------
   /**
+   * 退職日を「有休消化1日目」として数える（退職日を含めて paidLeaveDays 日ぶんを消化する）。
+   * 旧仕様（Ver.10.1）を踏襲し、必要営業日数 = paidLeaveDays + handoverDays を
+   * 退職日から過去へ遡ってカウントし、その直前の営業日を「最終出社日」とする。
+   * paidLeaveStartDay は「有休のみ」の消化開始日（引き継ぎ日数を含まない）を別途示す。
+   *
    * @param {Date} resignDate 退職希望日（契約終了日）
    * @param {number} paidLeaveDays 有給残日数
    * @param {function} businessDayChecker holidays.js createBusinessDayChecker() の返り値
+   * @param {number} [handoverDays=0] 引き継ぎ必要日数（有休消化前に出社する日数）
    */
-  function calcPaidLeaveBackward(resignDate, paidLeaveDays, businessDayChecker) {
+  function calcPaidLeaveBackward(resignDate, paidLeaveDays, businessDayChecker, handoverDays) {
     const days = Math.max(0, Number(paidLeaveDays) || 0);
+    const handover = Math.max(0, Number(handoverDays) || 0);
+    const needDays = days + handover;
 
-    if (days === 0) {
-      return { lastWorkDay: resignDate, paidLeaveStartDay: null, businessDaysUsed: 0 };
+    if (needDays === 0) {
+      return { lastWorkDay: resignDate, paidLeaveStartDay: null, businessDaysUsed: 0, handoverDaysUsed: 0 };
     }
 
-    const dayBeforeResign = addDays(resignDate, -1);
-    const paidLeaveStartDay = H.subtractBusinessDays(addDays(dayBeforeResign, 1), days, businessDayChecker);
-    const lastWorkDay = H.subtractBusinessDays(paidLeaveStartDay, 1, businessDayChecker);
+    // 退職日自身を1日目として数えるため、起点は「退職日の翌日」からの逆算にする
+    const paidLeaveStartDay = days > 0
+      ? H.subtractBusinessDays(addDays(resignDate, 1), days, businessDayChecker)
+      : null;
 
-    return { lastWorkDay, paidLeaveStartDay, businessDaysUsed: days };
+    // 最終出社日：退職日から (有休+引き継ぎ) 営業日ぶん遡った直前の営業日
+    const lastWorkDay = calcLastWorkDayByCount(resignDate, needDays, businessDayChecker);
+
+    return { lastWorkDay, paidLeaveStartDay, businessDaysUsed: days, handoverDaysUsed: handover };
+  }
+
+  /**
+   * 起点日から過去へ1日ずつ遡り、営業日を needDays 日カウントし終えた直前の営業日を返す。
+   * 起点日自身も営業日ならカウントに含む（Ver.10.1 の calcLastWorkDay を移植）。
+   */
+  function calcLastWorkDayByCount(fromDate, needDays, businessDayChecker) {
+    const isBiz = businessDayChecker || H.isBusinessDay;
+    const GUARD = 3650; // 無限ループ保険（約10年分）
+    let cursor = new Date(fromDate);
+    let counted = 0, steps = 0;
+
+    while (counted < needDays) {
+      if (isBiz(cursor)) counted++;
+      cursor = addDays(cursor, -1);
+      if (++steps > GUARD) return cursor;
+    }
+    while (!isBiz(cursor)) {
+      cursor = addDays(cursor, -1);
+      if (++steps > GUARD) return cursor;
+    }
+    return cursor;
   }
 
   // ---------------------------------------------------------------
@@ -253,6 +287,7 @@
     calcQualificationLossDate,
     calcStandardRemunerationGrade,
     calcPaidLeaveBackward,
+    calcLastWorkDayByCount,
     calcInsuranceOptimization,
     calcTakeHomeImpact,
     getBranchContext,

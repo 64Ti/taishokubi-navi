@@ -31,52 +31,8 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="トク退">
 
-<!-- Tailwind CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          navy:    { DEFAULT: '#1E293B', 50: '#F1F5F9' },
-          gold:    { DEFAULT: '#D97706', light: '#FEF3C7', dark: '#92400E' },
-          caution: { DEFAULT: '#F59E0B', light: '#FFFBEB', dark: '#92400E' },
-          crimson: { DEFAULT: '#DC2626', light: '#FEE2E2', dark: '#991B1B' },
-          emerald: { DEFAULT: '#059669', light: '#D1FAE5', dark: '#065F46' },
-          monetize:{ DEFAULT: '#64748B', light: '#F1F5F9' },
-        },
-        fontFamily: { sans: ['"Noto Sans JP"', '"Hiragino Sans"', 'sans-serif'] },
-        boxShadow: {
-          card: '0 2px 12px rgba(30, 41, 59, 0.08)',
-          sheet: '0 -8px 30px rgba(30, 41, 59, 0.18)',
-        }
-      }
-    }
-  }
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-<style>
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Noto Sans JP', sans-serif; background: #F1F5F9; color: #1E293B; }
-  .step-panel { display: none; }
-  .step-panel.active { display: block; animation: fadeUp .35s ease both; }
-  @keyframes fadeUp { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform: translateY(0);} }
-  .bottom-sheet { transform: translateY(100%); transition: transform .32s cubic-bezier(.32,.72,0,1); }
-  .bottom-sheet.open { transform: translateY(0); }
-  .sheet-backdrop { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
-  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(20%); }
-  .snippet-fuel { font-weight: 900; }
-  .toggle-track { transition: background-color .2s ease; }
-  .toggle-thumb { transition: transform .2s ease; }
-  .toggle-on .toggle-track { background-color: #059669; }
-  .toggle-on .toggle-thumb { transform: translateX(18px); }
-  @media (prefers-reduced-motion: reduce) {
-    .step-panel.active, .bottom-sheet { animation: none !important; transition: none !important; }
-  }
-</style>
+<!-- 外部依存ゼロ：CDN・Webフォントは使わず、自前CSS(同一オリジン)のみ読み込む -->
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="pb-28">
 
@@ -137,18 +93,46 @@
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">現在の有給残日数（0〜40日）</label>
-        <input id="inputPaidLeave" type="number" min="0" max="40" placeholder="例：12" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">現在の有給残日数（0〜60日）</label>
+        <input id="inputPaidLeave" type="number" min="0" max="60" placeholder="例：12" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">独自の休業予定日（任意・最大3件）</label>
-        <div id="extraDatesList" class="space-y-2 mb-2"></div>
-        <div class="flex gap-2">
-          <input id="extraDateInput" type="date" class="flex-1 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
-          <button id="btnAddExtraDate" type="button" class="px-4 rounded-xl border border-slate-300 text-sm font-bold text-navy">追加</button>
-        </div>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">引き継ぎ必要日数（0〜60日）</label>
+        <input id="inputHandoverDays" type="number" min="0" max="60" value="0" placeholder="例：3" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+        <p class="text-[11px] text-slate-400 mt-1.5">有休消化に入る前に出社して引き継ぐ日数。最終出社日の算定に加算します。</p>
       </div>
+
+      <details class="cd-accordion" id="customDaysAccordion">
+        <summary class="cd-summary">
+          <span class="cd-title">会社独自の休日・出勤日を設定する<span class="cd-tagopt">任意</span></span>
+          <span class="cd-badge" id="cdBadge" hidden></span>
+          <span class="cd-chev"></span>
+        </summary>
+        <div class="cd-body">
+          <p class="cd-note">夏季休暇・創立記念日などの独自の休みや、祝日出勤・土曜出勤を日付ごとに指定できます。設定するとその場で試算プレビューに反映されます。</p>
+
+          <div class="cd-block">
+            <div class="cd-block-h"><span class="cd-tag off">休</span>会社独自の休み</div>
+            <div id="extraDatesList" class="cd-list" style="margin-bottom:.5rem;"></div>
+            <div class="cd-add">
+              <input id="extraDateInput" type="date" aria-label="会社独自の休みの日付">
+              <button id="btnAddExtraDate" type="button">追加</button>
+            </div>
+          </div>
+
+          <div class="cd-block">
+            <div class="cd-block-h"><span class="cd-tag work">出</span>会社独自の出勤日</div>
+            <div id="extraWorkDatesList" class="cd-list" style="margin-bottom:.5rem;"></div>
+            <div class="cd-add">
+              <input id="extraWorkDateInput" type="date" aria-label="会社独自の出勤日の日付">
+              <button id="btnAddExtraWorkDate" type="button">追加</button>
+            </div>
+          </div>
+
+          <p class="cd-pri">判定の優先順位：<b>① 独自の出勤日</b>（土日祝でも出勤）→ ② 独自の休み（平日でも休み）→ ③ 定休日・国民の祝日</p>
+        </div>
+      </details>
 
       <div id="livePreview" class="rounded-xl border-2 border-emerald bg-emerald-light p-4 hidden">
         <p class="text-[11px] font-black tracking-wider text-emerald mb-1">試算プレビュー</p>

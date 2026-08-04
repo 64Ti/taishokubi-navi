@@ -19,8 +19,10 @@
     resignDate: null,      // 'YYYY-MM-DD'
     closedOnSaturday: true,
     closedOnHolidays: true,
-    extraOffDates: [],     // ['YYYY-MM-DD', ...]
+    extraOffDates: [],     // ['YYYY-MM-DD', ...] 会社独自の休み
+    extraWorkDates: [],    // ['YYYY-MM-DD', ...] 会社独自の出勤日
     paidLeave: null,
+    handoverDays: 0,       // 引き継ぎ必要日数
     salary: null,
     insuranceContinuation: 'kokuho',
     isUnionKenpo: false,
@@ -57,6 +59,10 @@
     document.getElementById('btnRestart').addEventListener('click', onRestart);
     document.getElementById('btnShareX').addEventListener('click', onShareX);
     document.getElementById('sheetBackdrop').addEventListener('click', closeSheet);
+    document.getElementById('customDaysAccordion').addEventListener('click', e => {
+      const btn = e.target.closest('.cd-del');
+      if (btn) removeExtraDate(btn.dataset.kind, btn.dataset.date);
+    });
 
     // STEP1
     document.getElementById('inputResignDate').addEventListener('change', e => {
@@ -76,7 +82,13 @@
       validateStep2();
       updateLivePreview();
     });
-    document.getElementById('btnAddExtraDate').addEventListener('click', onAddExtraDate);
+    document.getElementById('inputHandoverDays').addEventListener('input', e => {
+      state.handoverDays = e.target.value;
+      saveToStorage();
+      updateLivePreview();
+    });
+    document.getElementById('btnAddExtraDate').addEventListener('click', () => onAddExtraDate('off'));
+    document.getElementById('btnAddExtraWorkDate').addEventListener('click', () => onAddExtraDate('work'));
 
     // STEP3
     document.getElementById('inputSalary').addEventListener('input', e => {
@@ -118,39 +130,59 @@
   }
 
   // ---------------------------------------------------------------
-  // STEP2：独自休業予定日リスト
+  // STEP2：会社独自の休日・出勤日リスト（優先順位：出勤日 > 休み > 通常判定）
   // ---------------------------------------------------------------
-  function onAddExtraDate() {
-    const input = document.getElementById('extraDateInput');
+  function onAddExtraDate(kind) {
+    const input = document.getElementById(kind === 'work' ? 'extraWorkDateInput' : 'extraDateInput');
     if (!input.value) return;
-    if (state.extraOffDates.length >= 3) return;
-    if (state.extraOffDates.includes(input.value)) return;
-    state.extraOffDates.push(input.value);
-    state.extraOffDates.sort();
+    const target = kind === 'work' ? state.extraWorkDates : state.extraOffDates;
+    const other = kind === 'work' ? state.extraOffDates : state.extraWorkDates;
+    const dateStr = input.value;
+
+    if (target.includes(dateStr)) { input.value = ''; return; }
+    const otherIdx = other.indexOf(dateStr);
+    if (otherIdx !== -1) other.splice(otherIdx, 1); // 反対側に既にあれば移動する（優先順位に従い一意にする）
+
+    target.push(dateStr);
+    target.sort();
     input.value = '';
     saveToStorage();
     renderExtraDatesList();
     updateLivePreview();
   }
 
+  function removeExtraDate(kind, dateStr) {
+    if (kind === 'work') {
+      state.extraWorkDates = state.extraWorkDates.filter(d => d !== dateStr);
+    } else {
+      state.extraOffDates = state.extraOffDates.filter(d => d !== dateStr);
+    }
+    saveToStorage();
+    renderExtraDatesList();
+    updateLivePreview();
+  }
+
+  function renderDateChipList(containerId, dateList, kind) {
+    const container = document.getElementById(containerId);
+    if (!dateList.length) {
+      container.innerHTML = '<li class="cd-empty">まだ登録がありません</li>';
+      return;
+    }
+    container.innerHTML = dateList.map(dateStr => {
+      const label = escapeHtml(Calc.fmtJP(Calc.parseDate(dateStr)));
+      return `<li class="cd-chip ${kind}"><span>${label}</span>` +
+        `<button type="button" class="cd-del" data-kind="${kind}" data-date="${escapeAttr(dateStr)}" aria-label="${label}を削除">×</button></li>`;
+    }).join('');
+  }
+
   function renderExtraDatesList() {
-    const container = document.getElementById('extraDatesList');
-    container.innerHTML = '';
-    state.extraOffDates.forEach(dateStr => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm';
-      row.innerHTML = `
-        <span>${escapeHtml(Calc.fmtJP(Calc.parseDate(dateStr)))}</span>
-        <button type="button" class="text-slate-400 text-xs font-bold" data-date="${escapeAttr(dateStr)}">削除</button>
-      `;
-      row.querySelector('button').addEventListener('click', () => {
-        state.extraOffDates = state.extraOffDates.filter(d => d !== dateStr);
-        saveToStorage();
-        renderExtraDatesList();
-        updateLivePreview();
-      });
-      container.appendChild(row);
-    });
+    renderDateChipList('extraDatesList', state.extraOffDates, 'off');
+    renderDateChipList('extraWorkDatesList', state.extraWorkDates, 'work');
+
+    const total = state.extraOffDates.length + state.extraWorkDates.length;
+    const badge = document.getElementById('cdBadge');
+    badge.textContent = total ? `${total}件 設定中` : '';
+    badge.hidden = !total;
   }
 
   function buildBusinessDayChecker() {
@@ -158,6 +190,7 @@
       closedOnSaturday: state.closedOnSaturday,
       closedOnHolidays: state.closedOnHolidays,
       extraOffDates: state.extraOffDates,
+      extraWorkDates: state.extraWorkDates,
     });
   }
 
@@ -169,7 +202,7 @@
     }
     const resignDate = Calc.parseDate(state.resignDate);
     const checker = buildBusinessDayChecker();
-    const r = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker);
+    const r = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     document.getElementById('previewLastWorkDay').textContent = Calc.fmtJP(r.lastWorkDay);
     preview.classList.remove('hidden');
   }
@@ -206,7 +239,7 @@
     return valid;
   }
   function validateStep2() {
-    const valid = state.paidLeave !== null && state.paidLeave !== '' && Number(state.paidLeave) >= 0 && Number(state.paidLeave) <= 40;
+    const valid = state.paidLeave !== null && state.paidLeave !== '' && Number(state.paidLeave) >= 0 && Number(state.paidLeave) <= 60;
     document.getElementById('btnNext').disabled = !valid;
     return valid;
   }
@@ -238,11 +271,13 @@
   function onRestart() {
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state, {
-      resignDate: null, closedOnSaturday: true, closedOnHolidays: true, extraOffDates: [],
-      paidLeave: null, salary: null, insuranceContinuation: 'kokuho', isUnionKenpo: false,
+      resignDate: null, closedOnSaturday: true, closedOnHolidays: true,
+      extraOffDates: [], extraWorkDates: [],
+      paidLeave: null, handoverDays: 0, salary: null, insuranceContinuation: 'kokuho', isUnionKenpo: false,
       branch: null, result: null,
     });
     document.getElementById('inputPaidLeave').value = '';
+    document.getElementById('inputHandoverDays').value = '0';
     document.getElementById('inputSalary').value = '';
     document.getElementById('inputInsuranceContinuation').value = 'kokuho';
     document.getElementById('inputUnionKenpo').checked = false;
@@ -264,7 +299,7 @@
   function runDiagnosis() {
     const resignDate = Calc.parseDate(state.resignDate);
     const checker = buildBusinessDayChecker();
-    const paidLeaveResult = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker);
+    const paidLeaveResult = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     const gradeResult = Calc.calcStandardRemunerationGrade(state.salary);
     const qualification = Calc.calcQualificationLossDate(resignDate, state.isUnionKenpo);
     const insuranceOptimization = Calc.calcInsuranceOptimization(resignDate, gradeResult);
@@ -506,7 +541,9 @@
         closedOnSaturday: state.closedOnSaturday,
         closedOnHolidays: state.closedOnHolidays,
         extraOffDates: state.extraOffDates,
+        extraWorkDates: state.extraWorkDates,
         paidLeave: state.paidLeave,
+        handoverDays: state.handoverDays,
         salary: state.salary,
         insuranceContinuation: state.insuranceContinuation,
         isUnionKenpo: state.isUnionKenpo,
@@ -524,7 +561,12 @@
       if (!raw) return;
       Object.assign(state, JSON.parse(raw));
 
+      if (!Array.isArray(state.extraOffDates)) state.extraOffDates = [];
+      if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
+      if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
+
       if (state.paidLeave !== null && state.paidLeave !== undefined) document.getElementById('inputPaidLeave').value = state.paidLeave;
+      document.getElementById('inputHandoverDays').value = state.handoverDays;
       if (state.salary) document.getElementById('inputSalary').value = state.salary;
       document.getElementById('inputInsuranceContinuation').value = state.insuranceContinuation || 'kokuho';
       document.getElementById('inputUnionKenpo').checked = !!state.isUnionKenpo;

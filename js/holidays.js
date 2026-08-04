@@ -130,21 +130,33 @@
 
   /**
    * 会社の定休日設定を反映した営業日チェッカーを生成する。
+   * 判定の優先順位：
+   *   ① 会社独自の出勤日（extraWorkDates）… 日曜・土曜・祝日であっても営業日
+   *   ② 会社独自の休み（extraOffDates）  … 平日であっても休日
+   *   ③ 通常判定（曜日設定・国民の祝日）
+   *
    * @param {object} config
    *   closedOnSaturday: 土曜日を休日として扱うか（デフォルトtrue）
    *   closedOnHolidays: 祝日を休日として扱うか（デフォルトtrue）。falseなら祝日でも出勤日扱い
-   *   extraOffDates: 'YYYY-MM-DD'文字列の配列。個別の休業予定日
+   *   extraOffDates: 'YYYY-MM-DD'文字列の配列/Set。会社独自の休み
+   *   extraWorkDates: 'YYYY-MM-DD'文字列の配列/Set。会社独自の出勤日
    */
   function createBusinessDayChecker(config) {
-    const cfg = Object.assign({ closedOnSaturday: true, closedOnHolidays: true, extraOffDates: [] }, config || {});
-    const extraSet = new Set(cfg.extraOffDates || []);
+    const cfg = Object.assign(
+      { closedOnSaturday: true, closedOnHolidays: true, extraOffDates: [], extraWorkDates: [] },
+      config || {}
+    );
+    const offSet = cfg.extraOffDates instanceof Set ? cfg.extraOffDates : new Set(cfg.extraOffDates || []);
+    const workSet = cfg.extraWorkDates instanceof Set ? cfg.extraWorkDates : new Set(cfg.extraWorkDates || []);
 
     return function checkerIsBusinessDay(date) {
+      const key = fmtKey(date);
+      if (workSet.has(key)) return true;   // ① 最優先：独自の出勤日
+      if (offSet.has(key)) return false;   // ② 第2優先：独自の休み
       const day = date.getDay();
       if (day === 0) return false; // 日曜は常に休日
       if (day === 6 && cfg.closedOnSaturday) return false;
       if (cfg.closedOnHolidays && isHoliday(date)) return false;
-      if (extraSet.has(fmtKey(date))) return false;
       return true;
     };
   }
