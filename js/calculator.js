@@ -94,6 +94,64 @@
     };
   }
 
+  /**
+   * 月をまたぐ減算を、対象月に存在しない日付（例：3/31の1か月前→2/31）に
+   * ならないよう月末でクランプして行う。
+   */
+  function subMonthsClamped(date, months) {
+    const targetMonthIndex = date.getMonth() - months;
+    const lastDayOfTargetMonth = new Date(date.getFullYear(), targetMonthIndex + 1, 0).getDate();
+    const day = Math.min(date.getDate(), lastDayOfTargetMonth);
+    return new Date(date.getFullYear(), targetMonthIndex, day);
+  }
+
+  /**
+   * 上司へ退職を切り出す目安日。
+   * 通常は理想の退職日の1か月前だが、有休消化が多く最終出社日の方が
+   * それより早く来る場合は、出社しているうちに伝える必要があるため
+   * 最終出社日を目安日として採用する（在籍していない日には伝えられないため）。
+   *
+   * @param {Date} recommendedDate 理想の退職日
+   * @param {Date} lastWorkDay 最終出社日
+   */
+  function calcNoticeDate(recommendedDate, lastWorkDay) {
+    const oneMonthBefore = subMonthsClamped(recommendedDate, 1);
+    const clampedByLastWorkDay = lastWorkDay.getTime() < oneMonthBefore.getTime();
+    const date = clampedByLastWorkDay ? lastWorkDay : oneMonthBefore;
+    return { date, dateLabel: fmtJP(date), clampedByLastWorkDay };
+  }
+
+  // ---------------------------------------------------------------
+  // 進路別の実務期限（転職／療養・無職／独立で異なる「次にやること」）
+  // ---------------------------------------------------------------
+  /**
+   * 療養・無職：国民健康保険・国民年金の切替手続き期限（資格喪失日から原則14日以内）。
+   */
+  function calcInsuranceSwitchDeadline(lossDate) {
+    const deadline = addDays(lossDate, 14);
+    return { from: lossDate, fromLabel: fmtJP(lossDate), to: deadline, toLabel: fmtJP(deadline) };
+  }
+
+  /**
+   * 独立：青色申告承認申請書の提出期限の目安。
+   * 原則は開業日から2か月以内。ただし1/1〜1/15に開業した場合のみ、
+   * その年の3/15まで（＝2か月ルールより遅い期限）を使える特例がある。
+   * 開業日は個別に把握できないため、退職日の翌日を「開業準備を始める日」の目安として計算する。
+   */
+  function calcBlueFormDeadline(resignDate) {
+    const assumedStartDate = addDays(resignDate, 1);
+    const twoMonthsLater = (() => {
+      const d = new Date(assumedStartDate);
+      d.setMonth(d.getMonth() + 2);
+      return d;
+    })();
+    const isJan1to15 = assumedStartDate.getMonth() === 0 && assumedStartDate.getDate() <= 15;
+    const deadline = isJan1to15
+      ? new Date(assumedStartDate.getFullYear(), 2, 15)
+      : twoMonthsLater;
+    return { assumedStartDate, deadline, deadlineLabel: fmtJP(deadline) };
+  }
+
   // ---- 標準報酬月額等級テーブル（簡易版・主要帯のみ抜粋） ----
   const STANDARD_REMUNERATION_TABLE = [
     { min: 0, max: 93000, grade: 1, standard: 88000 },
@@ -476,6 +534,9 @@
     isLastDayOfMonth,
     calcQualificationLossDate,
     buildResignationNoticeAdvice,
+    calcNoticeDate,
+    calcInsuranceSwitchDeadline,
+    calcBlueFormDeadline,
     calcStandardRemunerationGrade,
     calcPaidLeaveBackward,
     calcLastWorkDayByCount,

@@ -69,15 +69,9 @@
     </div>
 
     <div class="mt-5">
-      <label class="block text-xs font-bold text-slate-500 mb-1.5">次の会社への入社予定日（決まっていれば）</label>
-      <input id="inputNextJoinDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れない理想の退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
-    </div>
-
-    <div class="mt-5">
-      <label class="block text-xs font-bold text-slate-500 mb-1.5">次回のボーナス（賞与）支給予定日（あれば）</label>
+      <label class="block text-xs font-bold text-slate-500 mb-1.5">直近1回分のボーナス（賞与）の支給予定日（あれば）</label>
       <input id="inputBonusDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      <p class="text-[11px] text-slate-400 mt-1.5">多くの会社は「支給日に在籍していること」が条件です。支給日より前に退職すると受け取れない場合があります。</p>
+      <p class="text-[11px] text-slate-400 mt-1.5">今後何回も支給される場合は、退職を検討している時期に一番近い1回分だけを入力してください（夏・冬などまとめてではありません）。多くの会社は「支給日に在籍していること」が条件で、支給日より前に退職すると受け取れない場合があります。</p>
     </div>
   </section>
 
@@ -198,7 +192,7 @@
       </div>
 
       <div id="bonusAmountField" hidden>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">そのボーナスのだいたいの見込み額</label>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">その直近1回分のボーナスのだいたいの見込み額</label>
         <select id="inputBonusAmount" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
           <option value="" disabled selected>選択してください</option>
           <option value="50000">5万円未満</option>
@@ -240,6 +234,12 @@
           </button>
         </div>
       </div>
+
+      <div id="nextJoinDateField" hidden>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">次の会社への入社予定日（決まっていれば）</label>
+        <input id="inputNextJoinDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+        <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れない理想の退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
+      </div>
     </div>
   </section>
 
@@ -251,7 +251,7 @@
     <!-- 手取り最大化インパクトカード -->
     <div id="impactCard" class="rounded-2xl p-5 text-white shadow-card mb-6" style="background:linear-gradient(135deg,#D97706,#92400E);"></div>
 
-    <div id="timeline" class="space-y-5 mb-6"></div>
+    <div id="timeline" class="tl-list mb-6"></div>
 
     <button id="btnLineCV" type="button" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-navy rounded-xl py-3.5 font-bold text-sm mb-3">
       <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>

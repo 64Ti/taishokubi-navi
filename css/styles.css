@@ -174,6 +174,40 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 
 .branch-btn{background:#fff;cursor:pointer;transition:border-color .15s ease,background-color .15s ease;}
 
+/* ---------- 結果画面：接続されたアクションタイムライン ---------- */
+.tl-list{display:flex;flex-direction:column;}
+.tl-item{position:relative;display:flex;gap:12px;align-items:flex-start;padding-bottom:16px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-node{flex:none;display:flex;flex-direction:column;align-items:center;width:32px;}
+.tl-num{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  background:linear-gradient(150deg,var(--emerald),var(--emerald-dark));color:#fff;
+  font-weight:900;font-size:.92rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(5,150,105,.4);
+}
+.tl-line{flex:1;width:2px;background:var(--slate-200);margin-top:4px;min-height:14px;}
+.tl-card{flex:1;min-width:0;border-radius:1rem;padding:13px 15px;box-shadow:var(--shadow-card);border:1.5px solid var(--slate-200);background:#fff;}
+.tl-card.crimson{border-color:#fca5a5;background:var(--crimson-light);}
+.tl-card.caution{border-color:#fde68a;background:var(--caution-light);}
+.tl-card.gold{border-color:#fcd34d;background:var(--gold-light);}
+.tl-date{
+  display:inline-block;font-size:.7rem;font-weight:900;letter-spacing:.02em;
+  color:var(--emerald-dark);background:var(--emerald-light);border-radius:.4rem;
+  padding:2px 8px;margin-bottom:6px;
+}
+.tl-card.crimson .tl-date{color:var(--crimson-dark);background:#fff;}
+.tl-card.caution .tl-date{color:var(--caution-dark);background:#fff;}
+.tl-card.gold .tl-date{color:var(--gold-dark);background:#fff;}
+.tl-heading{font-size:.92rem;font-weight:800;color:var(--navy);margin-bottom:4px;line-height:1.5;}
+.tl-body{font-size:.78rem;line-height:1.8;color:var(--slate-500);}
+.tl-card.crimson .tl-body{color:var(--crimson-dark);opacity:.85;}
+.tl-card.caution .tl-body{color:var(--caution-dark);opacity:.85;}
+.tl-card.gold .tl-body{color:var(--gold-dark);opacity:.85;}
+
+/* 番号を持たない補足カード（アラート/PR導線）：直前のカードに従属する形で字下げ表示 */
+.tl-aside{margin-left:44px;margin-top:-4px;padding-bottom:16px;}
+
 /* ---------- AIOアンサーファースト・ブロック ---------- */
 .aio-answer{
   font-size:.78rem;line-height:1.85;color:var(--slate-600);

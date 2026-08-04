@@ -135,10 +135,25 @@
         });
         btn.classList.remove('border-slate-300');
         btn.classList.add('border-emerald', 'bg-emerald-light');
+        updateNextJoinDateVisibility();
         saveToStorage();
         validateStep3();
       });
     });
+  }
+
+  // ---------------------------------------------------------------
+  // STEP3：次の入社日は「①転職」を選んだときだけ意味を持つため、
+  // それ以外の進路（療養・無職／独立）では入力欄ごと隠し、値もクリアする。
+  // ---------------------------------------------------------------
+  function updateNextJoinDateVisibility() {
+    const field = document.getElementById('nextJoinDateField');
+    const isTransfer = state.branch === 'transfer';
+    field.hidden = !isTransfer;
+    if (!isTransfer && state.nextJoinDate) {
+      state.nextJoinDate = null;
+      document.getElementById('inputNextJoinDate').value = '';
+    }
   }
 
   // ---------------------------------------------------------------
@@ -422,6 +437,7 @@
       branch: null, result: null,
     });
     document.getElementById('inputNextJoinDate').value = '';
+    document.getElementById('nextJoinDateField').hidden = true;
     document.getElementById('inputBonusDate').value = '';
     document.getElementById('inputBonusAmount').value = '';
     document.getElementById('bonusAmountField').hidden = true;
@@ -448,20 +464,36 @@
   function runDiagnosis() {
     const resignDate = Calc.parseDate(state.resignDate);
     const checker = buildBusinessDayChecker();
-    const paidLeaveResult = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     const gradeResult = Calc.calcStandardRemunerationGrade(state.salary);
-    const qualification = Calc.calcQualificationLossDate(resignDate, state.insuranceType);
     const noticeAdvice = Calc.buildResignationNoticeAdvice();
     const insuranceOptimization = Calc.calcInsuranceOptimization(resignDate, gradeResult);
     const branchContext = Calc.getBranchContext(state.branch);
     const recommendation = Calc.calcRecommendedResignDate(resignDate, state.nextJoinDate, insuranceOptimization, state.bonusDate);
     const insuranceGap = Calc.calcInsuranceGap(recommendation.date, state.nextJoinDate);
 
+    // タイムラインは「理想の退職日」を軸に構成するため、最終出社日・資格喪失日は
+    // 指定日(resignDate)ではなく理想の退職日(recommendation.date)を基準に計算する。
+    // （以前は指定日を基準にしていたため、理想の退職日が9/30でも資格喪失日が
+    //   指定日9/15の翌日=9/16と表示される不整合があった）
+    const paidLeaveResult = Calc.calcPaidLeaveBackward(recommendation.date, state.paidLeave, checker, state.handoverDays);
+    const qualification = Calc.calcQualificationLossDate(recommendation.date, state.insuranceType);
+
     // ⑤⑦⑨ 損得計算：指定日のまま vs 理想の退職日で、社会保険料とボーナスがどう変わるか
     const gainLoss = Calc.calcResignDateGainLoss(resignDate, recommendation.date, gradeResult, state.bonusDate, state.bonusAmount);
 
     // 有休の金銭的価値は「参考情報」。退職日をどちらにしても消化日数が同じなら変わらない。
     const paidLeaveInfo = Calc.calcTakeHomeImpact(state.salary, state.paidLeave, { potentialSavings: 0 });
+
+    // 上司へ切り出す目安日（最終出社日でクランプ）
+    const noticeDate = Calc.calcNoticeDate(recommendation.date, paidLeaveResult.lastWorkDay);
+
+    // 進路別の実務期限（②③ タイムラインの差別化）
+    let branchDeadline = null;
+    if (state.branch === 'recuperation') {
+      branchDeadline = { type: 'insuranceSwitch', ...Calc.calcInsuranceSwitchDeadline(qualification.lossDate) };
+    } else if (state.branch === 'independence') {
+      branchDeadline = { type: 'blueForm', ...Calc.calcBlueFormDeadline(resignDate) };
+    }
 
     state.result = {
       resignDate,
@@ -474,11 +506,13 @@
       grade: gradeResult,
       qualification,
       noticeAdvice,
+      noticeDate,
       insuranceOptimization,
       recommendation,
       insuranceGap,
       gainLoss,
       paidLeaveInfo,
+      branchDeadline,
       bonusDate: state.bonusDate,
       bonusAmount: state.bonusAmount,
       branch: state.branch,
@@ -509,9 +543,11 @@
     const bonusNote = buildBonusNote(r);
     const gainLossBlock = buildGainLossBlock(r);
     const lossAversionHeadline = buildLossAversionHeadline(r);
+    const branchLabel = buildBranchLabel(r.branch);
 
     impactCard.innerHTML = `
       ${lossAversionHeadline}
+      ${branchLabel}
       <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">あなたの理想の退職日</p>
       <p class="text-3xl font-black mb-2">${escapeHtml(r.recommendation.dateLabel)}</p>
       <p class="text-xs opacity-90 leading-relaxed mb-2">${escapeHtml(headline)}</p>
@@ -524,88 +560,68 @@
 
     const timeline = document.getElementById('timeline');
     timeline.innerHTML = '';
+    let step = 1;
 
-    // --- タイムライン項目0：就業規則アドバイス（民法2週間 vs 就業規則の申し出期限） ---
-    timeline.appendChild(buildTimelineCard({
-      heading: r.noticeAdvice.title,
-      snippetFuel: '結論：就業規則の定めがあれば、民法の2週間より就業規則の期限を優先しましょう。',
-      body: r.noticeAdvice.body,
-      colorClass: 'border-slate-200 bg-white',
-      labelClass: 'text-navy/60',
-      labelText: 'TASK',
-    }));
+    // --- ① 上司に相談する（就業規則アドバイスの本文を統合し、具体的な日付を明示） ---
+    const noticeBody = r.noticeDate.clampedByLastWorkDay
+      ? `${r.noticeAdvice.body} なお、有休消化の日数が多いため、通常の「退職日の1か月前」より早い、最終出社日までに伝える必要があります。`
+      : r.noticeAdvice.body;
+    timeline.appendChild(buildTimelineNode(step++, r.noticeDate.dateLabel + 'まで', r.noticeAdvice.title, noticeBody));
 
-    // --- タイムライン項目1：離職票タイムラグ注記（STEP1文脈・常設Caution） ---
-    timeline.appendChild(buildTimelineCard({
-      heading: '離職票の到着を待つ',
-      snippetFuel: '結論：離職票は退職後10日〜2週間で郵送されます。届いてから役所手続きへ進みましょう。',
-      body: '会社から「離職票-1, 2」が自宅に郵送されてからハローワーク・役所へ向かいましょう（退職後10日〜2週間程度かかります）。',
-      colorClass: 'border-caution bg-caution-light',
-      labelClass: 'text-caution-dark',
-      labelText: 'CAUTION',
-    }));
-
-    // --- ②療養branchの critical はSTEP1文脈のため、離職票の後に挿入 ---
-    if (r.branchContext && r.branchContext.critical && r.branch === 'recuperation') {
-      timeline.appendChild(buildCriticalPair(r.branchContext.critical));
+    // 療養branchのcritical（傷病手当金）は「出社しない」判断に直結するため、相談の直後に挿入
+    if (r.branch === 'recuperation' && r.branchContext && r.branchContext.critical) {
+      timeline.appendChild(wrapAside(buildCriticalPair(r.branchContext.critical)));
     }
 
-    // --- タイムライン項目2：最終出社日 ---
-    timeline.appendChild(buildTimelineCard({
-      heading: '最終出社日',
-      snippetFuel: `結論：${r.lastWorkDayLabel}までに引き継ぎ業務を完了させてください。`,
-      body: `有休消化前の最終出社日は${r.lastWorkDayLabel}です。引き継ぎ資料の準備はこの日までに終えましょう。`,
-      colorClass: 'border-slate-200 bg-white',
-      labelClass: 'text-navy/60',
-      labelText: 'TASK',
-    }));
+    // --- ② 最終出社日 ---
+    timeline.appendChild(buildTimelineNode(step++, r.lastWorkDayLabel, '最終出社日を迎える', '引き継ぎ資料の準備はこの日までに終えましょう。ここが会社に出社する最後の日です。'));
 
-    // --- タイムライン項目3：有休消化開始（①転職branchの文脈monetizeをここに挿入） ---
+    // --- ③ 有給休暇の消化開始（あれば） ---
     if (r.paidLeaveStartLabel) {
-      timeline.appendChild(buildTimelineCard({
-        heading: '有給休暇の消化を開始',
-        snippetFuel: `結論：${r.paidLeaveStartLabel}から退職日まで有給休暇を消化します。`,
-        body: `${r.paidLeaveStartLabel}から有給休暇の消化期間に入ります。`,
-        colorClass: 'border-slate-200 bg-white',
-        labelClass: 'text-navy/60',
-        labelText: 'TASK',
-      }));
+      timeline.appendChild(buildTimelineNode(step++, r.paidLeaveStartLabel, '有給休暇の消化を開始', `${r.paidLeaveStartLabel}から理想の退職日まで、残っている有給休暇を消化する期間に入ります。`));
     }
-    if (r.branchContext && r.branch === 'transfer') {
-      timeline.appendChild(buildMonetizeCard(r.branchContext.monetize));
+    // 転職branchの導線は「有休消化中の時間の使い方」の文脈なので、消化開始の直後に挿入
+    if (r.branch === 'transfer' && r.branchContext) {
+      timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
     }
 
-    // --- タイムライン項目4：退職日・資格喪失日（社労士実務ロジック） ---
-    const qualCard = document.createElement('div');
-    qualCard.className = `rounded-2xl border-2 p-4 shadow-card border-crimson bg-crimson-light`;
-    qualCard.innerHTML = `
-      <p class="text-[11px] font-black tracking-wider text-crimson mb-1">社会保険 資格喪失日</p>
-      <p class="snippet-fuel text-sm text-crimson-dark leading-snug mb-2">結論：資格喪失日は退職日の翌日（${r.qualification.lossDateLabel}）。月末退職なら保険料は労使折半で済みます。</p>
-      <p class="text-xs text-crimson-dark/80 leading-relaxed">${escapeHtml(r.qualification.note)}</p>
-      ${r.qualification.insuranceTypeNote ? `<p class="text-xs text-crimson-dark/80 leading-relaxed mt-2 border-t border-crimson/20 pt-2">※${escapeHtml(r.qualification.insuranceTypeNote)}</p>` : ''}
-    `;
-    timeline.appendChild(qualCard);
+    // --- ④ 理想の退職日を迎える（ハイライト表示） ---
+    timeline.appendChild(buildTimelineNode(step++, r.recommendation.dateLabel, '理想の退職日を迎える', 'これが雇用契約上の最終在籍日です。この日の翌日から社会保険の資格を失います。', 'gold'));
 
-    // --- タイムライン項目5：③独立branchの開業届提出（STEP3文脈） / critical ---
-    if (r.branchContext && r.branch === 'independence') {
-      if (r.branchContext.critical) timeline.appendChild(buildCriticalPair(r.branchContext.critical));
-      timeline.appendChild(buildMonetizeCard(r.branchContext.monetize));
-    }
-    if (r.branchContext && r.branch === 'recuperation') {
-      timeline.appendChild(buildMonetizeCard(r.branchContext.monetize));
+    // --- ⑤ 社会保険 資格喪失日 ---
+    let qualBody = r.qualification.note;
+    if (r.qualification.insuranceTypeNote) qualBody += ' ' + r.qualification.insuranceTypeNote;
+    timeline.appendChild(buildTimelineNode(step++, r.qualification.lossDateLabel, '社会保険 資格喪失日', qualBody, 'crimson'));
+
+    // --- ⑥ 進路別の実務ステップ（ここが最も差が出る部分） ---
+    if (r.branch === 'transfer') {
+      if (r.nextJoinDate) {
+        const nextJoinLabel = Calc.fmtJP(Calc.parseDate(r.nextJoinDate));
+        const gapBody = r.insuranceGap && r.insuranceGap.type === 'gap'
+          ? `新しい会社で働き始める日です。退職日との間に約${r.insuranceGap.days}日間の空白期間があるため、国民健康保険・国民年金への一時加入が必要です。`
+          : r.insuranceGap && r.insuranceGap.type === 'overlap'
+            ? '新しい会社で働き始める予定日ですが、退職日より前になっています。日程を見直してください。'
+            : '新しい会社で働き始める日です。退職日の翌日なので、社会保険の手続きは会社間でそのまま引き継がれます。';
+        timeline.appendChild(buildTimelineNode(step++, nextJoinLabel, '次の会社で働き始める', gapBody));
+      }
+      if (r.branchContext && r.branchContext.caution) {
+        timeline.appendChild(wrapAside(buildTimelineCaution(r.branchContext.caution.title, r.branchContext.caution.description)));
+      }
+    } else if (r.branch === 'recuperation' && r.branchDeadline) {
+      const bd = r.branchDeadline;
+      timeline.appendChild(buildTimelineNode(step++, `${bd.fromLabel}から${bd.toLabel}まで`, '国民健康保険・国民年金へ切り替える', '資格喪失日から原則14日以内に、お住まいの市区町村役場で手続きします。期限を過ぎても加入自体はできますが、保険料の遡及請求や給付が受けられない期間が生じる場合があるため早めに済ませましょう。'));
+      if (r.branchContext) timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
+    } else if (r.branch === 'independence' && r.branchDeadline) {
+      const bd = r.branchDeadline;
+      timeline.appendChild(buildTimelineNode(step++, bd.deadlineLabel + 'まで', '青色申告承認申請書を提出する（開業する場合）', '開業日から2か月以内（1/1〜1/15開業の場合はその年の3/15まで）に税務署へ提出すると、その年から青色申告の特典を受けられます。開業日は退職日の翌日を仮定した目安です。'));
+      if (r.branchContext && r.branchContext.critical) timeline.appendChild(wrapAside(buildCriticalPair(r.branchContext.critical)));
+      if (r.branchContext) timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
     }
 
-    // --- 転職branchの一般Caution ---
-    if (r.branchContext && r.branchContext.caution) {
-      timeline.appendChild(buildTimelineCard({
-        heading: r.branchContext.caution.title,
-        snippetFuel: null,
-        body: r.branchContext.caution.description,
-        colorClass: 'border-caution bg-caution-light',
-        labelClass: 'text-caution-dark',
-        labelText: 'CAUTION',
-      }));
-    }
+    // --- ⑦ 離職票の到着を待つ（資格喪失日を起点に、具体的な日付レンジで提示） ---
+    const noticeFrom = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 10));
+    const noticeTo = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 14));
+    timeline.appendChild(buildTimelineNode(step++, `${noticeFrom}〜${noticeTo}ごろ`, '離職票の到着を待つ', '会社から「離職票-1, 2」が自宅に郵送されます。届いたらハローワークで求職の申し込み、市区町村で国民健康保険の軽減申請を行いましょう。', 'caution'));
   }
 
   // ---------------------------------------------------------------
@@ -619,6 +635,21 @@
     }
     const yen = Math.abs(delta).toLocaleString();
     return `<p class="loss-aversion-warn"><b>【注意】</b>退職日を1日間違えるだけで、最大<b>${yen}円</b>をドブに捨てることになります。</p>`;
+  }
+
+  // ---------------------------------------------------------------
+  // 進路別のラベル（診断が「誰向け」かを冒頭で明示し、以降のタイムラインとの
+  // つながりを分かりやすくする）
+  // ---------------------------------------------------------------
+  function buildBranchLabel(branch) {
+    const LABELS = {
+      transfer: '💼 転職される方向けの診断結果です',
+      recuperation: '🩺 療養・離職される方向けの診断結果です',
+      independence: '🚀 独立される方向けの診断結果です',
+    };
+    const text = LABELS[branch];
+    if (!text) return '';
+    return `<p class="text-[11px] font-bold opacity-85 mb-2">${escapeHtml(text)}</p>`;
   }
 
   // ---------------------------------------------------------------
@@ -718,14 +749,44 @@
     return `${sign}${Math.abs(yen).toLocaleString()}円`;
   }
 
-  function buildTimelineCard({ heading, snippetFuel, body, colorClass, labelClass, labelText }) {
+  // ---------------------------------------------------------------
+  // 番号付き・日付付きの接続タイムラインノード
+  // 「具体的にいつ・何をするか」を1項目1アクションで明示する。
+  // ---------------------------------------------------------------
+  function buildTimelineNode(stepNum, dateLabel, heading, body, variant) {
     const el = document.createElement('div');
-    el.className = `rounded-2xl border-2 p-4 shadow-card ${colorClass}`;
+    el.className = 'tl-item';
     el.innerHTML = `
-      <p class="text-[11px] font-black tracking-wider ${labelClass} mb-1">${escapeHtml(labelText)}</p>
+      <div class="tl-node">
+        <span class="tl-num">${stepNum}</span>
+        <span class="tl-line"></span>
+      </div>
+      <div class="tl-card${variant ? ' ' + variant : ''}">
+        <span class="tl-date">${escapeHtml(dateLabel)}</span>
+        <h3 class="tl-heading">${escapeHtml(heading)}</h3>
+        <p class="tl-body">${escapeHtml(body)}</p>
+      </div>
+    `;
+    return el;
+  }
+
+  // 番号を持たない補足カード（アラート/PR導線）を、直前の番号付きアクションに
+  // 従属する形で挿入するためのラッパー。
+  function wrapAside(el) {
+    const wrap = document.createElement('div');
+    wrap.className = 'tl-aside';
+    wrap.appendChild(el);
+    return wrap;
+  }
+
+  // 番号を持たない一般的な注意カード（住民税の一括徴収など、日付に紐づかない補足情報）
+  function buildTimelineCaution(heading, body) {
+    const el = document.createElement('div');
+    el.className = 'rounded-2xl border-2 p-4 shadow-card border-caution bg-caution-light';
+    el.innerHTML = `
+      <p class="text-[11px] font-black tracking-wider text-caution-dark mb-1">CAUTION</p>
       <h3 class="text-sm font-bold text-navy mb-1">${escapeHtml(heading)}</h3>
-      ${snippetFuel ? `<p class="snippet-fuel text-xs text-navy mb-1.5 leading-relaxed">${escapeHtml(snippetFuel)}</p>` : ''}
-      <p class="text-xs text-slate-500 leading-relaxed">${escapeHtml(body)}</p>
+      <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(body)}</p>
     `;
     return el;
   }
@@ -925,6 +986,7 @@
           b.classList.toggle('border-slate-300', !active);
         });
       }
+      updateNextJoinDateVisibility();
     } catch (e) {
       console.warn('LocalStorage restore failed:', e);
     }
