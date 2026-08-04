@@ -18,7 +18,7 @@
   const state = {
     resignDate: null,      // 'YYYY-MM-DD'
     nextJoinDate: null,    // 'YYYY-MM-DD'（次の会社への入社予定日・任意）
-    closedOnSaturday: true,
+    offDays: [0, 6],       // 毎週の定休日（0:日〜6:土）。シフト制の人向けに自由選択。
     closedOnHolidays: true,
     extraOffDates: [],     // ['YYYY-MM-DD', ...] 会社独自の休み
     extraWorkDates: [],    // ['YYYY-MM-DD', ...] 会社独自の出勤日
@@ -39,6 +39,7 @@
     restoreFromStorage();
     prefillDefaultDate();
     bindEvents();
+    buildWeekdayGrid();
     renderExtraDatesList();
     renderStep();
   });
@@ -79,7 +80,6 @@
     });
 
     // STEP2
-    document.getElementById('toggleSaturday').addEventListener('click', () => toggleSwitch('closedOnSaturday'));
     document.getElementById('toggleHoliday').addEventListener('click', () => toggleSwitch('closedOnHolidays'));
     document.getElementById('inputPaidLeave').addEventListener('input', e => {
       state.paidLeave = e.target.value;
@@ -123,12 +123,41 @@
 
   function toggleSwitch(key) {
     state[key] = !state[key];
-    const id = key === 'closedOnSaturday' ? 'toggleSaturday' : 'toggleHoliday';
-    const el = document.getElementById(id);
+    const el = document.getElementById('toggleHoliday');
     el.classList.toggle('toggle-on', state[key]);
     el.setAttribute('aria-pressed', String(state[key]));
     saveToStorage();
     updateLivePreview();
+  }
+
+  // ---------------------------------------------------------------
+  // 毎週の定休日（曜日グリッド）
+  // ---------------------------------------------------------------
+  function buildWeekdayGrid() {
+    const DOW_JA = ['日', '月', '火', '水', '木', '金', '土'];
+    const grid = document.getElementById('weekdayGrid');
+    grid.innerHTML = '';
+    DOW_JA.forEach((label, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'wd-btn';
+      btn.textContent = label;
+      btn.setAttribute('aria-pressed', state.offDays.includes(i) ? 'true' : 'false');
+      btn.setAttribute('aria-label', `${label}曜日を定休日にする`);
+      btn.addEventListener('click', () => {
+        const idx = state.offDays.indexOf(i);
+        if (idx !== -1) {
+          if (state.offDays.length <= 1) { return; } // 定休日は最低1日必要
+          state.offDays.splice(idx, 1);
+        } else {
+          state.offDays.push(i);
+        }
+        btn.setAttribute('aria-pressed', state.offDays.includes(i) ? 'true' : 'false');
+        saveToStorage();
+        updateLivePreview();
+      });
+      grid.appendChild(btn);
+    });
   }
 
   // ---------------------------------------------------------------
@@ -189,7 +218,7 @@
 
   function buildBusinessDayChecker() {
     return H.createBusinessDayChecker({
-      closedOnSaturday: state.closedOnSaturday,
+      offDays: state.offDays,
       closedOnHolidays: state.closedOnHolidays,
       extraOffDates: state.extraOffDates,
       extraWorkDates: state.extraWorkDates,
@@ -197,6 +226,8 @@
   }
 
   function updateLivePreview() {
+    renderHolidayCalendar();
+
     const preview = document.getElementById('livePreview');
     if (!state.resignDate || state.paidLeave === null || state.paidLeave === '') {
       preview.classList.add('hidden');
@@ -206,7 +237,57 @@
     const checker = buildBusinessDayChecker();
     const r = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     document.getElementById('previewLastWorkDay').textContent = Calc.fmtJP(r.lastWorkDay);
+
+    // ③ 自分が指定した退職日に対して、いつが良いかを先出しで伝える（金額はSTEP3の給与入力後に確定するためここでは日付のみ）
+    const optimalStub = {
+      optimalDate: Calc.lastDayOfMonth(resignDate),
+      optimalDateLabel: Calc.fmtJP(Calc.lastDayOfMonth(resignDate)),
+      isOptimal: Calc.isLastDayOfMonth(resignDate),
+    };
+    const rec = Calc.calcRecommendedResignDate(resignDate, state.nextJoinDate, optimalStub);
+    const recEl = document.getElementById('previewRecommendation');
+    if (rec.isSameAsUserPlan) {
+      recEl.textContent = '✓ この退職日は社会保険料の面ですでに最適です。';
+    } else if (rec.limitedByNextJob) {
+      recEl.textContent = `次の入社日の前日（${rec.dateLabel}）が、保険を途切れさせずに退職できる最終日です。`;
+    } else {
+      recEl.textContent = `${rec.dateLabel}（月末）に変更すると社会保険料がお得になります。くわしい金額はSTEP3の給与入力後に表示されます。`;
+    }
+
     preview.classList.remove('hidden');
+  }
+
+  // ---------------------------------------------------------------
+  // ② 期間内の祝日カレンダー（可視化）
+  // ---------------------------------------------------------------
+  function renderHolidayCalendar() {
+    const listEl = document.getElementById('holidayCalendarList');
+    const badge = document.getElementById('holidayBadge');
+    if (!state.resignDate) {
+      listEl.innerHTML = '<li class="cd-empty">退職希望日を入力すると表示されます</li>';
+      badge.hidden = true;
+      return;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const resignDate = Calc.parseDate(state.resignDate);
+    const from = today < resignDate ? today : resignDate;
+    const to = today < resignDate ? resignDate : today;
+    const offDaySet = new Set(state.offDays);
+    const holidays = H.listHolidaysInRange(from, to, offDaySet);
+
+    if (!holidays.length) {
+      listEl.innerHTML = '<li class="cd-empty">この期間に該当する祝日はありません</li>';
+      badge.hidden = true;
+      return;
+    }
+    const DOW_JA = ['日', '月', '火', '水', '木', '金', '土'];
+    listEl.innerHTML = holidays.map(h => {
+      const dateLabel = `${h.date.getMonth() + 1}/${h.date.getDate()}（${DOW_JA[h.dayOfWeek]}）`;
+      return `<li class="holiday-cal-row"><span class="hc-date">${escapeHtml(dateLabel)}</span><span class="hc-name">${escapeHtml(h.name)}</span></li>`;
+    }).join('');
+    badge.textContent = `${holidays.length}件`;
+    badge.hidden = false;
   }
 
   // ---------------------------------------------------------------
@@ -273,7 +354,7 @@
   function onRestart() {
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state, {
-      resignDate: null, nextJoinDate: null, closedOnSaturday: true, closedOnHolidays: true,
+      resignDate: null, nextJoinDate: null, offDays: [0, 6], closedOnHolidays: true,
       extraOffDates: [], extraWorkDates: [],
       paidLeave: null, handoverDays: 0, annualIncome: null, salary: null, isUnionKenpo: false,
       branch: null, result: null,
@@ -283,13 +364,13 @@
     document.getElementById('inputHandoverDays').value = '0';
     document.getElementById('inputAnnualIncome').value = '';
     document.getElementById('inputUnionKenpo').checked = false;
-    document.getElementById('toggleSaturday').classList.add('toggle-on');
     document.getElementById('toggleHoliday').classList.add('toggle-on');
     document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {
       b.classList.remove('border-emerald', 'bg-emerald-light');
       b.classList.add('border-slate-300');
     });
     prefillDefaultDate();
+    buildWeekdayGrid();
     renderExtraDatesList();
     currentStepIndex = 0;
     renderStep();
@@ -605,7 +686,7 @@
       const persistable = {
         resignDate: state.resignDate,
         nextJoinDate: state.nextJoinDate,
-        closedOnSaturday: state.closedOnSaturday,
+        offDays: state.offDays,
         closedOnHolidays: state.closedOnHolidays,
         extraOffDates: state.extraOffDates,
         extraWorkDates: state.extraWorkDates,
@@ -632,6 +713,16 @@
       if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
       if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
 
+      // 旧データ互換：closedOnSaturday(boolean) しかない場合は offDays へ変換する
+      if (!Array.isArray(state.offDays) || !state.offDays.length) {
+        if (state.closedOnSaturday !== undefined) {
+          state.offDays = state.closedOnSaturday === false ? [0] : [0, 6];
+        } else {
+          state.offDays = [0, 6];
+        }
+      }
+      delete state.closedOnSaturday;
+
       if (state.nextJoinDate) document.getElementById('inputNextJoinDate').value = state.nextJoinDate;
       if (state.paidLeave !== null && state.paidLeave !== undefined) document.getElementById('inputPaidLeave').value = state.paidLeave;
       document.getElementById('inputHandoverDays').value = state.handoverDays;
@@ -641,7 +732,6 @@
         if (!state.salary) state.salary = Calc.estimateMonthlyFromAnnual(state.annualIncome);
       }
       document.getElementById('inputUnionKenpo').checked = !!state.isUnionKenpo;
-      document.getElementById('toggleSaturday').classList.toggle('toggle-on', state.closedOnSaturday !== false);
       document.getElementById('toggleHoliday').classList.toggle('toggle-on', state.closedOnHolidays !== false);
       if (state.branch) {
         document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {

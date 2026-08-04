@@ -131,21 +131,23 @@
   /**
    * 会社の定休日設定を反映した営業日チェッカーを生成する。
    * 判定の優先順位：
-   *   ① 会社独自の出勤日（extraWorkDates）… 日曜・土曜・祝日であっても営業日
+   *   ① 会社独自の出勤日（extraWorkDates）… 曜日・祝日を問わず営業日
    *   ② 会社独自の休み（extraOffDates）  … 平日であっても休日
-   *   ③ 通常判定（曜日設定・国民の祝日）
+   *   ③ 通常判定（毎週の定休日・国民の祝日）
    *
    * @param {object} config
-   *   closedOnSaturday: 土曜日を休日として扱うか（デフォルトtrue）
+   *   offDays: 毎週の定休日。0(日)〜6(土)の配列/Set（デフォルト [0,6]）。
+   *            シフト制など土日出勤の人は自由な曜日の組み合わせを指定できる。
    *   closedOnHolidays: 祝日を休日として扱うか（デフォルトtrue）。falseなら祝日でも出勤日扱い
    *   extraOffDates: 'YYYY-MM-DD'文字列の配列/Set。会社独自の休み
    *   extraWorkDates: 'YYYY-MM-DD'文字列の配列/Set。会社独自の出勤日
    */
   function createBusinessDayChecker(config) {
     const cfg = Object.assign(
-      { closedOnSaturday: true, closedOnHolidays: true, extraOffDates: [], extraWorkDates: [] },
+      { offDays: [0, 6], closedOnHolidays: true, extraOffDates: [], extraWorkDates: [] },
       config || {}
     );
+    const offDaySet = cfg.offDays instanceof Set ? cfg.offDays : new Set(cfg.offDays || []);
     const offSet = cfg.extraOffDates instanceof Set ? cfg.extraOffDates : new Set(cfg.extraOffDates || []);
     const workSet = cfg.extraWorkDates instanceof Set ? cfg.extraWorkDates : new Set(cfg.extraWorkDates || []);
 
@@ -153,12 +155,40 @@
       const key = fmtKey(date);
       if (workSet.has(key)) return true;   // ① 最優先：独自の出勤日
       if (offSet.has(key)) return false;   // ② 第2優先：独自の休み
-      const day = date.getDay();
-      if (day === 0) return false; // 日曜は常に休日
-      if (day === 6 && cfg.closedOnSaturday) return false;
+      if (offDaySet.has(date.getDay())) return false; // ③ 毎週の定休日
       if (cfg.closedOnHolidays && isHoliday(date)) return false;
       return true;
     };
+  }
+
+  /**
+   * 指定期間内（開始日〜終了日、両端含む）で、その人の毎週の定休日に
+   * 当たらない祝日（＝定休日以外に発生する追加の休み）を日付順に列挙する。
+   * シフト制などで土日が定休日でない人ほど、この一覧の意味が大きくなる。
+   *
+   * @param {Date} fromDate 開始日
+   * @param {Date} toDateInclusive 終了日（この日を含む）
+   * @param {Set|Array} offDaySet 毎週の定休日（0〜6）
+   */
+  function listHolidaysInRange(fromDate, toDateInclusive, offDaySet) {
+    const offSet = offDaySet instanceof Set ? offDaySet : new Set(offDaySet || [0, 6]);
+    const result = [];
+    if (!(fromDate instanceof Date) || !(toDateInclusive instanceof Date)) return result;
+    const d = new Date(fromDate);
+    d.setHours(0, 0, 0, 0);
+    const end = new Date(toDateInclusive);
+    end.setHours(0, 0, 0, 0);
+    const GUARD = 3660; // 約10年分の日数を上限に無限ループを防止
+    let steps = 0;
+    while (d.getTime() <= end.getTime()) {
+      const name = getHolidayName(d);
+      if (name && !offSet.has(d.getDay())) {
+        result.push({ date: new Date(d), dateKey: fmtKey(d), dayOfWeek: d.getDay(), name });
+      }
+      d.setDate(d.getDate() + 1);
+      if (++steps > GUARD) break;
+    }
+    return result;
   }
 
   /** 起点から指定営業日数だけ「未来」に進めた日付を返す */
@@ -202,6 +232,7 @@
     isHoliday,
     isBusinessDay,
     createBusinessDayChecker,
+    listHolidaysInRange,
     addBusinessDays,
     subtractBusinessDays,
     countBusinessDaysBetween,

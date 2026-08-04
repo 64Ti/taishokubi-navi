@@ -75,18 +75,14 @@
     <p class="text-sm text-slate-500 mb-6">会社の定休日と有休残日数から、最終出社日を営業日ベースで即時算定します。</p>
 
     <div class="space-y-5">
-      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card space-y-3">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card">
+        <p class="text-sm font-bold mb-1">毎週の定休日</p>
+        <p class="text-[11px] text-slate-400 mb-3">お休みの曜日をすべて選んでください（初期値：土日）。シフト制で土日出勤の方も自由に選べます。</p>
+        <div class="weekday-grid" id="weekdayGrid" role="group" aria-label="毎週の定休日"></div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card">
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-bold">土曜日は休日扱い</p>
-            <p class="text-[11px] text-slate-400">OFFの場合、土曜も出勤日として計算します</p>
-          </div>
-          <button id="toggleSaturday" class="toggle-on shrink-0 w-11 h-6 rounded-full relative" aria-pressed="true">
-            <span class="toggle-track absolute inset-0 rounded-full bg-emerald"></span>
-            <span class="toggle-thumb absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"></span>
-          </button>
-        </div>
-        <div class="flex items-center justify-between border-t border-slate-100 pt-3">
           <div>
             <p class="text-sm font-bold">祝日は休日扱い</p>
             <p class="text-[11px] text-slate-400">OFFの場合、祝日も出勤日として計算します</p>
@@ -97,6 +93,18 @@
           </button>
         </div>
       </div>
+
+      <details class="cd-accordion" id="holidayCalendarAccordion">
+        <summary class="cd-summary">
+          <span class="cd-title">期間内の祝日カレンダーを見る<span class="cd-tagopt">参考</span></span>
+          <span class="cd-badge" id="holidayBadge" hidden></span>
+          <span class="cd-chev"></span>
+        </summary>
+        <div class="cd-body">
+          <p class="cd-note">今日から退職希望日までの間で、あなたの定休日以外に発生する祝日（＝実質的に追加の休みになる日）を一覧にしています。</p>
+          <ul id="holidayCalendarList" class="holiday-cal-list"></ul>
+        </div>
+      </details>
 
       <div>
         <label class="block text-xs font-bold text-slate-500 mb-1.5">現在の有給残日数（0〜60日）</label>
@@ -142,7 +150,8 @@
 
       <div id="livePreview" class="rounded-xl border-2 border-emerald bg-emerald-light p-4 hidden">
         <p class="text-[11px] font-black tracking-wider text-emerald mb-1">試算プレビュー</p>
-        <p class="text-sm font-bold text-emerald-dark">最終出社日：<span id="previewLastWorkDay">-</span></p>
+        <p class="text-sm font-bold text-emerald-dark mb-1">最終出社日：<span id="previewLastWorkDay">-</span></p>
+        <p class="text-xs text-emerald-dark leading-relaxed" id="previewRecommendation"></p>
       </div>
     </div>
   </section>
