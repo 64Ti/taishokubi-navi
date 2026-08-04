@@ -194,6 +194,17 @@
     };
   }
 
+  /**
+   * 特定の退職日を選んだ場合の、当月ぶん社会保険料の自己負担額（月額）を返す。
+   * 月末退職なら労使折半（低い方）、月末より前なら自己全額負担相当（高い方＝2倍）。
+   * calcInsuranceOptimization は「常に月末と比較した場合の差」を返す設計のため、
+   * 任意の日付（推奨日が入社日の制約で月末にならない場合など）についても
+   * 実額を求められるよう、この関数を独立して用意する。
+   */
+  function calcInsuranceMonthlyCost(date, grade) {
+    return isLastDayOfMonth(date) ? grade.employeeMonthlyBurden : grade.employeeMonthlyBurden * 2;
+  }
+
   // ---------------------------------------------------------------
   // ④ 手取り最大化インパクト（有休消化価値 + 保険料最適化差分）
   // ---------------------------------------------------------------
@@ -248,39 +259,103 @@
   }
 
   // ---------------------------------------------------------------
-  // ⑦ おすすめ退職日の統合判定
+  // ⑦ ボーナス（賞与）の支給日在籍判定
   // ---------------------------------------------------------------
   /**
-   * 「結局いつ辞めればいいか」への単一の結論を返す。
-   * 次の入社日が未定の場合は、社会保険料が最適な月末退職日を推奨する。
-   * 次の入社日が確定している場合は、それより後ろの月末退職を勧めても
-   * 実行不可能なため、空白期間が生じない「入社日の前日」を優先して推奨する
-   * （月末がその前日以前に収まるなら、両方の条件を満たせる）。
+   * 賞与規程の「支給日在籍要件」に基づき、指定した退職日でボーナスを
+   * 受け取れるかを判定する。退職日（雇用契約上の最終在籍日）が支給日以降で
+   * あれば支給日にまだ在籍しているため対象、支給日より前ならすでに退職済みのため対象外。
+   *
+   * @param {Date} date 判定したい退職日
+   * @param {string|null} bonusDateStr 次回ボーナス支給予定日 'YYYY-MM-DD'（未入力ならnull）
+   * @param {number|null} bonusAmountYen ボーナス見込み額（円）（未入力ならnull）
+   */
+  function calcBonusImpact(date, bonusDateStr, bonusAmountYen) {
+    if (!bonusDateStr || !bonusAmountYen) return null;
+    const bonusDate = parseDate(bonusDateStr);
+    const amount = Math.max(0, Number(bonusAmountYen) || 0);
+    const willReceive = date.getTime() >= bonusDate.getTime();
+    return { bonusDate, bonusDateLabel: fmtJP(bonusDate), amount, willReceive };
+  }
+
+  // ---------------------------------------------------------------
+  // ⑧ おすすめ退職日の統合判定
+  // ---------------------------------------------------------------
+  /**
+   * 「結局いつ辞めればいいか」への単一の結論を返す。優先順位は次のとおり。
+   *   1. 次の入社日が確定している場合は、その前日を超える日付は選べない（絶対条件）
+   *   2. ボーナス支給日が①の制約内に収まるなら、支給日以降の最初の月末まで繰り下げる
+   *      （ボーナス額は通常、社会保険料の差より大きいため優先する）
+   *   3. 上記いずれもなければ、社会保険料が最適な月末退職日を推奨する
    *
    * @param {Date} resignDate 今考えている退職日
    * @param {string|null} nextJoinDateStr 次の入社予定日
    * @param {object} insuranceOptimization calcInsuranceOptimization() の結果
+   * @param {string|null} bonusDateStr 次回ボーナス支給予定日
    */
-  function calcRecommendedResignDate(resignDate, nextJoinDateStr, insuranceOptimization) {
-    if (!nextJoinDateStr) {
-      return {
-        date: insuranceOptimization.optimalDate,
-        dateLabel: insuranceOptimization.optimalDateLabel,
-        limitedByNextJob: false,
-        isSameAsUserPlan: isLastDayOfMonth(resignDate) && insuranceOptimization.isOptimal,
-      };
+  function calcRecommendedResignDate(resignDate, nextJoinDateStr, insuranceOptimization, bonusDateStr) {
+    const ceiling = nextJoinDateStr ? addDays(parseDate(nextJoinDateStr), -1) : null;
+    let candidate = insuranceOptimization.optimalDate;
+    let bonusConflict = null; // 'unreachable'（入社日の制約でボーナス支給日まで待てない） | null
+
+    if (bonusDateStr) {
+      const bonusDate = parseDate(bonusDateStr);
+      if (ceiling && bonusDate.getTime() > ceiling.getTime()) {
+        bonusConflict = 'unreachable';
+      } else if (candidate.getTime() < bonusDate.getTime()) {
+        // lastDayOfMonth(bonusDate) は定義上つねに bonusDate 以降になるため、
+        // 支給日を含む月の月末まで繰り下げれば必ず支給日以降になる。
+        candidate = lastDayOfMonth(bonusDate);
+      }
     }
 
-    const nextJoin = parseDate(nextJoinDateStr);
-    const dayBeforeNextJoin = addDays(nextJoin, -1);
-    const monthEndFitsBeforeNextJoin = dayBeforeNextJoin.getTime() >= insuranceOptimization.optimalDate.getTime();
+    let limitedByNextJob = false;
+    if (ceiling && candidate.getTime() > ceiling.getTime()) {
+      candidate = ceiling;
+      limitedByNextJob = true;
+    }
 
-    const date = monthEndFitsBeforeNextJoin ? insuranceOptimization.optimalDate : dayBeforeNextJoin;
     return {
-      date,
-      dateLabel: fmtJP(date),
-      limitedByNextJob: !monthEndFitsBeforeNextJoin,
-      isSameAsUserPlan: fmtISO(date) === fmtISO(resignDate),
+      date: candidate,
+      dateLabel: fmtJP(candidate),
+      limitedByNextJob,
+      bonusConflict,
+      isSameAsUserPlan: fmtISO(candidate) === fmtISO(resignDate),
+    };
+  }
+
+  // ---------------------------------------------------------------
+  // ⑨ 退職日を変えることによる損得（社会保険料 + ボーナス）
+  // ---------------------------------------------------------------
+  /**
+   * 「今考えている日」のまま退職した場合と、「理想の退職日」にした場合とで、
+   * 実際に手元に残るお金がいくら変わるかを計算する。
+   * 有給休暇の金銭的価値は、消化する日数が同じである限りどちらの日付でも
+   * 変わらないため、この損得計算には含めない（別途「参考情報」として扱う）。
+   *
+   * @param {Date} userResignDate 今考えている退職日
+   * @param {Date} recommendedDate 理想の退職日（calcRecommendedResignDate の結果）
+   * @param {object} grade calcStandardRemunerationGrade() の結果
+   * @param {string|null} bonusDateStr 次回ボーナス支給予定日
+   * @param {number|null} bonusAmountYen ボーナス見込み額（円）
+   */
+  function calcResignDateGainLoss(userResignDate, recommendedDate, grade, bonusDateStr, bonusAmountYen) {
+    const userInsuranceCost = calcInsuranceMonthlyCost(userResignDate, grade);
+    const recommendedInsuranceCost = calcInsuranceMonthlyCost(recommendedDate, grade);
+    const insuranceDelta = userInsuranceCost - recommendedInsuranceCost; // 正なら理想日の方が安く済む
+
+    const userBonus = calcBonusImpact(userResignDate, bonusDateStr, bonusAmountYen);
+    const recommendedBonus = calcBonusImpact(recommendedDate, bonusDateStr, bonusAmountYen);
+    const userBonusYen = userBonus && userBonus.willReceive ? userBonus.amount : 0;
+    const recommendedBonusYen = recommendedBonus && recommendedBonus.willReceive ? recommendedBonus.amount : 0;
+    const bonusDelta = recommendedBonusYen - userBonusYen; // 正なら理想日の方がボーナスを受け取れる
+
+    return {
+      insuranceDelta,
+      bonusDelta,
+      totalDelta: insuranceDelta + bonusDelta,
+      userBonus,
+      recommendedBonus,
     };
   }
 
@@ -362,8 +437,11 @@
     calcLastWorkDayByCount,
     estimateMonthlyFromAnnual,
     calcInsuranceGap,
+    calcBonusImpact,
     calcRecommendedResignDate,
+    calcResignDateGainLoss,
     calcInsuranceOptimization,
+    calcInsuranceMonthlyCost,
     calcTakeHomeImpact,
     getBranchContext,
     judgeBranch,

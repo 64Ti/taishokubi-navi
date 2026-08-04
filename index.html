@@ -65,7 +65,13 @@
     <div class="mt-5">
       <label class="block text-xs font-bold text-slate-500 mb-1.5">次の会社への入社予定日（決まっていれば）</label>
       <input id="inputNextJoinDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れないおすすめの退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
+      <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れない理想の退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
+    </div>
+
+    <div class="mt-5">
+      <label class="block text-xs font-bold text-slate-500 mb-1.5">次回のボーナス（賞与）支給予定日（あれば）</label>
+      <input id="inputBonusDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <p class="text-[11px] text-slate-400 mt-1.5">多くの会社は「支給日に在籍していること」が条件です。支給日より前に退職すると受け取れない場合があります。</p>
     </div>
   </section>
 
@@ -82,15 +88,11 @@
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-bold">祝日は休日扱い</p>
-            <p class="text-[11px] text-slate-400">OFFの場合、祝日も出勤日として計算します</p>
-          </div>
-          <button id="toggleHoliday" class="toggle-on shrink-0 w-11 h-6 rounded-full relative" aria-pressed="true">
-            <span class="toggle-track absolute inset-0 rounded-full bg-emerald"></span>
-            <span class="toggle-thumb absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"></span>
-          </button>
+        <p class="text-sm font-bold mb-1">祝日の扱い</p>
+        <p class="text-[11px] text-slate-400 mb-3">国民の祝日を、最終出社日を計算するときの休みに含めるかどうかです。</p>
+        <div class="holiday-toggle-grid" id="holidayToggleGrid" role="group" aria-label="祝日の扱い">
+          <button type="button" class="ht-btn" id="holidayOnBtn" data-value="true" aria-pressed="true">祝日も休みにする<span class="ht-sub">一般的な会社はこちら</span></button>
+          <button type="button" class="ht-btn" id="holidayOffBtn" data-value="false" aria-pressed="false">祝日も出勤日にする<span class="ht-sub">シフト制・小売業など</span></button>
         </div>
       </div>
 
@@ -151,7 +153,12 @@
       <div id="livePreview" class="rounded-xl border-2 border-emerald bg-emerald-light p-4 hidden">
         <p class="text-[11px] font-black tracking-wider text-emerald mb-1">試算プレビュー</p>
         <p class="text-sm font-bold text-emerald-dark mb-1">最終出社日：<span id="previewLastWorkDay">-</span></p>
-        <p class="text-xs text-emerald-dark leading-relaxed" id="previewRecommendation"></p>
+        <div class="preview-compare" id="previewCompare" hidden>
+          <div><span class="pc-label">指定した退職日</span><span class="pc-value" id="previewUserDate">-</span></div>
+          <div class="pc-arrow">→</div>
+          <div><span class="pc-label">理想の退職日</span><span class="pc-value pc-ideal" id="previewIdealDate">-</span></div>
+        </div>
+        <p class="text-xs text-emerald-dark leading-relaxed mt-1" id="previewRecommendation"></p>
       </div>
     </div>
   </section>
@@ -182,6 +189,22 @@
           <option value="11000000">1000万円以上</option>
         </select>
         <p class="text-[11px] text-slate-400 mt-1.5">源泉徴収票や去年の手取りから、だいたいの帯で選んでください。賞与を含む年収を12等分して社会保険料の等級を概算します。</p>
+      </div>
+
+      <div id="bonusAmountField" hidden>
+        <label class="block text-xs font-bold text-slate-500 mb-1.5">そのボーナスのだいたいの見込み額</label>
+        <select id="inputBonusAmount" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+          <option value="" disabled selected>選択してください</option>
+          <option value="50000">5万円未満</option>
+          <option value="75000">5〜10万円</option>
+          <option value="150000">10〜20万円</option>
+          <option value="250000">20〜30万円</option>
+          <option value="400000">30〜50万円</option>
+          <option value="650000">50〜80万円</option>
+          <option value="900000">80〜100万円</option>
+          <option value="1200000">100万円以上</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-1.5">前回の明細やだいたいの相場でOKです。支給日に在籍しているかどうかの判定に使います。</p>
       </div>
 
       <label class="flex items-center gap-2.5 bg-white rounded-xl border border-slate-200 p-4 shadow-card">

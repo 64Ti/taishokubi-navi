@@ -72,7 +72,7 @@
       steps.push({
         '@type': 'HowToStep',
         name: '退職日を迎える',
-        text: `おすすめの退職日は${result.recommendation.dateLabel}です。${result.qualification.note}`,
+        text: `理想の退職日は${result.recommendation.dateLabel}です。${result.qualification.note}`,
       });
     }
     if (result.qualification && result.qualification.lossDateLabel) {
@@ -137,6 +137,13 @@
           a: '退職日の翌日と次の入社日が同じであれば、健康保険・厚生年金は途切れることなく転職先へ引き継がれるため、国民健康保険や任意継続被保険者制度の手続きは不要です。',
         });
       }
+    }
+
+    if (result.gainLoss && result.bonusDate && result.bonusAmount) {
+      baseFaqs.push({
+        q: 'ボーナス支給日の前に退職するとどうなりますか？',
+        a: '多くの会社の賞与規程には「支給日に在籍していること」という支給日在籍要件があります。支給日より前が退職日になっていると、査定期間を勤務していても賞与を受け取れない場合があります。支給日をまたいで在籍できるよう退職日を調整することで、この規定の対象外になれるかを確認できます。',
+      });
     }
 
     const ctx = result.branchContext;
