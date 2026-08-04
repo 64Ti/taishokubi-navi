@@ -1,6 +1,6 @@
 /**
  * calculator.js
- * 「トク退」社労士実務試算エンジン Ver.6.0
+ * 「トク退」社労士実務試算エンジン Ver.10.0
  * 資格喪失日／標準報酬月額等級／有休消化逆算／社会保険料の月末最適化／
  * 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア、一般Caution）を提供する。
  * window.TokutaiCalculator として公開。
@@ -48,6 +48,20 @@
   }
   function isLastDayOfMonth(date) {
     return date.getDate() === lastDayOfMonth(date).getDate();
+  }
+  /**
+   * 月またぎで日付が溢れる場合（例：8/31の6か月後→本来2/28だが、
+   * setMonthだけだと3/3等に繰り上がってしまう）を防ぐ安全な月加算。
+   * 溢れが起きたら、加算後の月の末日にクランプする。
+   */
+  function addMonthsSafe(baseDate, monthsToAdd) {
+    const result = new Date(baseDate.getTime());
+    const expectedMonth = (result.getMonth() + monthsToAdd) % 12;
+    result.setMonth(result.getMonth() + monthsToAdd);
+    if (result.getMonth() !== ((expectedMonth + 12) % 12)) {
+      result.setDate(0); // 翌月に溢れた場合、前月末日へ調整
+    }
+    return result;
   }
 
   // ---------------------------------------------------------------
@@ -119,6 +133,47 @@
     const clampedByLastWorkDay = lastWorkDay.getTime() < oneMonthBefore.getTime();
     const date = clampedByLastWorkDay ? lastWorkDay : oneMonthBefore;
     return { date, dateLabel: fmtJP(date), clampedByLastWorkDay };
+  }
+
+  // ---------------------------------------------------------------
+  // 定年退職の情報アドバイス（1か月前退職の可能性 ＋ 同日得喪特例）
+  // ---------------------------------------------------------------
+  /**
+   * 定年退職は多くの場合、就業規則で退職日そのものが定められているため、
+   * このツールが自動で「1か月前に繰り上げてください」と断定するのは不適切。
+   * そのため数値計算には反映せず、労務担当者への確認を促す情報アドバイスとして提供する。
+   */
+  function buildMandatoryRetirementAdvice() {
+    return {
+      title: '定年退職をご検討の方へ（1か月前退職のメリット ＆ 同日得喪特例）',
+      body: '定年到達月の1か月前（前月末）に退職日を設定できる場合、就業規則や退職金規程の条件によっては「退職所得控除の勤続年数計算」や「社会保険料の1か月分折半」で手取りが多くなることがあります。就業規則で退職日が固定されている場合は対象外なので、まずは労務担当者に確認しましょう。また、定年後に同じ会社で再雇用（嘱託等）される場合は、社会保険の「同日得喪（資格喪失と再取得を同時に行い、給与減額に合わせて1か月目から保険料を引き下げる特例）」の手続き予定もあわせて確認しましょう。',
+    };
+  }
+
+  // ---------------------------------------------------------------
+  // 企業型DC（確定拠出年金）の移管期限
+  // ---------------------------------------------------------------
+  /**
+   * 退職日翌日（資格喪失日）から6か月以内にiDeCoまたは転職先の企業型DCへの
+   * 移管手続きをしないと、自動的に国民年金基金連合会へ自動移管され、
+   * 運用が停止したうえ手数料がかかり続ける。
+   * @param {Date} resignDate 退職日（理想の退職日を渡すこと）
+   */
+  function calcDcDeadline(resignDate) {
+    const startDate = addDays(resignDate, 1);
+    const deadline = addMonthsSafe(startDate, 6);
+    return { startDate, deadline, deadlineLabel: fmtJP(deadline) };
+  }
+
+  // ---------------------------------------------------------------
+  // 退職金・退職所得申告書（20.42%源泉徴収回避）＆ 勤続1年未満切り上げ
+  // ---------------------------------------------------------------
+  function buildRetirementPayAdvice() {
+    return {
+      taskTitle: '「退職所得の受給に関する申告書」を提出する',
+      taskBody: '退職日までに会社へ提出してください。未提出だと退職金に20.42%の一律課税がされ、本来より手取りが一時的に大きく減ってしまいます（後日確定申告で還付は受けられますが、まずは提出しておくのが確実です）。',
+      note: '退職所得控除の計算に使う勤続年数は「1年未満の端数を切り上げ」て計算します（例：勤続20年3か月→21年として控除額を計算）。この分、控除額が有利になります。',
+    };
   }
 
   // ---------------------------------------------------------------
@@ -455,31 +510,20 @@
   // ⑧ 進路3分岐ごとの文脈型ノート（Critical Alert × Solution ペア／一般Caution）
   // ---------------------------------------------------------------
   /**
-   * v6.0仕様書 5. の「進路別動的パーソナライズ・オファーマトリクス」に準拠。
+   * v10.0仕様書に準拠。外部PR・アフィリエイトリンクは一切含まず、
+   * 純粋なテキストアドバイスのみを返す（旧 monetize フィールドは廃止）。
    * critical: Crimson Red 警告。存在する場合は必ず Emerald Green の solution とペアで返す。
-   * caution: Amber Yellow の一般注意（住民税一括徴収・空白期間・離職票タイムラグ等）。
-   * monetize: 進路の文脈に調和したPR導線（taskContext/message/ctaLabel/offerCategory を持つ）。
-   *
-   * 注：仕様書原案の療養・無職向けコピーには「国から最大28ヶ月の給付金」という記載があったが、
-   * 傷病手当金の上限は最長1年6ヶ月（18ヶ月）、雇用保険の基本手当は所定給付日数（最大でも
-   * 数百日単位）であり、単純合算しても28ヶ月には届かない根拠不明な数値だったため、
-   * 誇張のない表現に修正して実装している。
+   * caution: Amber Yellow の一般注意（住民税一括徴収等）。
    */
   function getBranchContext(branch) {
     const CONTEXT = {
       transfer: {
         label: '①転職',
         caution: {
-          title: '住民税の一括徴収・空白期間に注意',
-          description: '退職月によっては住民税が一括徴収されたり、転職先入社までに空白期間が生じたりすることがあります。',
+          title: '住民税の一括徴収に注意',
+          description: '退職月によっては、翌年5月分までの住民税が最後の給与や退職金から一括徴収されることがあります。手取り額を見込むときは差し引いて考えましょう。',
         },
         critical: null,
-        monetize: {
-          taskContext: 'STEP2: 有休消化期間',
-          message: '有休消化中の2週間で次のキャリアのスカウトを受け取る',
-          ctaLabel: '無料スカウト登録・転職エージェントを見る',
-          offerCategory: '転職スカウト・退職代行',
-        },
       },
       recuperation: {
         label: '②療養・無職',
@@ -487,30 +531,18 @@
         critical: {
           title: '傷病手当金の受給資格を失うリスク',
           description: '退職日に一日でも出社すると「労務不能」と認められず、退職後の傷病手当金継続受給ができなくなる場合があります。',
-          solutionTitle: '退職手続きを専門家に任せる',
-          solutionDescription: '体調が優れない状態で会社と直接交渉するのは負担が大きいため、退職代行・給付金サポートへの相談も選択肢です。',
-        },
-        monetize: {
-          taskContext: 'STEP1: 退職手続き',
-          message: '自己都合退職でも、条件を満たせば傷病手当金や失業給付などの公的な給付金を受け取れる場合があります',
-          ctaLabel: '退職代行・退職給付金サポート相談窓口を見る',
-          offerCategory: '傷病手当金・給付金サポート',
+          solutionTitle: '退職日は出社しないスケジュールにする',
+          solutionDescription: '体調を優先し、退職日当日は出社しないよう調整しましょう。引き継ぎや会社への連絡はそれより前に済ませておくと安心です。',
         },
       },
       independence: {
         label: '③独立',
         caution: null,
         critical: {
-          title: '開業届の提出タイミングを誤るリスク',
+          title: '再就職手当の受給資格を失うリスク',
           description: 'ハローワークで受給資格が決定してから1か月以内に開業届を提出すると、再就職手当を受け取れなくなる場合があります。',
-          solutionTitle: '提出日をコントロールして開業届を作成する',
-          solutionDescription: 'スマホで10分、提出日を指定して無料で開業届を作成できるツールを使えば、提出タイミングを誤らず準備できます。',
-        },
-        monetize: {
-          taskContext: 'STEP3: 開業届提出',
-          message: '国保より安くなる？個人事業主の社会保険料を見直しつつ、無料で開業届を作成する',
-          ctaLabel: '無料で開業届を作成する（freee開業 / マネーフォワード開業）',
-          offerCategory: 'freee開業 / マネーフォワード開業',
+          solutionTitle: '受給資格決定日を確認してから開業届を出す',
+          solutionDescription: 'ハローワークで受給資格決定日を確認し、そこから1か月が経過してから開業届を提出すると、再就職手当の対象から外れずに済む可能性があります。',
         },
       },
     };
@@ -530,10 +562,14 @@
     fmtJP,
     fmtISO,
     addDays,
+    addMonthsSafe,
     lastDayOfMonth,
     isLastDayOfMonth,
     calcQualificationLossDate,
     buildResignationNoticeAdvice,
+    buildMandatoryRetirementAdvice,
+    calcDcDeadline,
+    buildRetirementPayAdvice,
     calcNoticeDate,
     calcInsuranceSwitchDeadline,
     calcBlueFormDeadline,

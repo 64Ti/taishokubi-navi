@@ -1,7 +1,15 @@
 /**
  * app.js
- * トク退：UI制御本体 Ver.6.0
- * STEP1(退職希望日) → STEP2(休日・有休設定) → STEP3(給与・進路3分岐) → 結果(ToDoタイムライン)
+ * トク退：UI制御本体 Ver.10.0
+ * STEP1(退職希望日+退職区分) → STEP2(休日・有休設定) → STEP3(給与・資産・進路) → 結果(ToDoタイムライン)
+ *
+ * v10.0での主要変更：
+ * - 外部PR・アフィリエイトボタン・広告要素を完全撤去。純粋なテキストアドバイスのみ表示。
+ * - SafeStorage: iOS Safariプライベートモード等でlocalStorageが使えない環境でも例外を投げない。
+ * - INITIAL_STATE を用いたデフォルト値マージで、旧形式データとの衝突・欠損フィールドを防止。
+ * - 退職区分（定年退職）・企業型DC・退職金・再就職手当希望の入力と、それに応じた
+ *   タイムラインの条件分岐（離職票の要否等）を追加。
+ * - 結果画面の印刷 / PDF保存（window.print）に対応。
  */
 (function () {
   'use strict';
@@ -15,23 +23,63 @@
   const STEP_LABELS = ['STEP 1 / 3', 'STEP 2 / 3', 'STEP 3 / 3', '診断結果'];
   let currentStepIndex = 0;
 
-  const state = {
-    resignDate: null,      // 'YYYY-MM-DD'
-    nextJoinDate: null,    // 'YYYY-MM-DD'（次の会社への入社予定日・任意）
-    bonusDate: null,       // 'YYYY-MM-DD'（次回ボーナス支給予定日・任意）
-    bonusAmount: null,     // 選択したボーナス見込み額の代表額（円）
-    offDays: [0, 6],       // 毎週の定休日（0:日〜6:土）。シフト制の人向けに自由選択。
-    closedOnHolidays: true,
-    extraOffDates: [],     // ['YYYY-MM-DD', ...] 会社独自の休み
-    extraWorkDates: [],    // ['YYYY-MM-DD', ...] 会社独自の出勤日
-    paidLeave: null,
-    handoverDays: 0,       // 引き継ぎ必要日数
-    annualIncome: null,    // 選択した年収帯の代表額（円）
-    salary: null,          // annualIncome から換算した月給概算（円）
-    insuranceType: 'kyokai', // 加入中の健康保険 'kyokai'|'kumiai'|'kyosai'
-    branch: null,
-    result: null,
-  };
+  // ---------------------------------------------------------------
+  // SafeStorage：iOS Safariのプライベートブラウジング等でlocalStorageの
+  // setItem/getItemが例外を投げる環境でも、アプリ全体を落とさないためのラッパー。
+  // ---------------------------------------------------------------
+  const SafeStorage = (function () {
+    let available = true;
+    try {
+      const testKey = '__tokutai_storage_test__';
+      window.localStorage.setItem(testKey, '1');
+      window.localStorage.removeItem(testKey);
+    } catch (e) {
+      available = false;
+    }
+    return {
+      isAvailable: () => available,
+      getItem(key) {
+        if (!available) return null;
+        try { return window.localStorage.getItem(key); } catch (e) { return null; }
+      },
+      setItem(key, value) {
+        if (!available) return false;
+        try { window.localStorage.setItem(key, value); return true; } catch (e) { return false; }
+      },
+      removeItem(key) {
+        if (!available) return;
+        try { window.localStorage.removeItem(key); } catch (e) { /* noop */ }
+      },
+    };
+  })();
+
+  // 復元・リセット双方の基準となる初期状態。マイグレーション時は
+  // 「この形をベースに、保存データを上書きマージする」ことで欠損フィールドを防ぐ。
+  function createInitialState() {
+    return {
+      resignDate: null,        // 'YYYY-MM-DD'
+      retireReason: 'voluntary', // 'voluntary'|'company'|'mandatory'
+      nextJoinDate: null,       // 'YYYY-MM-DD'（次の会社への入社予定日・転職時のみ）
+      bonusDate: null,          // 'YYYY-MM-DD'（直近1回分のボーナス支給予定日・任意）
+      bonusAmount: null,        // 選択したボーナス見込み額の代表額（円）
+      offDays: [0, 6],          // 毎週の定休日（0:日〜6:土）。シフト制の人向けに自由選択。
+      closedOnHolidays: true,
+      extraOffDates: [],        // ['YYYY-MM-DD', ...] 会社独自の休み
+      extraWorkDates: [],       // ['YYYY-MM-DD', ...] 会社独自の出勤日
+      paidLeave: null,
+      handoverDays: 0,          // 引き継ぎ必要日数
+      annualIncome: null,       // 選択した年収帯の代表額（円）
+      salary: null,             // annualIncome から換算した月給概算（円）
+      insuranceType: 'kyokai',  // 加入中の健康保険 'kyokai'|'kumiai'|'kyosai'
+      corporateDC: 'no',        // 企業型DC（確定拠出年金）の加入有無 'yes'|'no'
+      retirementPay: 'no',      // 退職金の支給予定 'yes'|'no'
+      branch: null,             // 'transfer'|'recuperation'|'independence'
+      wantAllowance: 'no',      // 再就職手当の受給希望（独立選択時のみ意味を持つ）'yes'|'no'
+      result: null,
+    };
+  }
+
+  const state = createInitialState();
 
   // ---------------------------------------------------------------
   // 初期化
@@ -62,8 +110,7 @@
     document.getElementById('btnBack').addEventListener('click', onBack);
     document.getElementById('btnRestart').addEventListener('click', onRestart);
     document.getElementById('btnShareX').addEventListener('click', onShareX);
-    document.getElementById('btnLineCV').addEventListener('click', onLineCV);
-    document.getElementById('sheetBackdrop').addEventListener('click', closeSheet);
+    document.getElementById('btnPrint').addEventListener('click', onPrint);
     document.getElementById('customDaysAccordion').addEventListener('click', e => {
       const btn = e.target.closest('.cd-del');
       if (btn) removeExtraDate(btn.dataset.kind, btn.dataset.date);
@@ -77,8 +124,8 @@
       saveToStorage();
       validateStep1();
     });
-    document.getElementById('inputNextJoinDate').addEventListener('change', e => {
-      state.nextJoinDate = e.target.value || null;
+    document.getElementById('inputRetireReason').addEventListener('change', e => {
+      state.retireReason = e.target.value;
       saveToStorage();
     });
     document.getElementById('resignDateChips').addEventListener('click', e => {
@@ -90,7 +137,6 @@
       document.getElementById('bonusAmountField').hidden = !state.bonusDate;
       saveToStorage();
       // STEP1の入力なので、他ステップの btnNext 状態には触れない
-      // （STEP3側は inputBonusAmount のハンドラと renderStep() が担当する）
     });
 
     // STEP2
@@ -126,6 +172,18 @@
       state.insuranceType = e.target.value;
       saveToStorage();
     });
+    document.getElementById('inputCorporateDC').addEventListener('change', e => {
+      state.corporateDC = e.target.value;
+      saveToStorage();
+    });
+    document.getElementById('inputRetirementPay').addEventListener('change', e => {
+      state.retirementPay = e.target.value;
+      saveToStorage();
+    });
+    document.getElementById('inputWantAllowance').addEventListener('change', e => {
+      state.wantAllowance = e.target.value;
+      saveToStorage();
+    });
     document.querySelectorAll('#branchSelector .branch-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         state.branch = btn.dataset.branch;
@@ -136,6 +194,7 @@
         btn.classList.remove('border-slate-300');
         btn.classList.add('border-emerald', 'bg-emerald-light');
         updateNextJoinDateVisibility();
+        updateWantAllowanceVisibility();
         saveToStorage();
         validateStep3();
       });
@@ -157,6 +216,19 @@
   }
 
   // ---------------------------------------------------------------
+  // STEP3：再就職手当の受給希望は「③独立」を選んだときだけ意味を持つ。
+  // ---------------------------------------------------------------
+  function updateWantAllowanceVisibility() {
+    const field = document.getElementById('wantAllowanceField');
+    const isIndependence = state.branch === 'independence';
+    field.hidden = !isIndependence;
+    if (!isIndependence) {
+      state.wantAllowance = 'no';
+      document.getElementById('inputWantAllowance').value = 'no';
+    }
+  }
+
+  // ---------------------------------------------------------------
   // STEP1：退職希望日のクイック選択チップ（EFO改善）
   // ---------------------------------------------------------------
   function applyQuickDate(kind) {
@@ -169,6 +241,8 @@
       target = Calc.lastDayOfMonth(today);
     } else if (kind === 'nextMonthEnd') {
       target = Calc.lastDayOfMonth(Calc.addDays(Calc.lastDayOfMonth(today), 1));
+    } else if (kind === 'nextMonth1st') {
+      target = Calc.addDays(Calc.lastDayOfMonth(today), 1);
     } else {
       return;
     }
@@ -298,7 +372,7 @@
     const r = Calc.calcPaidLeaveBackward(resignDate, state.paidLeave, checker, state.handoverDays);
     document.getElementById('previewLastWorkDay').textContent = Calc.fmtJP(r.lastWorkDay);
 
-    // ③④ 自分が指定した退職日に対して、いつが理想かを先出しで伝える
+    // 自分が指定した退職日に対して、いつが理想かを先出しで伝える
     // （金額はSTEP3の給与・ボーナス入力後に確定するためここでは日付のみ）
     const optimalStub = {
       optimalDate: Calc.lastDayOfMonth(resignDate),
@@ -332,7 +406,7 @@
   }
 
   // ---------------------------------------------------------------
-  // ② 期間内の祝日カレンダー（可視化）
+  // 期間内の祝日カレンダー（可視化）
   // ---------------------------------------------------------------
   function renderHolidayCalendar() {
     const listEl = document.getElementById('holidayCalendarList');
@@ -428,14 +502,9 @@
   }
 
   function onRestart() {
-    localStorage.removeItem(STORAGE_KEY);
-    Object.assign(state, {
-      resignDate: null, nextJoinDate: null, bonusDate: null, bonusAmount: null,
-      offDays: [0, 6], closedOnHolidays: true,
-      extraOffDates: [], extraWorkDates: [],
-      paidLeave: null, handoverDays: 0, annualIncome: null, salary: null, insuranceType: 'kyokai',
-      branch: null, result: null,
-    });
+    SafeStorage.removeItem(STORAGE_KEY);
+    Object.assign(state, createInitialState());
+    document.getElementById('inputRetireReason').value = 'voluntary';
     document.getElementById('inputNextJoinDate').value = '';
     document.getElementById('nextJoinDateField').hidden = true;
     document.getElementById('inputBonusDate').value = '';
@@ -445,6 +514,10 @@
     document.getElementById('inputHandoverDays').value = '0';
     document.getElementById('inputAnnualIncome').value = '';
     document.getElementById('inputInsuranceType').value = 'kyokai';
+    document.getElementById('inputCorporateDC').value = 'no';
+    document.getElementById('inputRetirementPay').value = 'no';
+    document.getElementById('inputWantAllowance').value = 'no';
+    document.getElementById('wantAllowanceField').hidden = true;
     document.getElementById('holidayOnBtn').setAttribute('aria-pressed', 'true');
     document.getElementById('holidayOffBtn').setAttribute('aria-pressed', 'false');
     document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {
@@ -473,12 +546,10 @@
 
     // タイムラインは「理想の退職日」を軸に構成するため、最終出社日・資格喪失日は
     // 指定日(resignDate)ではなく理想の退職日(recommendation.date)を基準に計算する。
-    // （以前は指定日を基準にしていたため、理想の退職日が9/30でも資格喪失日が
-    //   指定日9/15の翌日=9/16と表示される不整合があった）
     const paidLeaveResult = Calc.calcPaidLeaveBackward(recommendation.date, state.paidLeave, checker, state.handoverDays);
     const qualification = Calc.calcQualificationLossDate(recommendation.date, state.insuranceType);
 
-    // ⑤⑦⑨ 損得計算：指定日のまま vs 理想の退職日で、社会保険料とボーナスがどう変わるか
+    // 損得計算：指定日のまま vs 理想の退職日で、社会保険料とボーナスがどう変わるか
     const gainLoss = Calc.calcResignDateGainLoss(resignDate, recommendation.date, gradeResult, state.bonusDate, state.bonusAmount);
 
     // 有休の金銭的価値は「参考情報」。退職日をどちらにしても消化日数が同じなら変わらない。
@@ -487,7 +558,7 @@
     // 上司へ切り出す目安日（最終出社日でクランプ）
     const noticeDate = Calc.calcNoticeDate(recommendation.date, paidLeaveResult.lastWorkDay);
 
-    // 進路別の実務期限（②③ タイムラインの差別化）
+    // 進路別の実務期限（療養＝国保切替、独立＝青色申告）
     let branchDeadline = null;
     if (state.branch === 'recuperation') {
       branchDeadline = { type: 'insuranceSwitch', ...Calc.calcInsuranceSwitchDeadline(qualification.lossDate) };
@@ -495,9 +566,19 @@
       branchDeadline = { type: 'blueForm', ...Calc.calcBlueFormDeadline(resignDate) };
     }
 
+    // 定年退職アドバイス（数値計算は変えず、情報アドバイスとしてのみ提供）
+    const mandatoryAdvice = state.retireReason === 'mandatory' ? Calc.buildMandatoryRetirementAdvice() : null;
+
+    // 企業型DC移管期限
+    const dcDeadline = state.corporateDC === 'yes' ? Calc.calcDcDeadline(recommendation.date) : null;
+
+    // 退職金・退職所得申告書アドバイス
+    const retirementPayAdvice = state.retirementPay === 'yes' ? Calc.buildRetirementPayAdvice() : null;
+
     state.result = {
       resignDate,
       resignDateLabel: Calc.fmtJP(resignDate),
+      retireReason: state.retireReason,
       nextJoinDate: state.nextJoinDate,
       lastWorkDay: paidLeaveResult.lastWorkDay,
       lastWorkDayLabel: Calc.fmtJP(paidLeaveResult.lastWorkDay),
@@ -513,6 +594,10 @@
       gainLoss,
       paidLeaveInfo,
       branchDeadline,
+      mandatoryAdvice,
+      dcDeadline,
+      retirementPayAdvice,
+      wantAllowance: state.branch === 'independence' ? state.wantAllowance : null,
       bonusDate: state.bonusDate,
       bonusAmount: state.bonusAmount,
       branch: state.branch,
@@ -525,12 +610,12 @@
   }
 
   // ---------------------------------------------------------------
-  // 結果画面：インパクトカード + ToDoタイムライン
+  // 結果画面：見出しカード + ToDoタイムライン
   // ---------------------------------------------------------------
   function renderResult() {
     const r = state.result;
 
-    // ヘッダーカード：まず「結局いつ辞めればいいか」の結論を最上段に出す（Gold Amber）
+    // 見出しカード：まず「結局いつ辞めればいいか」の結論を最上段に出す（Gold Amber）
     const impactCard = document.getElementById('impactCard');
     const headline = buildHeadline(r);
     const compareRow = r.recommendation.isSameAsUserPlan ? '' : `
@@ -558,6 +643,19 @@
       <p class="text-[11px] opacity-80 leading-relaxed mt-3">※有休消化の価値（約${r.paidLeaveInfo.paidLeaveValue.toLocaleString()}円／日給概算${r.paidLeaveInfo.dailyWage.toLocaleString()}円×${r.paidLeaveInfo.days}日）は、退職日をどちらにしても消化日数が同じであれば変わらないため、上の損得には含めていません。</p>
     `;
 
+    // 定年退職の情報アドバイス（見出しカードとタイムラインの間に独立表示）
+    const mandatoryCard = document.getElementById('mandatoryAdviceCard');
+    if (r.mandatoryAdvice) {
+      mandatoryCard.hidden = false;
+      mandatoryCard.innerHTML = `
+        <p class="ic-title">💡 ${escapeHtml(r.mandatoryAdvice.title)}</p>
+        <p class="ic-body">${escapeHtml(r.mandatoryAdvice.body)}</p>
+      `;
+    } else {
+      mandatoryCard.hidden = true;
+      mandatoryCard.innerHTML = '';
+    }
+
     const timeline = document.getElementById('timeline');
     timeline.innerHTML = '';
     let step = 1;
@@ -568,33 +666,37 @@
       : r.noticeAdvice.body;
     timeline.appendChild(buildTimelineNode(step++, r.noticeDate.dateLabel + 'まで', r.noticeAdvice.title, noticeBody));
 
+    // --- ② 退職所得の受給に関する申告書（退職金ありの場合のみ） ---
+    if (r.retirementPayAdvice) {
+      timeline.appendChild(buildTimelineNode(step++, r.recommendation.dateLabel + 'まで', r.retirementPayAdvice.taskTitle, r.retirementPayAdvice.taskBody));
+      timeline.appendChild(wrapAside(buildAdviceCard('こうすることをお勧めします', r.retirementPayAdvice.note)));
+    }
+
     // 療養branchのcritical（傷病手当金）は「出社しない」判断に直結するため、相談の直後に挿入
     if (r.branch === 'recuperation' && r.branchContext && r.branchContext.critical) {
       timeline.appendChild(wrapAside(buildCriticalPair(r.branchContext.critical)));
     }
 
-    // --- ② 最終出社日 ---
-    timeline.appendChild(buildTimelineNode(step++, r.lastWorkDayLabel, '最終出社日を迎える', '引き継ぎ資料の準備はこの日までに終えましょう。ここが会社に出社する最後の日です。'));
+    // --- ③ 最終出社日 ---
+    timeline.appendChild(buildTimelineNode(step++, r.lastWorkDayLabel, '最終出社日を迎える', '社章・備品の返却、引き継ぎ資料の準備をこの日までに終えましょう。ここが会社に出社する最後の日です。'));
 
-    // --- ③ 有給休暇の消化開始（あれば） ---
+    // --- ④ 有給休暇の消化開始（あれば） ---
     if (r.paidLeaveStartLabel) {
-      timeline.appendChild(buildTimelineNode(step++, r.paidLeaveStartLabel, '有給休暇の消化を開始', `${r.paidLeaveStartLabel}から理想の退職日まで、残っている有給休暇を消化する期間に入ります。`));
-    }
-    // 転職branchの導線は「有休消化中の時間の使い方」の文脈なので、消化開始の直後に挿入
-    if (r.branch === 'transfer' && r.branchContext) {
-      timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
+      timeline.appendChild(buildTimelineNode(step++, r.paidLeaveStartLabel, '有給休暇の消化を開始', `${r.paidLeaveStartLabel}から理想の退職日まで、残っている有給休暇を消化する期間に入ります。有休消化中の二重就労を避け、次の準備や体調管理に充てましょう。`));
     }
 
-    // --- ④ 理想の退職日を迎える（ハイライト表示） ---
-    timeline.appendChild(buildTimelineNode(step++, r.recommendation.dateLabel, '理想の退職日を迎える', 'これが雇用契約上の最終在籍日です。この日の翌日から社会保険の資格を失います。', 'gold'));
+    // --- ⑤ 理想の退職日を迎える（ハイライト表示） ---
+    timeline.appendChild(buildTimelineNode(step++, r.recommendation.dateLabel, '理想の退職日を迎える', '社会保険料の会社折半負担やボーナス受給権が最大化される、雇用契約上の最終在籍日です。この日の翌日から社会保険の資格を失います。', 'gold'));
 
-    // --- ⑤ 社会保険 資格喪失日 ---
+    // --- ⑥ 社会保険 資格喪失日 ---
     let qualBody = r.qualification.note;
     if (r.qualification.insuranceTypeNote) qualBody += ' ' + r.qualification.insuranceTypeNote;
+    qualBody += ' 健康保険証はこの日以降使用できません。会社への返却を行いましょう。';
     timeline.appendChild(buildTimelineNode(step++, r.qualification.lossDateLabel, '社会保険 資格喪失日', qualBody, 'crimson'));
 
-    // --- ⑥ 進路別の実務ステップ（ここが最も差が出る部分） ---
+    // --- ⑦ 進路別の実務ステップ（離職票の要否を含め、ここが最も差が出る部分） ---
     if (r.branch === 'transfer') {
+      timeline.appendChild(buildTimelineNode(step++, r.qualification.lossDateLabel + '以降', '雇用保険被保険者証・源泉徴収票を準備する', '離職票の到着を待つ必要はありません。転職先へ「雇用保険被保険者証」と「源泉徴収票」を提出しましょう。'));
       if (r.nextJoinDate) {
         const nextJoinLabel = Calc.fmtJP(Calc.parseDate(r.nextJoinDate));
         const gapBody = r.insuranceGap && r.insuranceGap.type === 'gap'
@@ -607,21 +709,33 @@
       if (r.branchContext && r.branchContext.caution) {
         timeline.appendChild(wrapAside(buildTimelineCaution(r.branchContext.caution.title, r.branchContext.caution.description)));
       }
-    } else if (r.branch === 'recuperation' && r.branchDeadline) {
-      const bd = r.branchDeadline;
-      timeline.appendChild(buildTimelineNode(step++, `${bd.fromLabel}から${bd.toLabel}まで`, '国民健康保険・国民年金へ切り替える', '資格喪失日から原則14日以内に、お住まいの市区町村役場で手続きします。期限を過ぎても加入自体はできますが、保険料の遡及請求や給付が受けられない期間が生じる場合があるため早めに済ませましょう。'));
-      if (r.branchContext) timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
-    } else if (r.branch === 'independence' && r.branchDeadline) {
-      const bd = r.branchDeadline;
-      timeline.appendChild(buildTimelineNode(step++, bd.deadlineLabel + 'まで', '青色申告承認申請書を提出する（開業する場合）', '開業日から2か月以内（1/1〜1/15開業の場合はその年の3/15まで）に税務署へ提出すると、その年から青色申告の特典を受けられます。開業日は退職日の翌日を仮定した目安です。'));
-      if (r.branchContext && r.branchContext.critical) timeline.appendChild(wrapAside(buildCriticalPair(r.branchContext.critical)));
-      if (r.branchContext) timeline.appendChild(wrapAside(buildMonetizeCard(r.branchContext.monetize)));
+    } else if (r.branch === 'recuperation') {
+      const noticeFrom = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 10));
+      const noticeTo = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 14));
+      timeline.appendChild(buildTimelineNode(step++, `${noticeFrom}〜${noticeTo}ごろ`, '離職票の到着を待ち、基本手当を申請する', '会社から「離職票-1, 2」が自宅に郵送されます。届いたらハローワークで基本手当（および傷病手当金）の申請を行いましょう。', 'caution'));
+      if (r.branchDeadline) {
+        const bd = r.branchDeadline;
+        timeline.appendChild(buildTimelineNode(step++, `${bd.fromLabel}から${bd.toLabel}まで`, '国民健康保険・国民年金へ切り替える', '資格喪失日から原則14日以内に、お住まいの市区町村役場で手続きします。期限を過ぎても加入自体はできますが、給付が受けられない期間が生じる場合があるため早めに済ませましょう。'));
+      }
+    } else if (r.branch === 'independence') {
+      if (r.wantAllowance === 'yes') {
+        const noticeFrom = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 10));
+        const noticeTo = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 14));
+        timeline.appendChild(buildTimelineNode(step++, `${noticeFrom}〜${noticeTo}ごろ`, '離職票の到着を待ち、再就職手当を申請する', '再就職手当の申請には離職票が必要です。ハローワークで受給資格が決定してから1か月以内に開業届を提出すると、再就職手当を受け取れなくなる場合があります。', 'caution'));
+        if (r.branchContext && r.branchContext.critical) timeline.appendChild(wrapAside(buildCriticalPair(r.branchContext.critical)));
+      } else {
+        timeline.appendChild(buildTimelineNode(step++, r.qualification.lossDateLabel + '以降', '雇用保険被保険者証を準備する', 'すぐに開業する場合、離職票の到着を待つ必要はありません。雇用保険被保険者証を保管しておきましょう。'));
+      }
+      if (r.branchDeadline) {
+        const bd = r.branchDeadline;
+        timeline.appendChild(buildTimelineNode(step++, bd.deadlineLabel + 'まで', '青色申告承認申請書を提出する（開業する場合）', '開業日から2か月以内（1/1〜1/15開業の場合はその年の3/15まで）に税務署へ提出すると、その年から青色申告の特典を受けられます。開業日は退職日の翌日を仮定した目安です。'));
+      }
     }
 
-    // --- ⑦ 離職票の到着を待つ（資格喪失日を起点に、具体的な日付レンジで提示） ---
-    const noticeFrom = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 10));
-    const noticeTo = Calc.fmtJP(Calc.addDays(r.qualification.lossDate, 14));
-    timeline.appendChild(buildTimelineNode(step++, `${noticeFrom}〜${noticeTo}ごろ`, '離職票の到着を待つ', '会社から「離職票-1, 2」が自宅に郵送されます。届いたらハローワークで求職の申し込み、市区町村で国民健康保険の軽減申請を行いましょう。', 'caution'));
+    // --- ⑧ 企業型DC（確定拠出年金）の移管手続き（加入ありの場合のみ） ---
+    if (r.dcDeadline) {
+      timeline.appendChild(buildTimelineNode(step++, r.dcDeadline.deadlineLabel + 'まで', '企業型DC（確定拠出年金）を移管する', '退職翌日から6か月以内に、iDeCoまたは転職先の企業型DCへの移管手続きを行ってください。放置すると自動的に移管され、運用が停止したうえ手数料がかかり続けます。'));
+    }
   }
 
   // ---------------------------------------------------------------
@@ -698,19 +812,16 @@
     const amountLabel = Number(r.bonusAmount).toLocaleString();
 
     if (gl.userBonus.willReceive) {
-      // 今の予定でも既にもらえる
       return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">✓ 今の予定でもボーナス（約${amountLabel}円・支給日${escapeHtml(bonusLabel)}）は受け取れる見込みです。</p>`;
     }
     if (gl.recommendedBonus.willReceive) {
-      // 今の予定だと逃すが、理想の日にすれば受け取れる
       return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">⚠ 今の予定のままだとボーナス（約${amountLabel}円）を受け取れません。理想の日まで在籍すれば、支給日（${escapeHtml(bonusLabel)}）に間に合い受け取れます。</p>`;
     }
-    // 理想の日にしても間に合わない（入社日の制約など）
     return `<p class="text-[11px] font-bold bg-white/15 rounded-lg px-3 py-2 leading-relaxed mb-2">⚠ 次の入社日の都合で、ボーナス（約${amountLabel}円・支給日${escapeHtml(bonusLabel)}）には間に合いません。</p>`;
   }
 
   // ---------------------------------------------------------------
-  // ④ 損得の内訳（社会保険料 + ボーナス）
+  // 損得の内訳（社会保険料 + ボーナス）
   // ---------------------------------------------------------------
   function buildGainLossBlock(r) {
     const gl = r.gainLoss;
@@ -770,8 +881,8 @@
     return el;
   }
 
-  // 番号を持たない補足カード（アラート/PR導線）を、直前の番号付きアクションに
-  // 従属する形で挿入するためのラッパー。
+  // 番号を持たない補足カード（アラート/テキストアドバイス）を、直前の番号付き
+  // アクションに従属する形で挿入するためのラッパー。
   function wrapAside(el) {
     const wrap = document.createElement('div');
     wrap.className = 'tl-aside';
@@ -787,6 +898,17 @@
       <p class="text-[11px] font-black tracking-wider text-caution-dark mb-1">CAUTION</p>
       <h3 class="text-sm font-bold text-navy mb-1">${escapeHtml(heading)}</h3>
       <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(body)}</p>
+    `;
+    return el;
+  }
+
+  // 純粋なテキストアドバイスカード（外部リンク・PRバッジ・クリックハンドラなし）
+  function buildAdviceCard(label, body) {
+    const el = document.createElement('div');
+    el.className = 'tl-advice';
+    el.innerHTML = `
+      <p class="ta-label">${escapeHtml(label)}</p>
+      <p class="ta-body">${escapeHtml(body)}</p>
     `;
     return el;
   }
@@ -824,42 +946,6 @@
     return wrap;
   }
 
-  // 進路文脈型マネタイズ導線カード（PR表記／Slate Light）
-  function buildMonetizeCard(monetize) {
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'w-full text-left rounded-2xl border border-slate-200 bg-white p-4 shadow-card';
-    el.innerHTML = `
-      <div class="flex items-center gap-2 mb-1.5">
-        <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>
-        <span class="text-[10px] font-bold text-slate-400">${escapeHtml(monetize.taskContext)}</span>
-      </div>
-      <p class="text-sm font-bold text-navy leading-snug mb-1.5">${escapeHtml(monetize.message)}</p>
-      <span class="inline-flex items-center gap-1 text-xs font-bold text-gold">${escapeHtml(monetize.ctaLabel)} →</span>
-      ${monetize.offerCategory ? `<p class="text-[10px] text-slate-400 mt-1.5">取扱カテゴリ：${escapeHtml(monetize.offerCategory)}</p>` : ''}
-    `;
-    el.addEventListener('click', () => openSheet(monetize.ctaLabel, monetize.message));
-    return el;
-  }
-
-  // ---------------------------------------------------------------
-  // LINE公式アカウント案内（マイクロCV）
-  // 実際のLINE公式アカウントは未接続のため、外部リンクは開かず案内のみ表示する。
-  // ---------------------------------------------------------------
-  function onLineCV() {
-    document.getElementById('sheetContent').innerHTML = `
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>
-        <h4 class="text-base font-black text-navy">診断結果の保存・個別カレンダー作成</h4>
-      </div>
-      <p class="text-sm text-slate-600 leading-relaxed mb-4">LINE公式アカウントで、診断結果の保存や個別の退職スケジュールカレンダーを受け取れる機能を準備中です。公開までもうしばらくお待ちください。</p>
-      <button id="sheetCloseBtn" class="w-full mt-1 bg-navy text-white rounded-xl py-3 text-sm font-bold">閉じる</button>
-    `;
-    document.getElementById('sheetCloseBtn').addEventListener('click', closeSheet);
-    document.getElementById('bottomSheet').classList.add('open');
-    document.getElementById('sheetBackdrop').classList.add('open');
-  }
-
   // ---------------------------------------------------------------
   // Xシェア：ワンタップ投稿テキスト生成
   // ---------------------------------------------------------------
@@ -885,111 +971,105 @@
   }
 
   // ---------------------------------------------------------------
-  // ボトムシート（PR詳細・免責）
+  // 印刷 / PDF保存
   // ---------------------------------------------------------------
-  function openSheet(title, desc) {
-    document.getElementById('sheetContent').innerHTML = `
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-[10px] font-black text-white bg-monetize rounded px-1.5 py-0.5">PR</span>
-        <h4 class="text-base font-black text-navy">${escapeHtml(title)}</h4>
-      </div>
-      <p class="text-sm text-slate-600 leading-relaxed mb-4">${escapeHtml(desc)}</p>
-      <p class="text-[11px] text-slate-400 leading-relaxed">
-        本サービスの紹介にはアフィリエイトプログラムを利用しており、リンク経由でお申し込みいただくと
-        当サイトに紹介料が発生する場合があります。表示内容は情報提供時点のものです。
-      </p>
-      <button id="sheetCloseBtn" class="w-full mt-5 bg-navy text-white rounded-xl py-3 text-sm font-bold">閉じる</button>
-    `;
-    document.getElementById('sheetCloseBtn').addEventListener('click', closeSheet);
-    document.getElementById('bottomSheet').classList.add('open');
-    document.getElementById('sheetBackdrop').classList.add('open');
-  }
-  function closeSheet() {
-    document.getElementById('bottomSheet').classList.remove('open');
-    document.getElementById('sheetBackdrop').classList.remove('open');
+  function onPrint() {
+    window.print();
   }
 
   // ---------------------------------------------------------------
-  // LocalStorage 管理
+  // LocalStorage 管理（SafeStorage経由。マイグレーションは
+  // createInitialState() をベースにしたマージで実現する）
   // ---------------------------------------------------------------
   function saveToStorage() {
-    try {
-      const persistable = {
-        resignDate: state.resignDate,
-        nextJoinDate: state.nextJoinDate,
-        bonusDate: state.bonusDate,
-        bonusAmount: state.bonusAmount,
-        offDays: state.offDays,
-        closedOnHolidays: state.closedOnHolidays,
-        extraOffDates: state.extraOffDates,
-        extraWorkDates: state.extraWorkDates,
-        paidLeave: state.paidLeave,
-        handoverDays: state.handoverDays,
-        annualIncome: state.annualIncome,
-        salary: state.salary,
-        insuranceType: state.insuranceType,
-        branch: state.branch,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
-    } catch (e) {
-      console.warn('LocalStorage save failed:', e);
-    }
+    const persistable = {
+      resignDate: state.resignDate,
+      retireReason: state.retireReason,
+      nextJoinDate: state.nextJoinDate,
+      bonusDate: state.bonusDate,
+      bonusAmount: state.bonusAmount,
+      offDays: state.offDays,
+      closedOnHolidays: state.closedOnHolidays,
+      extraOffDates: state.extraOffDates,
+      extraWorkDates: state.extraWorkDates,
+      paidLeave: state.paidLeave,
+      handoverDays: state.handoverDays,
+      annualIncome: state.annualIncome,
+      salary: state.salary,
+      insuranceType: state.insuranceType,
+      corporateDC: state.corporateDC,
+      retirementPay: state.retirementPay,
+      branch: state.branch,
+      wantAllowance: state.wantAllowance,
+    };
+    const ok = SafeStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
+    if (!ok) console.warn('LocalStorage save skipped (unavailable or failed).');
   }
 
   function restoreFromStorage() {
+    const raw = SafeStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    let parsed;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      Object.assign(state, parsed);
-
-      if (!Array.isArray(state.extraOffDates)) state.extraOffDates = [];
-      if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
-      if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
-
-      // 旧データ互換：closedOnSaturday(boolean) しかない場合は offDays へ変換する。
-      // state側は初期値[0,6]が既に入っているため、判定は必ず parsed（保存されていた生データ）で行う。
-      if (!Array.isArray(parsed.offDays) || !parsed.offDays.length) {
-        state.offDays = parsed.closedOnSaturday !== undefined
-          ? (parsed.closedOnSaturday === false ? [0] : [0, 6])
-          : [0, 6];
-      }
-      delete state.closedOnSaturday;
-
-      if (state.nextJoinDate) document.getElementById('inputNextJoinDate').value = state.nextJoinDate;
-      if (state.bonusDate) {
-        document.getElementById('inputBonusDate').value = state.bonusDate;
-        document.getElementById('bonusAmountField').hidden = false;
-      }
-      if (state.bonusAmount) document.getElementById('inputBonusAmount').value = state.bonusAmount;
-      if (state.paidLeave !== null && state.paidLeave !== undefined) document.getElementById('inputPaidLeave').value = state.paidLeave;
-      document.getElementById('inputHandoverDays').value = state.handoverDays;
-      if (state.annualIncome) {
-        document.getElementById('inputAnnualIncome').value = state.annualIncome;
-        // 旧データ互換：salary が未保存の場合は annualIncome から再計算する
-        if (!state.salary) state.salary = Calc.estimateMonthlyFromAnnual(state.annualIncome);
-      }
-      // 旧データ互換：insuranceType が保存データに無く isUnionKenpo(boolean) しかない場合に変換。
-      // state側は初期値'kyokai'が既に入っているため、判定は必ず parsed で行う。
-      if (parsed.insuranceType === undefined) {
-        state.insuranceType = parsed.isUnionKenpo ? 'kumiai' : 'kyokai';
-      }
-      delete state.isUnionKenpo;
-      document.getElementById('inputInsuranceType').value = state.insuranceType;
-      document.getElementById('holidayOnBtn').setAttribute('aria-pressed', String(state.closedOnHolidays !== false));
-      document.getElementById('holidayOffBtn').setAttribute('aria-pressed', String(state.closedOnHolidays === false));
-      if (state.branch) {
-        document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {
-          const active = b.dataset.branch === state.branch;
-          b.classList.toggle('border-emerald', active);
-          b.classList.toggle('bg-emerald-light', active);
-          b.classList.toggle('border-slate-300', !active);
-        });
-      }
-      updateNextJoinDateVisibility();
+      parsed = JSON.parse(raw);
     } catch (e) {
-      console.warn('LocalStorage restore failed:', e);
+      console.warn('LocalStorage restore failed (invalid JSON):', e);
+      return;
     }
+    if (!parsed || typeof parsed !== 'object') return;
+
+    // マイグレーション：createInitialState() をベースに保存データをマージする。
+    // こうすることで、旧バージョンのデータに新フィールドが欠けていても
+    // 必ずデフォルト値で補われ、undefined由来のバグを防げる。
+    Object.assign(state, createInitialState(), parsed);
+
+    if (!Array.isArray(state.extraOffDates)) state.extraOffDates = [];
+    if (!Array.isArray(state.extraWorkDates)) state.extraWorkDates = [];
+    if (state.handoverDays === undefined || state.handoverDays === null) state.handoverDays = 0;
+
+    // 旧データ互換：closedOnSaturday(boolean) しかない場合は offDays へ変換する。
+    if (!Array.isArray(parsed.offDays) || !parsed.offDays.length) {
+      state.offDays = parsed.closedOnSaturday !== undefined
+        ? (parsed.closedOnSaturday === false ? [0] : [0, 6])
+        : [0, 6];
+    }
+    delete state.closedOnSaturday;
+
+    // 旧データ互換：insuranceType が保存データに無く isUnionKenpo(boolean) しかない場合に変換。
+    if (parsed.insuranceType === undefined && parsed.isUnionKenpo !== undefined) {
+      state.insuranceType = parsed.isUnionKenpo ? 'kumiai' : 'kyokai';
+    }
+    delete state.isUnionKenpo;
+
+    if (state.nextJoinDate) document.getElementById('inputNextJoinDate').value = state.nextJoinDate;
+    if (state.bonusDate) {
+      document.getElementById('inputBonusDate').value = state.bonusDate;
+      document.getElementById('bonusAmountField').hidden = false;
+    }
+    if (state.bonusAmount) document.getElementById('inputBonusAmount').value = state.bonusAmount;
+    if (state.paidLeave !== null && state.paidLeave !== undefined) document.getElementById('inputPaidLeave').value = state.paidLeave;
+    document.getElementById('inputHandoverDays').value = state.handoverDays;
+    if (state.annualIncome) {
+      document.getElementById('inputAnnualIncome').value = state.annualIncome;
+      if (!state.salary) state.salary = Calc.estimateMonthlyFromAnnual(state.annualIncome);
+    }
+    document.getElementById('inputRetireReason').value = state.retireReason;
+    document.getElementById('inputInsuranceType').value = state.insuranceType;
+    document.getElementById('inputCorporateDC').value = state.corporateDC;
+    document.getElementById('inputRetirementPay').value = state.retirementPay;
+    document.getElementById('inputWantAllowance').value = state.wantAllowance;
+    document.getElementById('holidayOnBtn').setAttribute('aria-pressed', String(state.closedOnHolidays !== false));
+    document.getElementById('holidayOffBtn').setAttribute('aria-pressed', String(state.closedOnHolidays === false));
+    if (state.branch) {
+      document.querySelectorAll('#branchSelector .branch-btn').forEach(b => {
+        const active = b.dataset.branch === state.branch;
+        b.classList.toggle('border-emerald', active);
+        b.classList.toggle('bg-emerald-light', active);
+        b.classList.toggle('border-slate-300', !active);
+      });
+    }
+    updateNextJoinDateVisibility();
+    updateWantAllowanceVisibility();
   }
 
   // ---------------------------------------------------------------

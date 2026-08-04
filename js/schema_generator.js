@@ -54,11 +54,21 @@
       text: '民法上は申し出から2週間で退職できますが（民法第627条第1項）、就業規則に「1か月前まで」等の定めがある場合は、就業規則を優先して早めに直属の上司へ相談します。',
     });
 
-    steps.push({
-      '@type': 'HowToStep',
-      name: '離職票の到着確認と国保減免申請',
-      text: '退職後10日〜2週間で届く離職票-1,2を持参し、市区町村役場で国民健康保険の軽減申請を行います。',
-    });
+    if (result.mandatoryAdvice) {
+      steps.push({
+        '@type': 'HowToStep',
+        name: '定年退職ならではの確認事項（1か月前退職・同日得喪特例）',
+        text: result.mandatoryAdvice.body,
+      });
+    }
+
+    if (result.retirementPayAdvice) {
+      steps.push({
+        '@type': 'HowToStep',
+        name: result.retirementPayAdvice.taskTitle,
+        text: result.retirementPayAdvice.taskBody,
+      });
+    }
 
     if (result.lastWorkDayLabel) {
       steps.push({
@@ -96,11 +106,39 @@
       });
     }
 
-    if (result.branch === 'independence') {
+    if (result.branch === 'transfer') {
       steps.push({
         '@type': 'HowToStep',
-        name: '独立時の開業届提出時期のコントロール',
-        text: 'ハローワーク受給資格決定後1ヶ月間は開業届の提出を控え、再就職手当の支給条件を満たします。',
+        name: '雇用保険被保険者証・源泉徴収票を準備する',
+        text: '離職票は不要です。転職先へ「雇用保険被保険者証」と「源泉徴収票」を提出します。',
+      });
+    } else if (result.branch === 'recuperation') {
+      steps.push({
+        '@type': 'HowToStep',
+        name: '離職票の到着を待ち、基本手当を申請する',
+        text: '退職後10日〜2週間で届く「離職票」を持参し、ハローワークで基本手当（および傷病手当金）の申請を行います。',
+      });
+    } else if (result.branch === 'independence') {
+      if (result.wantAllowance === 'yes') {
+        steps.push({
+          '@type': 'HowToStep',
+          name: '離職票の到着を待ち、再就職手当を申請する',
+          text: '再就職手当の申請には離職票が必要です。受給資格決定後1か月間は開業届の提出を控え、支給条件を満たしてから提出します。',
+        });
+      } else {
+        steps.push({
+          '@type': 'HowToStep',
+          name: '雇用保険被保険者証を準備する',
+          text: 'すぐに開業する場合、離職票の到着を待つ必要はありません。雇用保険被保険者証を保管しておきます。',
+        });
+      }
+    }
+
+    if (result.dcDeadline) {
+      steps.push({
+        '@type': 'HowToStep',
+        name: '企業型DC（確定拠出年金）を移管する',
+        text: `退職翌日から6か月以内の${result.dcDeadline.deadlineLabel}までに、iDeCoまたは転職先の企業型DCへ移管手続きを行います。放置すると自動移管され、運用停止と手数料発生の対象になります。`,
       });
     }
 
@@ -161,6 +199,27 @@
       }
     }
 
+    if (result.mandatoryAdvice) {
+      baseFaqs.push({
+        q: '定年退職では1か月前に退職日を設定した方がお得ですか？',
+        a: '定年到達月の1か月前（前月末）に退職日を設定できる場合、退職所得控除の勤続年数計算や社会保険料の1か月分折半で手取りが多くなることがあります。ただし就業規則で退職日そのものが固定されている場合は対象外なので、労務担当者に確認が必要です。定年後に同じ会社で再雇用される場合は、社会保険の「同日得喪」（資格喪失と再取得を同時に行い、給与減額に合わせて1か月目から保険料を引き下げる特例）の手続きも確認しましょう。',
+      });
+    }
+
+    if (result.dcDeadline) {
+      baseFaqs.push({
+        q: '企業型DC（確定拠出年金）はいつまでに移管すればいいですか？',
+        a: `退職日翌日から6か月以内（${result.dcDeadline.deadlineLabel}まで）に、iDeCoまたは転職先の企業型DCへ移管する必要があります。期限を過ぎると自動的に国民年金基金連合会へ自動移管され、運用が停止したうえ手数料がかかり続けます。`,
+      });
+    }
+
+    if (result.retirementPayAdvice) {
+      baseFaqs.push({
+        q: '退職金を受け取るとき、何か提出書類が必要ですか？',
+        a: '「退職所得の受給に関する申告書」を退職日までに会社へ提出してください。未提出だと退職金に20.42%の一律課税がされ、手取りが一時的に大きく減ります。また退職所得控除の計算に使う勤続年数は、1年未満の端数を切り上げて計算されるため、控除額が有利になる点も覚えておくとよいでしょう。',
+      });
+    }
+
     if (result.gainLoss && result.bonusDate && result.bonusAmount) {
       baseFaqs.push({
         q: 'ボーナス支給日の前に退職するとどうなりますか？',
@@ -170,7 +229,9 @@
 
     const ctx = result.branchContext;
     if (ctx) {
-      if (ctx.critical) {
+      // 独立branchのcritical（再就職手当リスク）は、再就職手当の受給を希望する場合のみ該当する
+      const criticalApplies = ctx.critical && (result.branch !== 'independence' || result.wantAllowance === 'yes');
+      if (criticalApplies) {
         baseFaqs.push({
           q: ctx.critical.title,
           a: `${ctx.critical.description} 対応策として「${ctx.critical.solutionTitle}」が有効です。${ctx.critical.solutionDescription}`,

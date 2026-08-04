@@ -11,7 +11,6 @@
   --caution:#F59E0B;    --caution-light:#FFFBEB; --caution-dark:#92400E;
   --crimson:#DC2626;    --crimson-light:#FEE2E2; --crimson-dark:#991B1B;
   --emerald:#059669;    --emerald-light:#D1FAE5; --emerald-dark:#065F46;
-  --monetize:#64748B;   --monetize-light:#F1F5F9;
 
   --slate-50:#f8fafc;  --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1;
   --slate-400:#94a3b8; --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155;
@@ -116,7 +115,7 @@ img{max-width:100%;display:block;}
 .bg-slate-300{background-color:var(--slate-300);}
 .bg-emerald{background-color:var(--emerald);} .bg-emerald-light{background-color:var(--emerald-light);}
 .bg-crimson{background-color:var(--crimson);} .bg-crimson-light{background-color:var(--crimson-light);}
-.bg-monetize{background-color:var(--monetize);}
+.bg-caution-light{background-color:var(--caution-light);}
 
 .text-navy{color:var(--navy);} .text-navy\/60{color:rgba(30,41,59,.6);}
 .text-white{color:#fff;}
@@ -126,12 +125,14 @@ img{max-width:100%;display:block;}
 .text-emerald-dark\/80{color:rgba(6,95,70,.8);}
 .text-crimson{color:var(--crimson);} .text-crimson-dark{color:var(--crimson-dark);}
 .text-crimson-dark\/80{color:rgba(153,27,27,.8);}
+.text-caution-dark{color:var(--caution-dark);}
 .text-gold{color:var(--gold);}
 
 .border-slate-100{border-color:var(--slate-100);} .border-slate-200{border-color:var(--slate-200);}
 .border-slate-300{border-color:var(--slate-300);}
 .border-emerald{border-color:var(--emerald);}
 .border-crimson{border-color:var(--crimson);} .border-crimson\/20{border-color:rgba(220,38,38,.2);}
+.border-caution{border-color:var(--caution);}
 
 /* ---------- 効果 ---------- */
 .backdrop-blur{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
@@ -159,11 +160,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 .step-panel{display:none;}
 .step-panel.active{display:block;animation:fadeUp .35s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);}}
-
-.bottom-sheet{transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);}
-.bottom-sheet.open{transform:translateY(0);}
-.sheet-backdrop{opacity:0;pointer-events:none;transition:opacity .25s ease;}
-.sheet-backdrop.open{opacity:1;pointer-events:auto;}
 
 .snippet-fuel{font-weight:900;}
 
@@ -344,6 +340,47 @@ details[open] .cd-chev{transform:rotate(180deg);}
 .cd-del:active{opacity:1;}
 .cd-pri{font-size:.7rem;line-height:1.75;color:var(--slate-600);background:var(--navy-50);border:1px solid var(--slate-200);border-radius:.6rem;padding:.6rem .7rem;margin:.25rem 0 0;}
 .cd-pri b{color:var(--emerald-dark);}
+
+/* ---------- テキストアドバイスカード（外部PR/アフィリエイトなし） ---------- */
+.tl-advice{
+  border-radius:1rem;padding:13px 15px;box-shadow:var(--shadow-card);
+  border:1.5px solid var(--emerald-light);background:var(--emerald-light);
+}
+.tl-advice .ta-label{
+  display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.03em;
+  color:var(--emerald-dark);background:#fff;border-radius:.4rem;padding:2px 8px;margin-bottom:6px;
+}
+.tl-advice .ta-heading{font-size:.9rem;font-weight:800;color:var(--emerald-dark);margin-bottom:4px;line-height:1.5;}
+.tl-advice .ta-body{font-size:.78rem;line-height:1.85;color:var(--emerald-dark);opacity:.9;}
+
+/* 定年退職・DC・退職金など、条件付きの独立した情報カード（ゴールド系） */
+.info-card{
+  border-radius:1rem;padding:15px 16px;margin-bottom:14px;
+  border:1.5px solid #fde68a;background:var(--gold-light);box-shadow:var(--shadow-card);
+}
+.info-card .ic-title{font-size:.88rem;font-weight:800;color:var(--gold-dark);margin-bottom:6px;line-height:1.6;}
+.info-card .ic-body{font-size:.79rem;line-height:1.9;color:#78350f;}
+
+/* ---------- 印刷 / PDF保存レイアウト ---------- */
+@media print{
+  .no-print,
+  #step1,#step2,#step3,
+  .quick-chip-row,
+  details.cd-accordion{ display:none!important; }
+  body{ background:#fff!important; padding-bottom:0!important; }
+  .max-w-lg{ max-width:100%!important; }
+  .shadow-card,.shadow-sheet{ box-shadow:none!important; }
+  #stepResult{ display:block!important; }
+  #impactCard{ color:#000!important; background:#fff!important; border:2px solid #000!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  #impactCard *{ color:#000!important; }
+  .tl-card,.tl-advice,.info-card,.legal-disclaimer{ break-inside:avoid; border-color:#94a3b8!important; }
+  .tl-num{ background:#334155!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  a[href]::after{ content:""; }
+}
+
+/* ---------- アクセシビリティ（シニア層配慮：文字サイズ・タップ領域・コントラスト） ---------- */
+button,select,input,.branch-btn,.wd-btn,.ht-btn,.qc-chip{ min-height:44px; }
+.tl-heading,.tl-body,.info-card .ic-body,.tl-advice .ta-body{ font-size:max(.78rem, 14px); }
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;}
