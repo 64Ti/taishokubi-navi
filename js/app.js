@@ -580,14 +580,26 @@
     const ic = r.insuranceComparison;
     const badge = verdictBadge(ic.verdict);
     const userChoseMonthEnd = Calc.isLastDayOfMonth(r.resignDate);
+    // 「理想の退職日」という断定表現は使わないが、社会保険料の面で有利になる
+    // 具体的な日付（その月の月末）は明示する。曖昧な「月末」表記のままだと
+    // 「結局いつ辞めればいいのか分からない」という声につながるため。
+    const monthEndDate = Calc.lastDayOfMonth(r.resignDate);
+    const monthEndDateLabel = Calc.fmtJP(monthEndDate);
+    const alreadyOnFavorableDate =
+      (ic.verdict === 'MONTH_END' && userChoseMonthEnd) ||
+      (ic.verdict === 'BEFORE_MONTH_END' && !userChoseMonthEnd);
 
     let verdictText;
     if (ic.verdict === 'UNCERTAIN') {
-      verdictText = `<b>どちらが有利かは判定が分かれます。</b>月末退職：${ic.patternA.toLocaleString()}円／月末前退職：約${ic.patternB.min.toLocaleString()}〜${ic.patternB.max.toLocaleString()}円。国民健康保険料はお住まいの市区町村によって幅があるため、この条件では逆転する可能性があります。`;
+      verdictText = `<b>月末（${monthEndDateLabel}）に退職した場合と、それより前に退職した場合とで、どちらが有利かは判定が分かれます。</b>月末退職：${ic.patternA.toLocaleString()}円／月末前退職：約${ic.patternB.min.toLocaleString()}〜${ic.patternB.max.toLocaleString()}円。国民健康保険料はお住まいの市区町村によって幅があるため、この条件では逆転する可能性があります。`;
     } else if (ic.verdict === 'MONTH_END') {
-      verdictText = `<b>この条件では、月末退職のほうが約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトク</b>になる見込みです。`;
+      verdictText = alreadyOnFavorableDate
+        ? `<b>選んだ退職日（${escapeHtml(r.resignDateLabel)}）はすでに月末です。</b>このまま退職すると、月末より前に辞める場合より約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトクになる見込みです。`
+        : `<b>具体的には、月末にあたる${monthEndDateLabel}に退職すると</b>、指定した${escapeHtml(r.resignDateLabel)}のままより約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトクになる見込みです。`;
     } else {
-      verdictText = `<b>この条件では、月末より前の退職のほうが約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトク</b>になる見込みです。`;
+      verdictText = alreadyOnFavorableDate
+        ? `<b>選んだ退職日（${escapeHtml(r.resignDateLabel)}）はすでに月末より前です。</b>このまま退職すると、月末（${monthEndDateLabel}）まで待つ場合より約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトクになる見込みです。`
+        : `<b>具体的には、月末（${monthEndDateLabel}）を待たずに退職すると</b>、指定した${escapeHtml(r.resignDateLabel)}のままより約${ic.difference.min.toLocaleString()}〜${ic.difference.max.toLocaleString()}円おトクになる見込みです。`;
     }
 
     const reductionNote = ic.reductionApplied
@@ -599,7 +611,7 @@
       <p class="verdict-line ${badge.cls}"><span class="vl-icon" aria-hidden="true">${badge.icon}</span><span>${verdictText}</span></p>
       <p class="text-[11px] font-black tracking-widest opacity-80 mb-1">${escapeHtml(r.resignDateLabel)}に退職した場合</p>
       <div class="text-xs" style="background:rgba(255,255,255,.12);border-radius:.5rem;padding:10px 12px;">
-        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>月末（${userChoseMonthEnd ? '今回選んだ日' : '月末'}）に退職した場合</span><b>${ic.patternA.toLocaleString()}円</b></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>月末（${escapeHtml(monthEndDateLabel)}）に退職した場合</span><b>${ic.patternA.toLocaleString()}円</b></div>
         <p style="font-size:.68rem;opacity:.75;margin:0 0 6px;">内訳：健康保険 ${ic.breakdown.employeeHealth.toLocaleString()}円／厚生年金 ${ic.breakdown.employeePension.toLocaleString()}円${ic.breakdown.employeeNursing ? `／介護保険 ${ic.breakdown.employeeNursing.toLocaleString()}円` : ''}／子ども・子育て支援金 ${ic.breakdown.employeeChildcareLevy.toLocaleString()}円　※会社が同額を負担しています</p>
         <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>月末より前に退職した場合</span><b>約${ic.patternB.min.toLocaleString()}〜${ic.patternB.max.toLocaleString()}円</b></div>
       </div>
