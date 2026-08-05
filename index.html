@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>トク退｜退職日計算ナビ</title>
-<meta name="description" content="退職希望日・有休残日数・給与を入力するだけで、最終出社日・資格喪失日・手取り最大化効果を自動算定。登録不要、完全無料の退職日シミュレーター。">
+<meta name="description" content="退職希望日・有休残日数・年収・定年等の条件を入力するだけで、最終出社日・資格喪失日・手取り差額（具体金額）・住民税や退職金の注意点を自動算定。登録不要、完全無料の退職日シミュレーター。">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#1E293B">
@@ -20,12 +20,12 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="トク退｜退職日計算ナビ">
 <meta property="og:title" content="トク退｜退職日計算ナビ">
-<meta property="og:description" content="退職希望日・有休残日数・給与を入力するだけで、最終出社日・資格喪失日・手取り最大化効果を自動算定。登録不要、完全無料の退職日シミュレーター。">
+<meta property="og:description" content="退職希望日・有休残日数・年収・定年等の条件を入力するだけで、最終出社日・資格喪失日・手取り差額（具体金額）・住民税や退職金の注意点を自動算定。登録不要、完全無料の退職日シミュレーター。">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="トク退｜退職日計算ナビ">
-<meta name="twitter:description" content="社会保険料・有給消化・資格喪失日を総合判定。無料・登録不要のシミュレーター。">
+<meta name="twitter:description" content="社会保険料・住民税・傷病手当金・失業給付を総合判定。無料・登録不要のシミュレーター。">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232563eb'/%3E%3Ctext x='50' y='54' font-size='60' font-weight='bold' font-family='sans-serif' fill='white' text-anchor='middle' dominant-baseline='central'%3E%E9%80%80%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -36,293 +36,428 @@
 </head>
 <body class="pb-28">
 
-<!-- 進捗バー -->
+<a href="#mainContent" class="skip-link">本文へスキップ</a>
+
+<!-- ============ ヘッダー ============ -->
 <header class="sticky top-0 z-40 bg-navy-50/90 backdrop-blur border-b border-slate-200 no-print">
   <div class="max-w-lg mx-auto px-4 pt-3 pb-2">
-    <div class="flex items-center justify-between mb-1.5">
+    <div class="flex items-center justify-between">
       <span class="text-[11px] font-bold tracking-widest text-navy/60">トク退｜退職日計算ナビ</span>
-      <span id="stepLabel" class="text-[11px] font-bold text-emerald">STEP 1 / 3</span>
-    </div>
-    <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-      <div id="progressBar" class="h-full bg-emerald rounded-full transition-all duration-500" style="width:33%"></div>
+      <span class="text-[11px] font-bold text-emerald">β版</span>
     </div>
   </div>
 </header>
 
-<main class="max-w-lg mx-auto px-4 pt-6">
+<main id="mainContent" class="max-w-lg mx-auto px-4 pt-6">
 
-  <!-- ============ STEP 1: 予定日入力 ============ -->
-  <section id="step1" class="step-panel active">
-    <h1 class="text-xl font-black leading-snug mb-1 text-navy">損しない退職日、逆算します。</h1>
-    <p class="text-sm text-slate-500 mb-3">3つの入力だけで、最終出社日・資格喪失日・手取り最大化効果がわかります。</p>
-    <p class="aio-answer">トク退｜退職日計算ナビは、退職希望日・有給残日数・年収・賞与支給日を入力するだけで、社会保険料の負担が最も少なく賞与も受け取れる「理想の退職日」を無料で自動算出するツールです。登録不要、入力内容は端末内だけで処理されサーバーには送信されません。</p>
+  <!-- ============ フェーズ1：コア4問（この4問だけで暫定結果を表示） ============ -->
+  <section id="coreForm" class="core-form">
+    <h1 class="text-xl font-black leading-snug mb-1 text-navy">退職日ごとの手取り差額、逆算します。</h1>
+    <p class="text-sm text-slate-500 mb-3">4つの入力だけで、最終出社日・資格喪失日・手取り差額の目安がわかります。</p>
+    <p class="aio-answer">トク退｜退職日計算ナビは、退職希望日・有給残日数・年収・退職後の進路を入力するだけで、金銭面で有利な退職日と手取り差額の目安を無料で算出するツールです。登録不要、入力内容は端末内だけで処理されサーバーには送信されません（フィードバック送信を除く）。</p>
 
     <div class="mt-5">
-      <label class="block text-xs font-bold text-slate-500 mb-1.5">退職を希望する日</label>
-      <input id="inputResignDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <label class="block text-xs font-bold text-slate-500 mb-1.5" for="inputResignDate">退職を希望する日</label>
+      <input id="inputResignDate" type="date" inputmode="none" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
       <div class="quick-chip-row" id="resignDateChips">
         <button type="button" class="qc-chip" data-quick="2weeks">2週間後</button>
         <button type="button" class="qc-chip" data-quick="thisMonthEnd">今月末</button>
         <button type="button" class="qc-chip" data-quick="nextMonthEnd">来月末</button>
-        <button type="button" class="qc-chip" data-quick="nextMonth1st">来月1日</button>
       </div>
       <p class="text-[11px] text-slate-400 mt-1.5">未入力の場合、当月末日を自動セットします。過去日付は選択できません。</p>
     </div>
 
     <div class="mt-5">
-      <label class="block text-xs font-bold text-slate-500 mb-1.5">退職の理由・区分</label>
-      <select id="inputRetireReason" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-        <option value="voluntary" selected>通常退職（自己都合等）</option>
-        <option value="company">会社都合・都合退職</option>
-        <option value="mandatory">定年退職</option>
-      </select>
-      <p class="text-[11px] text-slate-400 mt-1.5">「定年退職」を選ぶと、1か月前退職のメリットや同日得喪特例など、定年ならではのアドバイスを表示します。</p>
+      <label class="block text-xs font-bold text-slate-500 mb-1.5" for="inputPaidLeave">現在の有給残日数</label>
+      <input id="inputPaidLeave" type="number" inputmode="numeric" min="0" max="60" placeholder="例：12" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+      <div class="quick-chip-row" id="paidLeaveChips">
+        <button type="button" class="qc-chip" data-quick-leave="10">おまかせ（10日）</button>
+        <button type="button" class="qc-chip" data-quick-leave="20">フル消化（20日）</button>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1.5">0〜60日の範囲で入力してください。正確な日数が分からない場合は概算でOKです。</p>
     </div>
 
     <div class="mt-5">
-      <label class="block text-xs font-bold text-slate-500 mb-1.5">直近1回分のボーナス（賞与）の支給予定日（あれば）</label>
-      <input id="inputBonusDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      <p class="text-[11px] text-slate-400 mt-1.5">今後何回も支給される場合は、退職を検討している時期に一番近い1回分だけを入力してください（夏・冬などまとめてではありません）。多くの会社は「支給日に在籍していること」が条件で、支給日より前に退職すると受け取れない場合があります。</p>
+      <label class="block text-xs font-bold text-slate-500 mb-1.5" for="inputAnnualIncome">去年1年間の年収（総支給・概算でOK）</label>
+      <select id="inputAnnualIncome" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
+        <option value="" disabled selected>選択してください</option>
+        <option value="2400000">250万円未満</option>
+        <option value="2750000">250万円台</option>
+        <option value="3250000">300万円台</option>
+        <option value="3750000">350万円台</option>
+        <option value="4250000">400万円台</option>
+        <option value="4750000">450万円台</option>
+        <option value="5250000">500万円台</option>
+        <option value="5750000">550万円台</option>
+        <option value="6250000">600万円台</option>
+        <option value="6750000">650万円台</option>
+        <option value="7500000">700万円台</option>
+        <option value="8500000">800万円台</option>
+        <option value="9500000">900万円台</option>
+        <option value="11000000">1000万円以上</option>
+      </select>
+      <p class="text-[11px] text-slate-400 mt-1.5">源泉徴収票や去年の手取りから、だいたいの帯で選んでください。概算でOKです。</p>
     </div>
-  </section>
 
-  <!-- ============ STEP 2: 休日・有休設定 ============ -->
-  <section id="step2" class="step-panel">
-    <h2 class="text-lg font-black text-navy mb-1">休日・有休の設定</h2>
-    <p class="text-sm text-slate-500 mb-6">会社の定休日と有休残日数から、最終出社日を営業日ベースで即時算定します。</p>
-
-    <div class="space-y-5">
-      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card">
-        <p class="text-sm font-bold mb-1">毎週の定休日</p>
-        <p class="text-[11px] text-slate-400 mb-3">お休みの曜日をすべて選んでください（初期値：土日）。シフト制で土日出勤の方も自由に選べます。</p>
-        <div class="weekday-grid" id="weekdayGrid" role="group" aria-label="毎週の定休日"></div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-card">
-        <p class="text-sm font-bold mb-1">祝日の扱い</p>
-        <p class="text-[11px] text-slate-400 mb-3">国民の祝日を、最終出社日を計算するときの休みに含めるかどうかです。</p>
-        <div class="holiday-toggle-grid" id="holidayToggleGrid" role="group" aria-label="祝日の扱い">
-          <button type="button" class="ht-btn" id="holidayOnBtn" data-value="true" aria-pressed="true">祝日も休みにする<span class="ht-sub">一般的な会社はこちら</span></button>
-          <button type="button" class="ht-btn" id="holidayOffBtn" data-value="false" aria-pressed="false">祝日も出勤日にする<span class="ht-sub">シフト制・小売業など</span></button>
-        </div>
-      </div>
-
-      <details class="cd-accordion" id="holidayCalendarAccordion">
-        <summary class="cd-summary">
-          <span class="cd-title">期間内の祝日カレンダーを見る<span class="cd-tagopt">参考</span></span>
-          <span class="cd-badge" id="holidayBadge" hidden></span>
-          <span class="cd-chev"></span>
-        </summary>
-        <div class="cd-body">
-          <p class="cd-note">今日から退職希望日までの間で、あなたの定休日以外に発生する祝日（＝実質的に追加の休みになる日）を一覧にしています。</p>
-          <ul id="holidayCalendarList" class="holiday-cal-list"></ul>
-        </div>
-      </details>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">現在の有給残日数（0〜60日）</label>
-        <input id="inputPaidLeave" type="number" min="0" max="60" placeholder="例：12" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">引き継ぎ必要日数（0〜60日）</label>
-        <input id="inputHandoverDays" type="number" min="0" max="60" value="0" placeholder="例：3" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-        <p class="text-[11px] text-slate-400 mt-1.5">有休消化に入る前に出社して引き継ぐ日数。最終出社日の算定に加算します。</p>
-      </div>
-
-      <details class="cd-accordion" id="customDaysAccordion">
-        <summary class="cd-summary">
-          <span class="cd-title">会社独自の休日・出勤日を設定する<span class="cd-tagopt">任意</span></span>
-          <span class="cd-badge" id="cdBadge" hidden></span>
-          <span class="cd-chev"></span>
-        </summary>
-        <div class="cd-body">
-          <p class="cd-note">夏季休暇・創立記念日などの独自の休みや、祝日出勤・土曜出勤を日付ごとに指定できます。設定するとその場で試算プレビューに反映されます。</p>
-
-          <div class="cd-block">
-            <div class="cd-block-h"><span class="cd-tag off">休</span>会社独自の休み</div>
-            <div id="extraDatesList" class="cd-list" style="margin-bottom:.5rem;"></div>
-            <div class="cd-add">
-              <input id="extraDateInput" type="date" aria-label="会社独自の休みの日付">
-              <button id="btnAddExtraDate" type="button">追加</button>
-            </div>
-          </div>
-
-          <div class="cd-block">
-            <div class="cd-block-h"><span class="cd-tag work">出</span>会社独自の出勤日</div>
-            <div id="extraWorkDatesList" class="cd-list" style="margin-bottom:.5rem;"></div>
-            <div class="cd-add">
-              <input id="extraWorkDateInput" type="date" aria-label="会社独自の出勤日の日付">
-              <button id="btnAddExtraWorkDate" type="button">追加</button>
-            </div>
-          </div>
-
-          <p class="cd-pri">判定の優先順位：<b>① 独自の出勤日</b>（土日祝でも出勤）→ ② 独自の休み（平日でも休み）→ ③ 定休日・国民の祝日</p>
-        </div>
-      </details>
-
-      <div id="livePreview" class="rounded-xl border-2 border-emerald bg-emerald-light p-4 hidden">
-        <p class="text-[11px] font-black tracking-wider text-emerald mb-1">試算プレビュー</p>
-        <p class="text-sm font-bold text-emerald-dark mb-1">最終出社日：<span id="previewLastWorkDay">-</span></p>
-        <div class="preview-compare" id="previewCompare" hidden>
-          <div><span class="pc-label">指定した退職日</span><span class="pc-value" id="previewUserDate">-</span></div>
-          <div class="pc-arrow">→</div>
-          <div><span class="pc-label">理想の退職日</span><span class="pc-value pc-ideal" id="previewIdealDate">-</span></div>
-        </div>
-        <p class="text-xs text-emerald-dark leading-relaxed mt-1" id="previewRecommendation"></p>
+    <div class="mt-5">
+      <label class="block text-xs font-bold text-slate-500 mb-2">退職後の進路</label>
+      <div class="grid grid-cols-3 gap-2" id="branchSelector" role="group" aria-label="退職後の進路">
+        <button type="button" data-branch="transfer" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center" aria-pressed="false">
+          <div class="text-2xl mb-1" aria-hidden="true">💼</div>
+          <div class="text-xs font-bold">①転職</div>
+        </button>
+        <button type="button" data-branch="recuperation" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center" aria-pressed="false">
+          <div class="text-2xl mb-1" aria-hidden="true">🩺</div>
+          <div class="text-xs font-bold">②療養・無職</div>
+        </button>
+        <button type="button" data-branch="independence" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center" aria-pressed="false">
+          <div class="text-2xl mb-1" aria-hidden="true">🚀</div>
+          <div class="text-xs font-bold">③独立</div>
+        </button>
       </div>
     </div>
+
+    <button id="btnShowResult" type="button" class="w-full bg-emerald text-white rounded-xl py-3.5 mt-6 text-sm font-bold shadow-card disabled:opacity-40" disabled>この内容で結果を見る</button>
   </section>
 
-  <!-- ============ STEP 3: 条件・進路設定 ============ -->
-  <section id="step3" class="step-panel">
-    <h2 class="text-lg font-black text-navy mb-1">給与・進路の設定</h2>
-    <p class="text-sm text-slate-500 mb-6">最後に、おおよその年収と退職後の進路を教えてください。</p>
+  <!-- ============ 結果画面（暫定→精密） ============ -->
+  <section id="resultScreen" class="result-screen hidden" aria-live="polite">
+    <h2 class="text-lg font-black text-navy mb-1">診断結果</h2>
+    <p id="resultPrecisionNote" class="precision-note mb-4">概算です。あと数問で精度が上がります。</p>
 
-    <div class="space-y-5">
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">去年1年間の年収（総支給・概算でOK）</label>
-        <select id="inputAnnualIncome" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="" disabled selected>選択してください</option>
-          <option value="2400000">250万円未満</option>
-          <option value="2750000">250万円台</option>
-          <option value="3250000">300万円台</option>
-          <option value="3750000">350万円台</option>
-          <option value="4250000">400万円台</option>
-          <option value="4750000">450万円台</option>
-          <option value="5250000">500万円台</option>
-          <option value="5750000">550万円台</option>
-          <option value="6250000">600万円台</option>
-          <option value="6750000">650万円台</option>
-          <option value="7500000">700万円台</option>
-          <option value="8500000">800万円台</option>
-          <option value="9500000">900万円台</option>
-          <option value="11000000">1000万円以上</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">源泉徴収票や去年の手取りから、だいたいの帯で選んでください。賞与を含む年収を12等分して社会保険料の等級を概算します。</p>
-      </div>
+    <!-- 損失回避見出し + 手取り差額カード -->
+    <div id="impactCard" class="rounded-2xl p-5 text-white shadow-card mb-6" style="background:linear-gradient(135deg,#1E293B,#334155);"></div>
 
-      <div id="bonusAmountField" hidden>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">その直近1回分のボーナスのだいたいの見込み額</label>
-        <select id="inputBonusAmount" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="" disabled selected>選択してください</option>
-          <option value="50000">5万円未満</option>
-          <option value="75000">5〜10万円</option>
-          <option value="150000">10〜20万円</option>
-          <option value="250000">20〜30万円</option>
-          <option value="400000">30〜50万円</option>
-          <option value="650000">50〜80万円</option>
-          <option value="900000">80〜100万円</option>
-          <option value="1200000">100万円以上</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">前回の明細やだいたいの相場でOKです。支給日に在籍しているかどうかの判定に使います。</p>
-      </div>
+    <!-- 定年退職・その他の条件付き情報カード（ゴールド系）が動的に入る -->
+    <div id="infoCardsContainer" class="mb-2"></div>
 
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">加入中の健康保険</label>
-        <select id="inputInsuranceType" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="kyokai" selected>協会けんぽ</option>
-          <option value="kumiai">健康保険組合（組合健保）</option>
-          <option value="kyosai">共済組合（公務員等）</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">健康保険証に記載されています。わからなければ「協会けんぽ」のままでOKです（結果への影響は補足情報のみです）。</p>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">企業型DC（確定拠出年金）に加入していますか？</label>
-        <select id="inputCorporateDC" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="no" selected>なし</option>
-          <option value="yes">あり</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">「あり」の場合、退職後6か月以内の移管手続きが必要になるため、期限をタイムラインでお知らせします。</p>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">退職金の支給予定はありますか？</label>
-        <select id="inputRetirementPay" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="no" selected>なし</option>
-          <option value="yes">あり</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">「あり」の場合、20.42%の一律課税を避けるための書類提出タスクを表示します。</p>
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-slate-500 mb-2">退職後の進路</label>
-        <div class="grid grid-cols-3 gap-2" id="branchSelector">
-          <button data-branch="transfer" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
-            <div class="text-2xl mb-1">💼</div>
-            <div class="text-xs font-bold">①転職</div>
-          </button>
-          <button data-branch="recuperation" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
-            <div class="text-2xl mb-1">🩺</div>
-            <div class="text-xs font-bold">②療養・無職</div>
-          </button>
-          <button data-branch="independence" class="branch-btn py-4 rounded-xl border-2 border-slate-300 text-center">
-            <div class="text-2xl mb-1">🚀</div>
-            <div class="text-xs font-bold">③独立</div>
-          </button>
-        </div>
-      </div>
-
-      <div id="nextJoinDateField" hidden>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">次の会社への入社予定日（決まっていれば）</label>
-        <input id="inputNextJoinDate" type="date" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-        <p class="text-[11px] text-slate-400 mt-1.5">入力すると、社会保険が途切れない理想の退職日を計算します。まだ決まっていなければ空欄でOKです。</p>
-      </div>
-
-      <div id="wantAllowanceField" hidden>
-        <label class="block text-xs font-bold text-slate-500 mb-1.5">再就職手当の受給を希望しますか？</label>
-        <select id="inputWantAllowance" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-emerald focus:border-emerald">
-          <option value="no" selected>いいえ（すぐ開業する）</option>
-          <option value="yes">はい（受給してから開業したい）</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-1.5">「はい」を選ぶと、開業届の提出タイミングに関する注意点をタイムラインでお知らせします。</p>
-      </div>
+    <!-- 体調不調フラグ時の相談窓口ボックス（第6.2節・必須表示） -->
+    <div id="supportBox" class="support-box hidden" role="complementary">
+      <p><strong>一人で判断しなくて大丈夫です。</strong></p>
+      <p>体調やお仕事のことで迷われているときは、以下の窓口にご相談いただけます。</p>
+      <ul>
+        <li>主治医・産業医（傷病手当金の申請には医師の意見が必要です）</li>
+        <li>加入中の健康保険組合／協会けんぽ の窓口</li>
+        <li>お住まいの都道府県の精神保健福祉センター</li>
+        <li>こころの健康相談統一ダイヤル：0570-064-556</li>
+      </ul>
     </div>
-  </section>
 
-  <!-- ============ 結果画面：ToDoタイムライン ============ -->
-  <section id="stepResult" class="step-panel">
-    <h2 class="text-lg font-black text-navy mb-1">診断完了：退職ToDoタイムライン</h2>
-    <p class="text-sm text-slate-500 mb-5">上から順に進めれば、損なく退職準備ができます。</p>
-
-    <!-- 手取り最大化インパクトカード -->
-    <div id="impactCard" class="rounded-2xl p-5 text-white shadow-card mb-6" style="background:linear-gradient(135deg,#D97706,#92400E);"></div>
-
-    <div id="mandatoryAdviceCard" class="info-card mb-6" hidden></div>
-
+    <!-- ToDoタイムライン -->
     <div id="timeline" class="tl-list mb-6"></div>
 
+    <!-- 精度向上カード（フェーズ2への導線） -->
+    <div id="precisionUpgradeCard" class="precision-upgrade mb-6">
+      <p class="pu-title">もっと正確に知りたい方へ</p>
+      <button type="button" class="pu-btn" id="btnOpenGroupA">失業給付がいつから始まるか計算する<span class="pu-sub">あと4問</span></button>
+      <button type="button" class="pu-btn" id="btnOpenGroupB">社会保険料を都道府県別の正確な料率で計算する<span class="pu-sub">あと4問</span></button>
+      <button type="button" class="pu-btn" id="btnOpenGroupC">賞与・退職金・企業型DCなどその他の条件を入力する<span class="pu-sub">該当者のみ</span></button>
+    </div>
+
+    <!-- 第1層：文脈連動FAQ（最大5件） -->
+    <div id="contextualFaq" class="contextual-faq mb-6"></div>
+    <a href="#allFaq" class="all-faq-link no-print">よくある質問をすべて見る →</a>
+
+    <button id="btnOpenTemplateModal" type="button" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-slate-300 text-navy rounded-xl py-3.5 font-bold text-sm mt-6 mb-3 no-print">
+      💬 上司への面談テンプレートを表示・コピー
+    </button>
     <button id="btnPrint" type="button" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-slate-300 text-navy rounded-xl py-3.5 font-bold text-sm mb-3 no-print">
       🖨️ この診断結果を印刷 / PDF保存
     </button>
-
     <button id="btnShareX" class="w-full flex items-center justify-center gap-2 bg-navy text-white rounded-xl py-3.5 font-bold text-sm mb-3 no-print">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       診断結果をXでシェアする
     </button>
-    <button id="btnRestart" class="w-full text-center text-xs text-slate-400 underline py-2 mb-6 no-print">最初からやり直す</button>
+    <button id="btnRestart" class="w-full text-center text-xs text-slate-400 underline py-2 mb-6 no-print">入力内容をすべて消去する</button>
 
-    <!-- コンプライアンス常時掲載事項（v10.0仕様書 6.免責事項） -->
+    <!-- 入口A：結果画面のマイクロフィードバック（最重要・第13.5節） -->
+    <div class="feedback-micro no-print" role="group" aria-label="診断結果の評価" id="feedbackMicro">
+      <p class="feedback-q">この結果は、あなたの状況に合っていましたか？</p>
+      <div class="feedback-btns">
+        <button type="button" data-fb="good">👍 参考になった</button>
+        <button type="button" data-fb="unsure">🤔 よく分からなかった</button>
+        <button type="button" data-fb="wrong">😥 実際と違った</button>
+      </div>
+      <div class="feedback-thanks hidden" id="feedbackThanks">ご協力ありがとうございます。</div>
+    </div>
+
+    <!-- 第2層：全件FAQ（カテゴリ別アコーディオン） -->
+    <section id="allFaq" class="all-faq mt-8">
+      <h2 class="text-lg font-black text-navy mb-1">よくある質問</h2>
+      <p class="text-sm text-slate-500 mb-4">全22件をカテゴリ別にまとめています。</p>
+      <div id="allFaqList"></div>
+    </section>
+
+    <!-- 印刷時のみ表示：用語のミニ辞典（診断で使用した用語だけを一覧） -->
+    <section id="glossary-appendix" class="glossary-appendix" style="display:none;">
+      <h2>用語のミニ辞典</h2>
+      <ul id="glossaryAppendixList"></ul>
+    </section>
+
+    <!-- コンプライアンス常時掲載事項（v17.2仕様書 第11.4節） -->
     <div class="legal-disclaimer">
       <p class="ld-title">【免責事項・注意事項】</p>
-      <p>本シミュレーションによる試算結果は、労働基準法、民法、健康保険法、厚生年金保険法および所得税法等の関係法令に基づき算出された<b>概算値</b>であり、個別の雇用契約内容、就業規則、退職金規程、または所轄労働基準監督署・年金事務所・税務署の判断により異なる場合があります。本ツールの利用により生じた直接的・間接的トラブルや損害について、当サービス運営者は一切の法的責任を負いません。最終的な退職日、退職金の手続き、社会保険および確定拠出年金の移管については、必ず勤務先の労務・人事担当者または管轄の公的機関（年金事務所・ハローワーク・税務署・金融機関等）へご確認ください。</p>
+      <p>本シミュレーションによる試算結果は、労働基準法、民法、健康保険法、厚生年金保険法、雇用保険法および所得税法等の関係法令に基づき算出された<b>概算値</b>であり、個別の雇用契約内容、就業規則、退職金規程、加入されている健康保険組合の規約、またはお住まいの自治体の保険料率により異なる場合があります。</p>
+      <p>特に<b>国民健康保険料は前年の所得と自治体によって大きく変動するため、本ツールの試算額と実際の金額には差が生じます。</b></p>
+      <p>本ツールの利用により生じた直接的・間接的トラブルや損害について、当サービス運営者は一切の法的責任を負いません。最終的な退職日、退職金の手続き、社会保険および確定拠出年金の移管については、必ず勤務先の労務・人事担当者または管轄の公的機関（年金事務所・ハローワーク・税務署・市区町村役場・金融機関等）へご確認ください。</p>
+      <p><b class="rate-fiscal-year">料率適用年度：令和8年度（2026年度）／最終確認日：2026年8月5日</b></p>
     </div>
   </section>
 
 </main>
 
-<!-- ============ ボトムバー ============ -->
-<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_16px_rgba(30,41,59,.06)] no-print">
-  <div class="max-w-lg mx-auto px-4 py-3 flex gap-3">
-    <button id="btnBack" class="hidden shrink-0 px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold text-slate-500">戻る</button>
-    <button id="btnNext" class="flex-1 bg-emerald text-white rounded-xl py-3 text-sm font-bold shadow-card disabled:opacity-40" disabled>次へ進む</button>
+<!-- ============ ボトムバー（コア入力中のみ） ============ -->
+<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_16px_rgba(30,41,59,.06)] no-print">
+  <div class="max-w-lg mx-auto px-4 py-3">
+    <p class="text-[11px] text-slate-400 text-center">入力内容は端末内のみで処理されます。サーバーへの送信は行いません（フィードバック送信を除く）。</p>
   </div>
 </nav>
 
+<!-- ============ フッター（常設・第13.5節 入口C） ============ -->
+<footer class="site-footer no-print">
+  <a href="#" id="btnReportError">📝 間違いを見つけた・要望を送る</a>
+  <a href="changelog.html">更新履歴</a>
+  <span class="rate-fiscal-year">料率適用年度：令和8年度</span>
+</footer>
+
+<!-- ============ 精度向上モーダル：グループA（失業給付の精度を上げる） ============ -->
+<dialog id="modalGroupA" class="precision-modal" aria-labelledby="modalGroupATitle">
+  <form method="dialog" class="modal-form">
+    <h2 id="modalGroupATitle" class="modal-title">失業給付の精度を上げる</h2>
+    <p class="modal-sub">あと4問で、失業給付がいつから始まるかを計算します。</p>
+
+    <div class="modal-field">
+      <label for="inputRetireReason">退職の理由・区分</label>
+      <select id="inputRetireReason">
+        <option value="personal" selected>自己都合</option>
+        <option value="company">会社都合</option>
+        <option value="retirement_age">定年退職</option>
+        <option value="contract_end">契約期間満了</option>
+      </select>
+    </div>
+
+    <div class="modal-field" id="resignCountField">
+      <label for="inputResignCount5Years">直近5年の自己都合退職回数</label>
+      <select id="inputResignCount5Years">
+        <option value="2_or_less" selected>2回以下</option>
+        <option value="3_or_more">3回以上</option>
+      </select>
+    </div>
+
+    <div class="modal-field" id="educationField">
+      <label for="inputEnrolledEducation">教育訓練の受講予定</label>
+      <select id="inputEnrolledEducation">
+        <option value="no" selected>なし</option>
+        <option value="yes">あり</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputBirthYear">生年（西暦）</label>
+      <select id="inputBirthYear"></select>
+      <p class="modal-note">65歳の境界判定・介護保険料の判定に使用します。</p>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-secondary" data-close-modal="modalGroupA">閉じる</button>
+      <button type="button" class="modal-btn-primary" data-apply-modal="modalGroupA">この内容で再計算する</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ 精度向上モーダル：グループB（社会保険料・税金の精度を上げる） ============ -->
+<dialog id="modalGroupB" class="precision-modal" aria-labelledby="modalGroupBTitle">
+  <form method="dialog" class="modal-form">
+    <h2 id="modalGroupBTitle" class="modal-title">社会保険料・税金の精度を上げる</h2>
+    <p class="modal-sub">あと4問で、都道府県別の正確な料率で再計算します。</p>
+
+    <div class="modal-field">
+      <label for="inputPrefecture">お住まいの都道府県</label>
+      <select id="inputPrefecture"></select>
+      <p class="modal-note">協会けんぽの保険料率は、お勤め先の事業所がある都道府県によって決まります。お住まいの地域とお勤め先が別の都道府県の場合、実際の金額とは差が出ます。正確な料率は資格確認書またはお勤め先の労務担当者にご確認ください。</p>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputInsuranceType">加入中の健康保険</label>
+      <select id="inputInsuranceType">
+        <option value="kyokai" selected>協会けんぽ</option>
+        <option value="kumiai">健康保険組合（組合健保）</option>
+        <option value="kyosai">共済組合（公務員等）</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputAfterInsurance">退職後の健康保険</label>
+      <select id="inputAfterInsurance">
+        <option value="kokuho" selected>国民健康保険</option>
+        <option value="nini_keizoku">任意継続</option>
+        <option value="fuyou">家族の扶養に入る</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputTenureYears">現在の会社の在籍年数</label>
+      <input id="inputTenureYears" type="number" inputmode="numeric" min="0" max="50" step="1" placeholder="例：5">
+      <p class="modal-note">傷病手当金の継続給付要件・退職所得控除の計算に使用します。</p>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-secondary" data-close-modal="modalGroupB">閉じる</button>
+      <button type="button" class="modal-btn-primary" data-apply-modal="modalGroupB">この内容で再計算する</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ 精度向上モーダル：グループC（該当者のみ） ============ -->
+<dialog id="modalGroupC" class="precision-modal" aria-labelledby="modalGroupCTitle">
+  <form method="dialog" class="modal-form">
+    <h2 id="modalGroupCTitle" class="modal-title">その他の条件（該当者のみ）</h2>
+    <p class="modal-sub">該当する項目だけ入力してください。すべて任意です。</p>
+
+    <div class="modal-field" id="mentalUnfitField">
+      <label for="inputMentalPhysicalUnfit">体調不調・メンタル不調がありますか</label>
+      <select id="inputMentalPhysicalUnfit">
+        <option value="no" selected>いいえ</option>
+        <option value="yes">はい</option>
+      </select>
+      <p class="modal-note">この項目はこの端末に保存されず、送信もされません。</p>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputBonusDate">直近1回分のボーナス支給予定日</label>
+      <input id="inputBonusDate" type="date">
+    </div>
+    <div class="modal-field" id="bonusAmountField" hidden>
+      <label for="inputBonusAmount">その直近1回分のボーナスのだいたいの見込み額</label>
+      <select id="inputBonusAmount">
+        <option value="" disabled selected>選択してください</option>
+        <option value="50000">5万円未満</option>
+        <option value="75000">5〜10万円</option>
+        <option value="150000">10〜20万円</option>
+        <option value="250000">20〜30万円</option>
+        <option value="400000">30〜50万円</option>
+        <option value="650000">50〜80万円</option>
+        <option value="900000">80〜100万円</option>
+        <option value="1200000">100万円以上</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputRetirementPay">退職金の支給予定</label>
+      <select id="inputRetirementPay">
+        <option value="no" selected>なし</option>
+        <option value="yes">あり</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputCorporateDC">企業型DC（確定拠出年金）</label>
+      <select id="inputCorporateDC">
+        <option value="no" selected>なし</option>
+        <option value="yes">あり</option>
+      </select>
+    </div>
+
+    <div class="modal-field" id="nextJoinDateField" hidden>
+      <label for="inputNextJoinDate">次の会社への入社予定日</label>
+      <input id="inputNextJoinDate" type="date">
+    </div>
+
+    <div class="modal-field" id="wantAllowanceField" hidden>
+      <label for="inputWantAllowance">再就職手当の受給希望</label>
+      <select id="inputWantAllowance">
+        <option value="no" selected>いいえ（すぐ開業する）</option>
+        <option value="yes">はい（受給してから開業したい）</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label for="inputHandoverDays">引き継ぎ必要日数</label>
+      <input id="inputHandoverDays" type="number" inputmode="numeric" min="0" max="60" value="0">
+    </div>
+
+    <details class="cd-accordion">
+      <summary class="cd-summary">
+        <span class="cd-title">毎週の定休日を土日以外にする<span class="cd-tagopt">任意</span></span>
+        <span class="cd-chev"></span>
+      </summary>
+      <div class="cd-body">
+        <p class="cd-note">お休みの曜日をすべて選んでください（初期値：土日）。</p>
+        <div class="weekday-grid" id="weekdayGrid" role="group" aria-label="毎週の定休日"></div>
+        <p class="cd-note" style="margin-top:.75rem;">祝日の扱い</p>
+        <div class="holiday-toggle-grid" id="holidayToggleGrid" role="group" aria-label="祝日の扱い">
+          <button type="button" class="ht-btn" id="holidayOnBtn" data-value="true" aria-pressed="true">祝日も休みにする<span class="ht-sub">一般的な会社はこちら</span></button>
+          <button type="button" class="ht-btn" id="holidayOffBtn" data-value="false" aria-pressed="false">祝日も出勤日にする<span class="ht-sub">シフト制・小売業など</span></button>
+        </div>
+      </div>
+    </details>
+
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-secondary" data-close-modal="modalGroupC">閉じる</button>
+      <button type="button" class="modal-btn-primary" data-apply-modal="modalGroupC">この内容で再計算する</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ 上司連絡テンプレートモーダル（第7.3節） ============ -->
+<dialog id="templateModal" class="precision-modal" aria-labelledby="templateModalTitle">
+  <form method="dialog" class="modal-form">
+    <h2 id="templateModalTitle" class="modal-title">面談を申し込む文面テンプレート</h2>
+    <textarea id="templateText" class="template-textarea" rows="8" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-secondary" data-close-modal="templateModal">閉じる</button>
+      <button type="button" class="modal-btn-primary" id="btnCopyTemplate">コピーする</button>
+    </div>
+    <p id="templateCopyToast" class="copy-toast hidden">コピーしました</p>
+  </form>
+</dialog>
+
+<!-- ============ フィードバックフォーム（Google Formへ遷移する前の確認画面） ============ -->
+<dialog id="feedbackModal" class="precision-modal" aria-labelledby="feedbackModalTitle">
+  <form method="dialog" class="modal-form">
+    <h2 id="feedbackModalTitle" class="modal-title">フィードバックを送る</h2>
+    <div class="modal-field">
+      <label for="fbCategory">報告の種類</label>
+      <select id="fbCategory">
+        <option value="calc_mismatch">計算結果が実際と違った</option>
+        <option value="content_error">説明の内容が間違っている・古い</option>
+        <option value="usability">使い方が分からなかった</option>
+        <option value="feature_request">こんな条件にも対応してほしい</option>
+        <option value="praise">感想・応援</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label for="fbFreeText">自由記述（任意）</label>
+      <textarea id="fbFreeText" rows="4" maxlength="1000" placeholder="個人が特定される情報は書かないでください"></textarea>
+    </div>
+    <div class="fb-transparency">
+      <p class="fb-transparency-label">一緒に送られる情報</p>
+      <p id="fbContextSummary" class="fb-context-summary"></p>
+      <p class="fb-transparency-note">※お名前・メールアドレス・生年月日・勤務先などは含まれません。</p>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn-secondary" data-close-modal="feedbackModal">閉じる</button>
+      <button type="button" class="modal-btn-primary" id="btnSendFeedback">送信する</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ 用語ミニ解説ポップオーバー（第3層・単一共有要素） ============ -->
+<div id="term-popover" class="term-popover hidden" role="dialog" aria-modal="false" aria-labelledby="term-title">
+  <h4 id="term-title" class="term-title-el"></h4>
+  <p class="term-short" id="term-short-el"></p>
+  <p class="term-detail" id="term-detail-el"></p>
+  <a href="#allFaq" class="term-link" id="term-link-el">よくある質問で詳しく見る →</a>
+  <button type="button" class="term-close" aria-label="閉じる">×</button>
+</div>
+
+<script src="js/constants.js"></script>
 <script src="js/holidays.js"></script>
 <script src="js/calculator.js"></script>
+<script src="js/faq_master.js"></script>
+<script src="js/glossary.js"></script>
 <script src="js/schema_generator.js"></script>
+<script src="js/feedback.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

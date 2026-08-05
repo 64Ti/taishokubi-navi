@@ -157,18 +157,13 @@ button{cursor:pointer;}
    ========================================================= */
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 
-.step-panel{display:none;}
-.step-panel.active{display:block;animation:fadeUp .35s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);}}
+.core-form,.result-screen{animation:fadeUp .35s ease both;}
 
 .snippet-fuel{font-weight:900;}
 
-.toggle-track{transition:background-color .2s ease;}
-.toggle-thumb{transition:transform .2s ease;}
-.toggle-on .toggle-track{background-color:var(--emerald);}
-.toggle-on .toggle-thumb{transform:translateX(18px);}
-
 .branch-btn{background:#fff;cursor:pointer;transition:border-color .15s ease,background-color .15s ease;}
+.branch-btn[aria-pressed="true"]{border-color:var(--emerald);background:var(--emerald-light);}
 
 /* ---------- 結果画面：接続されたアクションタイムライン ---------- */
 .tl-list{display:flex;flex-direction:column;}
@@ -231,19 +226,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 .legal-disclaimer .ld-title{font-size:.72rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
 .legal-disclaimer .ld-pr{color:var(--slate-400);}
 
-/* ---------- 損失回避コピー（結果画面トップ） ---------- */
-.loss-aversion-warn{
-  font-size:.85rem;font-weight:700;line-height:1.8;color:#fff;
-  background:rgba(153,27,27,.32);border:1.5px solid rgba(254,202,202,.6);
-  border-radius:.7rem;padding:10px 13px;margin:0 0 12px;
-}
-.loss-aversion-warn b{font-weight:900;}
-.loss-aversion-safe{
-  font-size:.85rem;font-weight:700;line-height:1.8;color:#fff;
-  background:rgba(6,95,70,.32);border:1.5px solid rgba(167,243,208,.6);
-  border-radius:.7rem;padding:10px 13px;margin:0 0 12px;
-}
-
 /* ---------- 祝日の扱い（明示的な2択ボタン） ---------- */
 .holiday-toggle-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .ht-btn{
@@ -257,18 +239,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 .ht-btn:active{transform:scale(.97);}
 .ht-btn[aria-pressed="true"]{background:var(--emerald);border-color:var(--emerald);color:#fff;}
 .ht-btn .ht-sub{font-weight:400;font-size:.68rem;color:inherit;opacity:.75;}
-
-/* ---------- STEP2 プレビュー：指定日→理想日の比較 ---------- */
-.preview-compare{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.6);border-radius:.6rem;
-  padding:8px 10px;margin:8px 0;
-}
-.preview-compare > div:not(.pc-arrow){display:flex;flex-direction:column;flex:1;min-width:0;}
-.pc-label{font-size:.65rem;font-weight:800;color:var(--emerald-dark);opacity:.75;}
-.pc-value{font-size:.85rem;font-weight:800;color:var(--emerald-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pc-value.pc-ideal{color:var(--gold-dark);}
-.pc-arrow{flex:none;font-size:.9rem;font-weight:800;color:var(--emerald-dark);opacity:.6;}
 
 /* ---------- 毎週の定休日（曜日グリッド） ---------- */
 .weekday-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
@@ -361,26 +331,213 @@ details[open] .cd-chev{transform:rotate(180deg);}
 .info-card .ic-title{font-size:.88rem;font-weight:800;color:var(--gold-dark);margin-bottom:6px;line-height:1.6;}
 .info-card .ic-body{font-size:.79rem;line-height:1.9;color:#78350f;}
 
+/* =========================================================
+   v17.2 追加コンポーネント
+   ========================================================= */
+
+/* ---------- スキップリンク ---------- */
+.skip-link{
+  position:absolute;left:-999px;top:0;z-index:100;
+  background:var(--navy);color:#fff;padding:.6rem 1rem;border-radius:0 0 .5rem 0;font-size:.85rem;font-weight:700;
+}
+.skip-link:focus{left:0;}
+
+/* ---------- フェーズ1：コア入力フォーム ---------- */
+.core-form{padding-bottom:1rem;}
+
+/* ---------- 結果画面：暫定値の注記 ---------- */
+.precision-note{
+  font-size:.75rem;font-weight:700;color:var(--gold-dark);
+  background:var(--gold-light);border:1px solid #fde68a;border-radius:.6rem;
+  padding:.5rem .75rem;display:inline-block;
+}
+.precision-note.is-final{color:var(--emerald-dark);background:var(--emerald-light);border-color:#a7f3d0;}
+
+/* ---------- 見出しカードの損得表現（4段階：危険/注意/情報/有利） ---------- */
+.verdict-line{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:.85rem;font-weight:700;line-height:1.8;color:#fff;
+  border-radius:.7rem;padding:10px 13px;margin:0 0 12px;border:1.5px solid transparent;
+}
+.verdict-line .vl-icon{flex:none;font-size:1rem;line-height:1.6;}
+.verdict-line b{font-weight:900;}
+.verdict-danger{background:rgba(153,27,27,.32);border-color:rgba(254,202,202,.6);}
+.verdict-caution{background:rgba(146,64,6,.32);border-color:rgba(253,230,138,.6);}
+.verdict-info{background:rgba(2,132,199,.32);border-color:rgba(186,230,253,.6);}
+.verdict-favorable{background:rgba(6,95,70,.32);border-color:rgba(167,243,208,.6);}
+
+/* 汎用の警告レベルバッジ（アイコン+ラベル+色。色だけに依存しない） */
+.level-badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:900;letter-spacing:.02em;border-radius:.4rem;padding:2px 8px;}
+.level-badge.level-danger{color:var(--crimson-dark);background:#fff;}
+.level-badge.level-caution{color:var(--caution-dark);background:#fff;}
+.level-badge.level-info{color:#075985;background:#fff;}
+.level-badge.level-favorable{color:var(--emerald-dark);background:#fff;}
+
+/* ---------- 体調不調フラグ時の相談窓口ボックス（第6.2節・必須表示） ---------- */
+.support-box{
+  border:1.5px solid #93c5fd;background:#eff6ff;border-radius:1rem;
+  padding:14px 16px;margin-bottom:14px;
+}
+.support-box p{font-size:.8rem;line-height:1.8;color:#1e3a8a;margin:0 0 .5rem;}
+.support-box ul{margin:0;padding-left:1.1rem;}
+.support-box li{font-size:.78rem;line-height:1.9;color:#1e3a8a;}
+
+/* ---------- 精度向上カード ---------- */
+.precision-upgrade{
+  border:1.5px solid var(--slate-200);background:#fff;border-radius:1rem;
+  padding:14px 15px;box-shadow:var(--shadow-card);
+}
+.pu-title{font-size:.8rem;font-weight:800;color:var(--navy);margin:0 0 .6rem;}
+.pu-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  text-align:left;font-family:inherit;font-size:.82rem;font-weight:700;color:var(--navy);
+  background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:.7rem;
+  padding:.7rem .9rem;margin-bottom:.5rem;min-height:44px;
+}
+.pu-btn:last-child{margin-bottom:0;}
+.pu-btn .pu-sub{flex:none;font-size:.68rem;font-weight:800;color:var(--emerald-dark);background:var(--emerald-light);border-radius:.4rem;padding:2px 7px;}
+
+/* ---------- 文脈連動FAQ / 全件FAQ ---------- */
+.contextual-faq{display:flex;flex-direction:column;gap:.6rem;}
+.faq-item{border:1px solid var(--slate-200);border-radius:.75rem;background:#fff;padding:.9rem 1rem;box-shadow:var(--shadow-card);}
+.faq-q{font-size:.85rem;font-weight:800;color:var(--navy);margin:0 0 .4rem;}
+.faq-a1{font-size:.8rem;font-weight:800;color:var(--emerald-dark);margin:0 0 .4rem;line-height:1.7;}
+.faq-a2{font-size:.78rem;color:var(--slate-600);line-height:1.8;margin:0 0 .5rem;}
+.faq-a3{font-size:.76rem;color:var(--slate-600);line-height:1.8;background:var(--navy-50);border-radius:.5rem;padding:.5rem .65rem;margin:0;}
+.faq-a3-label{font-weight:800;color:var(--navy);}
+.all-faq-link{display:inline-block;font-size:.8rem;font-weight:700;color:var(--emerald-dark);margin:0 0 1rem;}
+.all-faq-category{font-size:.9rem;font-weight:800;color:var(--navy);margin:1.2rem 0 .6rem;}
+.all-faq-category:first-child{margin-top:0;}
+
+/* ---------- FAQ・警告カード単位の理解度フィードバック（入口B） ---------- */
+.faq-feedback{display:flex;align-items:center;gap:8px;margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--slate-200);}
+.faq-feedback span{font-size:.7rem;color:var(--slate-400);}
+.faq-feedback button{
+  font-size:.85rem;line-height:1;padding:.3rem .5rem;border-radius:.4rem;border:1px solid var(--slate-200);
+  background:#fff;min-height:32px;
+}
+.faq-feedback button[aria-pressed="true"]{background:var(--emerald-light);border-color:var(--emerald);}
+
+/* ---------- 結果画面のマイクロフィードバック（入口A・最重要） ---------- */
+.feedback-micro{
+  border:1.5px solid var(--slate-200);background:#fff;border-radius:1rem;
+  padding:16px;margin-bottom:1.5rem;text-align:center;box-shadow:var(--shadow-card);
+}
+.feedback-q{font-size:.85rem;font-weight:800;color:var(--navy);margin:0 0 .8rem;}
+.feedback-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.feedback-btns button{
+  font-family:inherit;font-size:.8rem;font-weight:700;color:var(--navy);
+  background:var(--slate-50);border:1.5px solid var(--slate-200);border-radius:.6rem;
+  padding:.6rem .8rem;min-height:44px;
+}
+.feedback-btns button[aria-pressed="true"]{background:var(--emerald-light);border-color:var(--emerald);color:var(--emerald-dark);}
+.feedback-thanks{margin-top:.7rem;font-size:.8rem;font-weight:700;color:var(--emerald-dark);}
+
+/* ---------- フッター（常設・入口C） ---------- */
+.site-footer{
+  max-width:32rem;margin:0 auto;padding:1.5rem 1rem 2rem;
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  font-size:.75rem;color:var(--slate-400);
+}
+.site-footer a{color:var(--slate-500);text-decoration:underline;min-height:44px;display:inline-flex;align-items:center;}
+.rate-fiscal-year{font-size:.7rem;color:var(--slate-400);}
+
+/* ---------- 精度向上・上司連絡テンプレート・フィードバック用モーダル ---------- */
+dialog.precision-modal{
+  border:none;border-radius:1.25rem 1.25rem 0 0;padding:0;width:100%;max-width:32rem;
+  margin:auto auto 0;box-shadow:var(--shadow-sheet);max-height:90vh;
+}
+@media (min-width:560px){
+  dialog.precision-modal{border-radius:1.25rem;margin:auto;max-height:85vh;}
+}
+dialog.precision-modal::backdrop{background:rgba(30,41,59,.5);}
+dialog.precision-modal[open]{animation:fadeUp .25s ease both;}
+.modal-form{padding:1.25rem 1.25rem 1.5rem;overflow-y:auto;max-height:90vh;-webkit-overflow-scrolling:touch;}
+.modal-title{font-size:1.05rem;font-weight:900;color:var(--navy);margin:0 0 .3rem;}
+.modal-sub{font-size:.8rem;color:var(--slate-500);margin:0 0 1rem;}
+.modal-field{margin-bottom:1rem;}
+.modal-field label{display:block;font-size:.78rem;font-weight:700;color:var(--slate-500);margin-bottom:.4rem;}
+.modal-field select,.modal-field input,.modal-field textarea{
+  width:100%;border:1px solid var(--slate-300);border-radius:.7rem;padding:.7rem .8rem;
+  font-size:1rem;font-family:inherit;background:#fff;min-height:44px;
+}
+.modal-field textarea{min-height:88px;resize:vertical;}
+.modal-note{font-size:.7rem;color:var(--slate-400);line-height:1.7;margin:.4rem 0 0;}
+.modal-actions{display:flex;gap:.6rem;margin-top:.5rem;}
+.modal-btn-secondary,.modal-btn-primary{
+  flex:1;font-family:inherit;font-size:.85rem;font-weight:800;border-radius:.7rem;padding:.75rem;min-height:44px;
+}
+.modal-btn-secondary{background:#fff;border:1.5px solid var(--slate-300);color:var(--slate-600);}
+.modal-btn-primary{background:var(--emerald);border:1.5px solid var(--emerald);color:#fff;}
+.template-textarea{width:100%;border:1px solid var(--slate-300);border-radius:.7rem;padding:.8rem;font-size:.85rem;line-height:1.8;font-family:inherit;color:var(--navy);background:var(--slate-50);}
+.copy-toast{margin-top:.6rem;font-size:.8rem;font-weight:700;color:var(--emerald-dark);text-align:center;}
+
+/* ---------- フィードバック送信前の透明性表示 ---------- */
+.fb-transparency{background:var(--navy-50);border:1px solid var(--slate-200);border-radius:.7rem;padding:.7rem .8rem;margin-bottom:1rem;}
+.fb-transparency-label{font-size:.7rem;font-weight:800;color:var(--navy);margin:0 0 .3rem;}
+.fb-context-summary{font-size:.68rem;color:var(--slate-500);word-break:break-all;margin:0 0 .4rem;font-family:monospace;}
+.fb-transparency-note{font-size:.68rem;color:var(--slate-400);margin:0;}
+
+/* ---------- 用語ミニ解説ポップオーバー（第3層） ---------- */
+.term-trigger{
+  background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;
+  border-bottom:1px dashed var(--slate-400);
+}
+.term-popover{
+  position:fixed;z-index:60;max-width:300px;
+  background:#fff;border:1.5px solid var(--slate-200);border-radius:.9rem;
+  box-shadow:var(--shadow-sheet);padding:.9rem 1rem;
+}
+.term-title-el{font-size:.85rem;font-weight:900;color:var(--navy);margin:0 0 .4rem;}
+.term-short{font-size:.78rem;font-weight:700;color:var(--emerald-dark);line-height:1.7;margin:0 0 .4rem;}
+.term-detail{font-size:.74rem;color:var(--slate-500);line-height:1.7;margin:0 0 .5rem;}
+.term-link{font-size:.74rem;font-weight:700;color:var(--emerald-dark);}
+.term-close{
+  position:absolute;top:.5rem;right:.5rem;width:28px;height:28px;border-radius:50%;
+  border:none;background:var(--slate-100);color:var(--slate-500);font-weight:800;
+}
+
+/* ---------- 更新履歴ページ（changelog.html） ---------- */
+.changelog-entry{margin-bottom:2rem;}
+.changelog-date{font-size:.95rem;font-weight:900;color:var(--navy);border-bottom:2px solid var(--slate-200);padding-bottom:.5rem;margin:0 0 .8rem;}
+.changelog-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem;}
+.changelog-list li{font-size:.82rem;line-height:1.8;color:var(--slate-600);}
+.cl-tag{display:inline-block;font-size:.7rem;font-weight:800;border-radius:.4rem;padding:2px 7px;margin-right:.4rem;white-space:nowrap;}
+.cl-tag.cl-fix{background:var(--gold-light);color:var(--gold-dark);}
+.cl-tag.cl-new{background:var(--emerald-light);color:var(--emerald-dark);}
+
+/* ---------- 印刷時のみ：用語のミニ辞典 ---------- */
+#glossary-appendix{display:none;}
+#glossary-appendix ul{list-style:none;margin:0;padding:0;}
+#glossary-appendix li{font-size:.78rem;line-height:1.8;margin-bottom:.5rem;}
+
 /* ---------- 印刷 / PDF保存レイアウト ---------- */
 @media print{
+  @page{ size:A4 portrait; margin:10mm 12mm; }
   .no-print,
-  #step1,#step2,#step3,
+  #coreForm,
   .quick-chip-row,
+  dialog,
   details.cd-accordion{ display:none!important; }
   body{ background:#fff!important; padding-bottom:0!important; }
   .max-w-lg{ max-width:100%!important; }
   .shadow-card,.shadow-sheet{ box-shadow:none!important; }
-  #stepResult{ display:block!important; }
+  #resultScreen{ display:block!important; }
   #impactCard{ color:#000!important; background:#fff!important; border:2px solid #000!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   #impactCard *{ color:#000!important; }
-  .tl-card,.tl-advice,.info-card,.legal-disclaimer{ break-inside:avoid; border-color:#94a3b8!important; }
+  .tl-item,.tl-card,.tl-advice,.info-card,.legal-disclaimer,.faq-item{ break-inside:avoid; page-break-inside:avoid; border-color:#94a3b8!important; }
   .tl-num{ background:#334155!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .term-trigger{ border-bottom:none; color:inherit; }
+  #glossary-appendix{ display:block!important; }
+  .rate-fiscal-year{ display:block!important; }
   a[href]::after{ content:""; }
 }
 
 /* ---------- アクセシビリティ（シニア層配慮：文字サイズ・タップ領域・コントラスト） ---------- */
-button,select,input,.branch-btn,.wd-btn,.ht-btn,.qc-chip{ min-height:44px; }
-.tl-heading,.tl-body,.info-card .ic-body,.tl-advice .ta-body{ font-size:max(.78rem, 14px); }
+html{font-size:16px;}
+button,select,input,.branch-btn,.wd-btn,.ht-btn,.qc-chip,.pu-btn,.term-trigger{ min-height:44px; }
+.tl-heading,.tl-body,.info-card .ic-body,.tl-advice .ta-body,.faq-q,.faq-a2,.faq-a3{ font-size:max(.78rem, 14px); }
+:focus-visible{ outline:2.5px solid #2563eb; outline-offset:2px; }
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;}
