@@ -128,6 +128,15 @@
     <!-- 損失回避見出し + 手取り差額カード -->
     <div id="impactCard" class="rounded-2xl p-5 text-white shadow-card mb-6" style="background:linear-gradient(135deg,#1E293B,#334155);"></div>
 
+    <!-- 精度向上カード（フェーズ2への導線）。結論（✓ 選んだ退職日...）の直後に置き、
+         結果を見てすぐ「もっと正確に知りたい」と思った人がそのまま追加入力できるようにする -->
+    <div id="precisionUpgradeCard" class="precision-upgrade mb-6">
+      <p class="pu-title">もっと正確に知りたい方へ</p>
+      <button type="button" class="pu-btn" id="btnOpenGroupA" aria-describedby="puSubA">失業給付がいつから始まるか計算する<span class="pu-sub" id="puSubA" data-default-label="あと4問">あと4問</span></button>
+      <button type="button" class="pu-btn" id="btnOpenGroupB" aria-describedby="puSubB">社会保険料を都道府県別の正確な料率で計算する<span class="pu-sub" id="puSubB" data-default-label="あと4問">あと4問</span></button>
+      <button type="button" class="pu-btn" id="btnOpenGroupC" aria-describedby="puSubC">賞与・退職金・企業型DCなどその他の条件を入力する<span class="pu-sub" id="puSubC" data-default-label="該当者のみ">該当者のみ</span></button>
+    </div>
+
     <!-- 定年退職・その他の条件付き情報カード（ゴールド系）が動的に入る -->
     <div id="infoCardsContainer" class="mb-2"></div>
 
@@ -145,14 +154,6 @@
 
     <!-- ToDoタイムライン -->
     <div id="timeline" class="tl-list mb-6"></div>
-
-    <!-- 精度向上カード（フェーズ2への導線） -->
-    <div id="precisionUpgradeCard" class="precision-upgrade mb-6">
-      <p class="pu-title">もっと正確に知りたい方へ</p>
-      <button type="button" class="pu-btn" id="btnOpenGroupA" aria-describedby="puSubA">失業給付がいつから始まるか計算する<span class="pu-sub" id="puSubA" data-default-label="あと4問">あと4問</span></button>
-      <button type="button" class="pu-btn" id="btnOpenGroupB" aria-describedby="puSubB">社会保険料を都道府県別の正確な料率で計算する<span class="pu-sub" id="puSubB" data-default-label="あと4問">あと4問</span></button>
-      <button type="button" class="pu-btn" id="btnOpenGroupC" aria-describedby="puSubC">賞与・退職金・企業型DCなどその他の条件を入力する<span class="pu-sub" id="puSubC" data-default-label="該当者のみ">該当者のみ</span></button>
-    </div>
 
     <!-- 第1層：文脈連動FAQ（最大5件） -->
     <div id="contextualFaq" class="contextual-faq mb-6"></div>
