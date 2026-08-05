@@ -374,6 +374,14 @@ details[open] .cd-chev{transform:rotate(180deg);}
   margin:0 0 .5rem;
 }
 
+/* ---------- 転職・空白期間ゼロ推奨の理由リスト ---------- */
+.gap-reason-list{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:.6rem;}
+.gap-reason-list li{
+  font-size:.78rem;line-height:1.75;color:#fff;opacity:.95;
+  background:rgba(255,255,255,.12);border-radius:.6rem;padding:.6rem .75rem;
+}
+.gap-reason-list li b{font-weight:900;}
+
 /* ---------- 見出しカードの損得表現（4段階：危険/注意/情報/有利） ---------- */
 .verdict-line{
   display:flex;align-items:flex-start;gap:8px;

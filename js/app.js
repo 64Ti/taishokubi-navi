@@ -589,6 +589,17 @@
       (ic.verdict === 'MONTH_END' && userChoseMonthEnd) ||
       (ic.verdict === 'BEFORE_MONTH_END' && !userChoseMonthEnd);
 
+    // 転職先の入社日が決まっていて、今の予定だと空白期間が生じる場合は、
+    // 社会保険料の自己負担額だけの比較よりも「空白期間をなくすこと」を優先して案内する。
+    // 半月分などの給与・有休の目減り、市区町村役場での二重の手続き、厚生年金の
+    // 加入期間が途切れることによる将来の年金額への影響は、保険料の自己負担額の
+    // 差（多くの場合1〜3万円程度）より総合的な影響がはるかに大きいことが多いため。
+    if (r.branch === 'transfer' && r.insuranceGap && state.nextJoinDate &&
+        (r.insuranceGap.type === 'gap' || r.insuranceGap.type === 'none')) {
+      renderImpactCardForTransferGap(r, ic);
+      return;
+    }
+
     // 「結局いつ辞めればいいか」に一言で答える結論（大きく最上部に出す）。
     // その下の理由文（reasonText）で、内訳・金額の根拠を補足する。
     let conclusionText;
@@ -628,6 +639,52 @@
       </div>
       ${reductionNote}
       <p class="text-[11px] opacity-80 leading-relaxed mt-3">※国民健康保険料は前年の所得とお住まいの市区町村により大きく変動します。上記は全国的な料率の幅から算出した目安です。${r.ageProvided ? '' : '生年を入力すると、介護保険料（40〜64歳）を反映した金額になります。'}</p>
+    `;
+  }
+
+  /**
+   * 転職先の入社日が決まっており、今の予定だと社会保険の空白期間が生じるケース専用の表示。
+   * 社会保険料の自己負担額だけの比較では「空白期間があるほうが安く見える」ことがあるが、
+   * 半月分などの給与・有休の目減り、市区町村役場での二重の手続き、厚生年金の加入期間が
+   * 途切れることによる将来の年金額への影響を合わせると、空白期間をなくすほうが
+   * 総合的に有利になるケースがほとんどのため、そちらを優先して案内する。
+   */
+  function renderImpactCardForTransferGap(r, ic) {
+    const nextJoinDate = Calc.parseDate(state.nextJoinDate);
+    const gapFreeDate = Calc.addDays(nextJoinDate, -1);
+    const gapFreeDateLabel = Calc.fmtJP(gapFreeDate);
+    const alreadyAligned = Calc.fmtISO(r.resignDate) === Calc.fmtISO(gapFreeDate);
+
+    const conclusionText = alreadyAligned
+      ? `選んだ退職日（${r.resignDateLabel}）のままで大丈夫です`
+      : `${gapFreeDateLabel}に退職するのがおトクです`;
+    const reasonText = alreadyAligned
+      ? `次の入社日（${r.insuranceGap.nextJoinLabel}）の前日にあたるため、社会保険の空白期間なく切り替わります。`
+      : `次の入社日（${r.insuranceGap.nextJoinLabel}）の前日です。今の予定（${escapeHtml(r.resignDateLabel)}）のままだと、入社日までに約${r.insuranceGap.days}日間の空白期間が生まれます。`;
+
+    const reasonsList = alreadyAligned
+      ? ''
+      : `
+      <ul class="gap-reason-list">
+        <li><b>①給与・有休の目減りがなくなります。</b>空白期間中は無給になりますが、その日数ぶん長く在籍すれば、給与または有給休暇の消化として受け取れます。多くの場合、社会保険料の自己負担額の差（下記参考）よりも金額が大きくなります。</li>
+        <li><b>②市区町村役場での手続きが不要になります。</b>空白期間があると、その間だけ国民健康保険・国民年金に加入する手続き（および入社後にまた会社の社会保険へ戻す手続き）が必要になります。</li>
+        <li><b>③厚生年金の加入期間が途切れません。</b>空白期間の月は国民年金の扱いになり、その分だけ厚生年金の加入期間が短くなるため、将来受け取れる年金額にわずかに影響します。</li>
+      </ul>`;
+
+    const referenceBox = `
+      <p class="text-[11px] font-black tracking-widest opacity-80 mb-1 mt-3">参考：社会保険料の自己負担額だけを比べると</p>
+      <div class="text-xs" style="background:rgba(255,255,255,.12);border-radius:.5rem;padding:10px 12px;">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${escapeHtml(gapFreeDateLabel)}（月末）に退職した場合</span><b>${ic.patternA.toLocaleString()}円</b></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>今の予定（${escapeHtml(r.resignDateLabel)}）のまま退職した場合</span><b>約${ic.patternB.min.toLocaleString()}〜${ic.patternB.max.toLocaleString()}円</b></div>
+      </div>
+      <p class="text-[11px] opacity-80 leading-relaxed mt-2">※この金額差だけを見ると空白期間があるほうが安く見えますが、上記①〜③を含めた総合的な損得では、空白期間をなくすほうが有利になることがほとんどです。</p>`;
+
+    const impactCard = document.getElementById('impactCard');
+    impactCard.innerHTML = `
+      <p class="impact-conclusion"><span aria-hidden="true">✓</span> ${escapeHtml(conclusionText)}</p>
+      <p class="verdict-line verdict-favorable"><span class="vl-icon" aria-hidden="true">✓</span><span>${escapeHtml(reasonText)}</span></p>
+      ${reasonsList}
+      ${referenceBox}
     `;
   }
 
