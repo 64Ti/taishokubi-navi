@@ -368,6 +368,12 @@ details[open] .cd-chev{transform:rotate(180deg);}
 }
 .precision-note.is-final{color:var(--emerald-dark);background:var(--emerald-light);border-color:#a7f3d0;}
 
+/* ---------- 見出しカードの結論行（「結局いつ辞めればいいか」への一言回答） ---------- */
+.impact-conclusion{
+  font-size:1.15rem;font-weight:900;color:#fff;line-height:1.5;
+  margin:0 0 .5rem;
+}
+
 /* ---------- 見出しカードの損得表現（4段階：危険/注意/情報/有利） ---------- */
 .verdict-line{
   display:flex;align-items:flex-start;gap:8px;
