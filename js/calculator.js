@@ -339,11 +339,19 @@
     else if (diffMin < 0 && diffMax < 0) verdict = 'BEFORE_MONTH_END';
     else verdict = 'UNCERTAIN';
 
+    // ⚠️ diffMin/diffMaxが両方とも負の場合（BEFORE_MONTH_END）、絶対値を取ると
+    //    大小関係が反転する（例: diffMin=-15284, diffMax=-4959 → abs()だけだと
+    //    difference.min(15284) > difference.max(4959) になり「小〜大」の表示が崩れる）。
+    //    必ず絶対値化した後で min/max を取り直し、表示側の「約○○〜△△円」の
+    //    順序が常に昇順になるようにする。
+    const absDiffValues = [Math.abs(diffMin), Math.abs(diffMax)];
+    const difference = { min: Math.min(...absDiffValues), max: Math.max(...absDiffValues) };
+
     return {
       verdict,
       patternA,
       patternB,
-      difference: { min: Math.abs(diffMin), max: Math.abs(diffMax) },
+      difference,
       reductionApplied,
       breakdown: { employeeHealth, employeePension, employeeNursing, employeeChildcareLevy },
     };

@@ -399,8 +399,16 @@ details[open] .cd-chev{transform:rotate(180deg);}
 
 /* ---------- 文脈連動FAQ / 全件FAQ ---------- */
 .contextual-faq{display:flex;flex-direction:column;gap:.6rem;}
-.faq-item{border:1px solid var(--slate-200);border-radius:.75rem;background:#fff;padding:.9rem 1rem;box-shadow:var(--shadow-card);}
-.faq-q{font-size:.85rem;font-weight:800;color:var(--navy);margin:0 0 .4rem;}
+.faq-item{border:1px solid var(--slate-200);border-radius:.75rem;background:#fff;box-shadow:var(--shadow-card);overflow:hidden;}
+.faq-item + .faq-item{margin-top:.6rem;}
+.faq-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  padding:.85rem 1rem;cursor:pointer;list-style:none;min-height:44px;
+}
+.faq-summary::-webkit-details-marker{display:none;}
+.faq-item .cd-chev{flex:none;}
+.faq-q{font-size:.85rem;font-weight:800;color:var(--navy);}
+.faq-body{padding:0 1rem .9rem;border-top:1px solid var(--slate-100);padding-top:.75rem;}
 .faq-a1{font-size:.8rem;font-weight:800;color:var(--emerald-dark);margin:0 0 .4rem;line-height:1.7;}
 .faq-a2{font-size:.78rem;color:var(--slate-600);line-height:1.8;margin:0 0 .5rem;}
 .faq-a3{font-size:.76rem;color:var(--slate-600);line-height:1.8;background:var(--navy-50);border-radius:.5rem;padding:.5rem .65rem;margin:0;}
@@ -527,6 +535,10 @@ dialog.precision-modal[open]{animation:fadeUp .25s ease both;}
   #impactCard *{ color:#000!important; }
   .tl-item,.tl-card,.tl-advice,.info-card,.legal-disclaimer,.faq-item{ break-inside:avoid; page-break-inside:avoid; border-color:#94a3b8!important; }
   .tl-num{ background:#334155!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  /* FAQアコーディオンは開閉状態にかかわらず全開表示にする */
+  .faq-item > *{ display:block!important; }
+  .faq-summary{ cursor:default; }
+  .faq-item .cd-chev{ display:none!important; }
   .term-trigger{ border-bottom:none; color:inherit; }
   #glossary-appendix{ display:block!important; }
   .rate-fiscal-year{ display:block!important; }

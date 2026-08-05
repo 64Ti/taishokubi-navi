@@ -714,7 +714,9 @@
 
   function renderContextualFaq(faqs) {
     const container = document.getElementById('contextualFaq');
-    container.innerHTML = faqs.map(f => buildFaqItemHtml(f)).join('');
+    // 文脈連動FAQ（最大5件）は既に絞り込み済みのため初期状態で開いておく。
+    // アンカーID(id="faq-xxx")は全件FAQ側にのみ付与し、DOM ID重複を避ける。
+    container.innerHTML = faqs.map(f => buildFaqItemHtml(f, { defaultOpen: true, anchorId: false })).join('');
     bindFaqFeedbackButtons(container);
   }
 
@@ -727,26 +729,40 @@
     let html = '';
     Object.keys(byCategory).forEach(cat => {
       html += `<h3 class="all-faq-category">${escapeHtml(cat)}</h3>`;
-      html += byCategory[cat].map(f => buildFaqItemHtml(f)).join('');
+      // 全22件を並べると長くなるため、質問文だけを見せる閉じたアコーディオンにする
+      html += byCategory[cat].map(f => buildFaqItemHtml(f, { defaultOpen: false, anchorId: true })).join('');
     });
     container.innerHTML = html;
     bindFaqFeedbackButtons(container);
   }
 
-  function buildFaqItemHtml(f) {
+  /**
+   * FAQ1件分を折りたたみ可能な <details> として描画する。
+   * ネイティブの <details>/<summary> を使うことで、キーボード操作・スクリーンリーダー
+   * 対応をブラウザ標準機能に委ね、フラグメントリンク（#faq-xxx）で自動的に開く挙動も得られる。
+   */
+  function buildFaqItemHtml(f, opts) {
+    opts = opts || {};
     const pressed = faqFeedbackState[f.id];
+    const idAttr = opts.anchorId ? ` id="faq-${escapeAttr(f.id)}"` : '';
+    const openAttr = opts.defaultOpen ? ' open' : '';
     return `
-      <div class="faq-item" id="faq-${escapeAttr(f.id)}">
-        <p class="faq-q">Q. ${escapeHtml(f.question)}</p>
-        <p class="faq-a1">${escapeHtml(f.conclusion)}</p>
-        <p class="faq-a2">${escapeHtml(f.detail)}</p>
-        <p class="faq-a3"><span class="faq-a3-label">→ 次にやること　</span>${escapeHtml(f.action)}</p>
-        <div class="faq-feedback">
-          <span>この説明は分かりやすかったですか？</span>
-          <button type="button" data-fb-item="${escapeAttr(f.id)}" data-fb="clear" aria-pressed="${pressed === 'clear'}">👍</button>
-          <button type="button" data-fb-item="${escapeAttr(f.id)}" data-fb="unclear" aria-pressed="${pressed === 'unclear'}">🤔</button>
+      <details class="faq-item"${idAttr}${openAttr}>
+        <summary class="faq-summary">
+          <span class="faq-q">Q. ${escapeHtml(f.question)}</span>
+          <span class="cd-chev" aria-hidden="true"></span>
+        </summary>
+        <div class="faq-body">
+          <p class="faq-a1">${escapeHtml(f.conclusion)}</p>
+          <p class="faq-a2">${escapeHtml(f.detail)}</p>
+          <p class="faq-a3"><span class="faq-a3-label">→ 次にやること　</span>${escapeHtml(f.action)}</p>
+          <div class="faq-feedback">
+            <span>この説明は分かりやすかったですか？</span>
+            <button type="button" data-fb-item="${escapeAttr(f.id)}" data-fb="clear" aria-pressed="${pressed === 'clear'}">👍</button>
+            <button type="button" data-fb-item="${escapeAttr(f.id)}" data-fb="unclear" aria-pressed="${pressed === 'unclear'}">🤔</button>
+          </div>
         </div>
-      </div>
+      </details>
     `;
   }
 
