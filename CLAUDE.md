@@ -4,7 +4,7 @@
 
 退職希望日・有休残日数・年収などを入力すると、金銭面で有利な退職日と手取り差額を算出するクライアントサイド完結型シミュレーター。
 
-- 公開URL: https://taishokubi-navi.pages.dev/
+- 公開URL: https://tokutai-navi.com/
 - ホスティング: Cloudflare Pages
 - 現フェーズ: **β版**（マネタイズ導線は実装しない）
 

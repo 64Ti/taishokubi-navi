@@ -1,7 +1,7 @@
 # 公開ロードマップ
 
 「退職日計算ナビ」をインターネットに公開するまでの手順。
-**方針: GitHub連携 ＋ Cloudflare Pages ＋ 独自ドメイン（これから取得）**
+**方針: GitHub連携 ＋ Cloudflare Pages ＋ 独自ドメイン（`tokutai-navi.com` 取得済み）**
 
 進捗はチェックボックスで管理する。
 
@@ -20,10 +20,11 @@
 
 ---
 
-## ✅ 公開済み — https://taishokubi-navi.pages.dev/
+## ✅ 公開済み
 
-**2026-08-04 公開完了。** 本番環境で全19項目の動作検証をパス。
-費用0円（Cloudflare Pages 無料プラン ＋ `.pages.dev` 無料サブドメイン）。
+- **2026-08-04**: `https://taishokubi-navi.pages.dev/`（`.pages.dev` 無料サブドメイン）で公開完了。本番環境で全19項目の動作検証をパス
+- **2026-08-05**: 独自ドメイン `https://tokutai-navi.com/` を取得。コード内の公開URL参照（canonical / OGP / sitemap.xml / robots.txt / schema_generator.js 等）を新ドメインへ更新済み
+  - ⚠️ Cloudflare Pagesプロジェクトの「カスタムドメイン」設定でこのドメインを接続するまでは、実際には旧`.pages.dev`のURLでのみアクセスできる状態（Phase 4参照）
 
 ---
 
@@ -53,28 +54,10 @@
 
 ---
 
-## Phase 2 — 独自ドメイン（保留：`.pages.dev` で運用中）
+## Phase 2 — 独自ドメイン ✅ 完了
 
-### ドメイン名の候補
-
-| 候補 | 読みやすさ | 備考 |
-|---|---|---|
-| `taishokubi.com` | ◎ | ツール名と一致。第一候補 |
-| `taishoku-navi.com` | ◎ | 「ナビ」まで入る |
-| `yametoku.com` | ○ | 「辞め得」。覚えやすいが意味が伝わりにくい |
-| `taishokubi.jp` | ◎ | 日本向けの信頼感。ただし費用が高め |
-
-### レジストラの選択
-
-| 選択肢 | 費用の目安 | 特徴 |
-|---|---|---|
-| **Cloudflare Registrar** | `.com` 年1,500〜2,000円 | 原価提供で**更新料が上がらない**。ホスティングと同じ管理画面で完結するのが最大の利点 |
-| お名前.com / ムームードメイン | 年1,000〜4,000円 | `.jp` が取れる。初年度が安く**2年目以降が高い**点に注意 |
-
-**推奨: Cloudflare Registrar で `.com`。** Phase 3 と管理画面が同じになり、DNS設定の手間がまるごと消える。
-
-- [ ] ドメイン名を決める
-- [ ] レジストラで取得する
+- [x] ドメイン名を決める → **`tokutai-navi.com`**
+- [x] レジストラで取得する → Cloudflare Registrar（2026-08-05）
 
 ---
 
@@ -100,19 +83,22 @@
 
 ---
 
-## Phase 4 — 独自ドメインをつなぐ（Phase 2 と同時に保留）
+## Phase 4 — 独自ドメインをつなぐ ⏱ 5分／担当: 本人 ← 👈 いまここ
 
-- [ ] Pagesプロジェクト → 「カスタムドメイン」→ 取得したドメインを追加
-- [ ] DNSの反映を待つ（Cloudflareで取得していれば**数分**。他社なら最大48時間）
-- [ ] `https://取得したドメイン` でアクセスできることを確認
+コード側（canonical・OGP・sitemap.xml等）は `tokutai-navi.com` 前提に更新済み。
+**この接続作業をしないと、実際のアクセスは今まで通り `.pages.dev` のままになる。**
 
-**完了の判定**: 独自ドメインで開ける。鍵マークが付いている。
+- [ ] Cloudflareダッシュボード → Workers & Pages → `taishokubi-navi` プロジェクト → 「カスタムドメイン」→ `tokutai-navi.com` を追加
+- [ ] DNSの反映を待つ（Cloudflare Registrarで取得済みのため**数分**で反映されるはず）
+- [ ] `https://tokutai-navi.com` でアクセスできることを確認（鍵マークが付くこと）
+
+**完了の判定**: `https://tokutai-navi.com` で開ける。
 
 > ✅ ここで **`file://` 制限が外れ、テンプレのワンタップコピーが正常動作する**ようになる。
 
 ---
 
-## Phase 5 — 検索に載せる ⏱ 1時間／担当: Claude＋本人 ← 👈 いまここ
+## Phase 5 — 検索に載せる ⏱ 1時間／担当: Claude＋本人
 
 - [x] `og:url` / `canonical` を確定URLに設定（Claude）
 - [x] `sitemap.xml` / `robots.txt` を確定URLで生成（Claude）

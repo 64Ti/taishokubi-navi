@@ -12,7 +12,7 @@
 (function (global) {
   'use strict';
 
-  const SITE_URL = 'https://taishokubi-navi.pages.dev/';
+  const SITE_URL = 'https://tokutai-navi.com/';
   const SITE_NAME = 'トク退｜退職日計算ナビ';
   const EGOV_BASE = 'https://laws.e-gov.go.jp/law/';
 

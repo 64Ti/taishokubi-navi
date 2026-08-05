@@ -20,4 +20,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://taishokubi-navi.pages.dev/sitemap.xml
+Sitemap: https://tokutai-navi.com/sitemap.xml

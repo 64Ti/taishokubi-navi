@@ -959,7 +959,7 @@
     ].join('\n');
     const url = new URL('https://twitter.com/intent/tweet');
     url.searchParams.set('text', text);
-    url.searchParams.set('url', 'https://taishokubi-navi.pages.dev/');
+    url.searchParams.set('url', 'https://tokutai-navi.com/');
     window.open(url.toString(), '_blank', 'noopener,noreferrer');
   }
 
