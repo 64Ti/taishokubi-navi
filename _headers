@@ -1,11 +1,26 @@
 # Cloudflare Pages のレスポンスヘッダー設定
-# HTML を常に再検証させる。これがないとブラウザが古い版を掴み続け、
+# HTML・JS・CSS を常に再検証させる。これがないとブラウザ（またはカスタムドメインの
+# ゾーンレベルのデフォルトキャッシュ、実測 Browser Cache TTL 4時間）が古い版を掴み続け、
 # 更新しても端末側に反映されない（スマホで特に起きやすい）。
+#
+# ⚠️ 2026-08-05: カスタムドメイン(tokutai-navi.com)接続後、js/app.js が
+#    max-age=0 の指定にもかかわらず public, max-age=14400 で配信される事象を確認した。
+#    原因はゾーン側のキャッシュ設定が .pages.dev では素通りしていたのに対し、
+#    独自ドメインでは効いてくるためと推測される。この _headers だけに頼らず、
+#    index.html / changelog.html 側の <script>/<link> に ?v=YYYYMMDDx の
+#    クエリを付け、JS/CSSを変更した回はこのバージョン文字列を必ず更新すること
+#    （URLが変われば、どのキャッシュ層を挟んでいても確実に新しいファイルが取得される）。
 
 /*
   Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+/*.js
+  Cache-Control: no-cache, must-revalidate
+
+/*.css
+  Cache-Control: no-cache, must-revalidate
 
 # 画像は内容が変わらないので長期キャッシュしてよい
 /*.png
