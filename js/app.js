@@ -87,6 +87,11 @@
       groupACompleted: false,
       groupBCompleted: false,
       groupCCompleted: false,
+      // グループ内のいずれかの項目を実際に操作したか（未保存・セッション内のみ）。
+      // 「適用する」を押しただけで未入力のまま完了扱いになるのを防ぐために使う。
+      groupATouched: false,
+      groupBTouched: false,
+      groupCTouched: false,
       result: null,
     };
   }
@@ -233,6 +238,11 @@
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
     });
+    // 「適用する」を押したかどうかではなく、実際にどれか1項目でも操作したかを
+    // groupXTouched として記録する（未入力のまま「入力済み」表示になるのを防ぐ）。
+    document.getElementById('modalGroupA').addEventListener('change', () => { state.groupATouched = true; });
+    document.getElementById('modalGroupB').addEventListener('change', () => { state.groupBTouched = true; });
+    document.getElementById('modalGroupC').addEventListener('change', () => { state.groupCTouched = true; });
     document.querySelectorAll('[data-apply-modal]').forEach(btn => {
       btn.addEventListener('click', () => {
         applyModalInputs(btn.dataset.applyModal);
@@ -362,14 +372,15 @@
       state.isEnrolledEducation = document.getElementById('inputEnrolledEducation').value;
       const by = document.getElementById('inputBirthYear').value;
       state.birthYear = by ? Number(by) : null;
-      state.groupACompleted = true;
+      // 「適用する」を押した事実だけでなく、実際に何か操作したかを条件にする
+      state.groupACompleted = state.groupACompleted || state.groupATouched;
     } else if (id === 'modalGroupB') {
       state.prefecture = document.getElementById('inputPrefecture').value;
       state.insuranceType = document.getElementById('inputInsuranceType').value;
       state.afterInsurance = document.getElementById('inputAfterInsurance').value;
       const ty = document.getElementById('inputTenureYears').value;
       state.tenureYears = ty === '' ? null : Number(ty);
-      state.groupBCompleted = true;
+      state.groupBCompleted = state.groupBCompleted || state.groupBTouched;
     } else if (id === 'modalGroupC') {
       // 体調不調フラグはstateのセッション内メモリにのみ保持（保存・送信しない）
       state.isMentalPhysicalUnfit = document.getElementById('inputMentalPhysicalUnfit').value;
@@ -380,7 +391,7 @@
       state.nextJoinDate = document.getElementById('inputNextJoinDate').value || null;
       state.wantAllowance = document.getElementById('inputWantAllowance').value;
       state.handoverDays = document.getElementById('inputHandoverDays').value || 0;
-      state.groupCCompleted = true;
+      state.groupCCompleted = state.groupCCompleted || state.groupCTouched;
     }
     updatePrecisionButtons();
   }
@@ -553,7 +564,8 @@
     document.getElementById('supportBox').classList.toggle('hidden', state.isMentalPhysicalUnfit !== 'yes');
     renderTimeline(r);
     renderContextualFaq(visibleFaqs);
-    renderAllFaq();
+    // 文脈連動FAQ（上部）に既に出ている項目は、下の全件FAQと重複しないよう除外する
+    renderAllFaq(new Set(visibleFaqs.map(f => f.id)));
     renderGlossaryAppendix();
   }
 
@@ -751,23 +763,35 @@
   function renderContextualFaq(faqs) {
     const container = document.getElementById('contextualFaq');
     // 文脈連動FAQ（最大5件）は既に絞り込み済みのため初期状態で開いておく。
-    // アンカーID(id="faq-xxx")は全件FAQ側にのみ付与し、DOM ID重複を避ける。
-    container.innerHTML = faqs.map(f => buildFaqItemHtml(f, { defaultOpen: true, anchorId: false })).join('');
+    // 全件FAQ側は同じ項目を重複除外するため、アンカーID(id="faq-xxx")はここに付けてよい
+    // （どちらか一方にしか描画されなくなったため、DOM ID重複の心配がない）。
+    container.innerHTML = faqs.map(f => buildFaqItemHtml(f, { defaultOpen: true, anchorId: true })).join('');
     bindFaqFeedbackButtons(container);
   }
 
-  function renderAllFaq() {
+  /**
+   * @param {Set<string>} excludeIds 上部の文脈連動FAQに既に表示されているFAQのID。
+   *   全件FAQ側では同じ質問を二重に見せないよう除外する。
+   */
+  function renderAllFaq(excludeIds) {
+    excludeIds = excludeIds || new Set();
     const container = document.getElementById('allFaqList');
     const byCategory = {};
     FaqMaster.getAllFaqs().forEach(f => {
+      if (excludeIds.has(f.id)) return;
       (byCategory[f.category] = byCategory[f.category] || []).push(f);
     });
     let html = '';
     Object.keys(byCategory).forEach(cat => {
+      // 除外の結果そのカテゴリの項目が0件になった場合は見出しごと出さない
+      if (!byCategory[cat].length) return;
       html += `<h3 class="all-faq-category">${escapeHtml(cat)}</h3>`;
-      // 全22件を並べると長くなるため、質問文だけを見せる閉じたアコーディオンにする
+      // 残りの項目を並べると長くなるため、質問文だけを見せる閉じたアコーディオンにする
       html += byCategory[cat].map(f => buildFaqItemHtml(f, { defaultOpen: false, anchorId: true })).join('');
     });
+    if (!html) {
+      html = '<p class="text-xs text-slate-400">上に表示されているFAQがすべてです。</p>';
+    }
     container.innerHTML = html;
     bindFaqFeedbackButtons(container);
   }
