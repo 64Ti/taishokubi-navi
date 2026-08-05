@@ -697,14 +697,14 @@
     const el = document.createElement('div');
     el.className = 'tl-item';
     // 詳細説明（tl-body）はやや長文になりがちなため、折りたたみ可能にする。
-    // 日付・見出しは常に見える summary 側に置き、初期状態は開いたままにして
-    // 「今まで見えていた内容がいきなり消える」ことがないようにする。
+    // 日付・見出しは常に見える summary 側に置き、初期状態は閉じておいて
+    // 気になった項目だけ開いて詳細を読む形にする。
     el.innerHTML = `
       <div class="tl-node">
         <span class="tl-num">${stepNum}</span>
         <span class="tl-line"></span>
       </div>
-      <details class="tl-card${variant ? ' ' + variant : ''}" open>
+      <details class="tl-card${variant ? ' ' + variant : ''}">
         <summary class="tl-summary">
           <span class="tl-summary-text">
             <span class="tl-date">${escapeHtml(dateLabel)}</span>
