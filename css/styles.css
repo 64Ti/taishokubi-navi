@@ -20,7 +20,7 @@
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden;width:100%;}
 body{
   margin:0;
   font-family:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
@@ -28,6 +28,8 @@ body{
   color:var(--navy);
   line-height:1.6;
   overflow-wrap:break-word;
+  overflow-x:hidden;
+  width:100%;
 }
 button,input,select{font-family:inherit;}
 img{max-width:100%;display:block;}
@@ -178,10 +180,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
   box-shadow:0 2px 8px rgba(5,150,105,.4);
 }
 .tl-line{flex:1;width:2px;background:var(--slate-200);margin-top:4px;min-height:14px;}
-.tl-card{flex:1;min-width:0;border-radius:1rem;padding:13px 15px;box-shadow:var(--shadow-card);border:1.5px solid var(--slate-200);background:#fff;}
+/* tl-cardは<details>要素。日付・見出しは常に見えるsummary側、詳細説明は開閉可能な本文側 */
+.tl-card{flex:1;min-width:0;border-radius:1rem;box-shadow:var(--shadow-card);border:1.5px solid var(--slate-200);background:#fff;overflow:hidden;}
 .tl-card.crimson{border-color:#fca5a5;background:var(--crimson-light);}
 .tl-card.caution{border-color:#fde68a;background:var(--caution-light);}
 .tl-card.gold{border-color:#fcd34d;background:var(--gold-light);}
+.tl-summary{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+  padding:13px 15px;cursor:pointer;list-style:none;min-height:44px;
+}
+.tl-summary::-webkit-details-marker{display:none;}
+.tl-card .cd-chev{flex:none;margin-top:2px;}
+.tl-summary-text{flex:1;min-width:0;}
 .tl-date{
   display:inline-block;font-size:.7rem;font-weight:900;letter-spacing:.02em;
   color:var(--emerald-dark);background:var(--emerald-light);border-radius:.4rem;
@@ -190,8 +200,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(20%);}
 .tl-card.crimson .tl-date{color:var(--crimson-dark);background:#fff;}
 .tl-card.caution .tl-date{color:var(--caution-dark);background:#fff;}
 .tl-card.gold .tl-date{color:var(--gold-dark);background:#fff;}
-.tl-heading{font-size:.92rem;font-weight:800;color:var(--navy);margin-bottom:4px;line-height:1.5;}
-.tl-body{font-size:.78rem;line-height:1.8;color:var(--slate-500);}
+.tl-heading{font-size:.92rem;font-weight:800;color:var(--navy);margin:0;line-height:1.5;}
+.tl-body{font-size:.78rem;line-height:1.8;color:var(--slate-500);padding:0 15px 13px;margin:0;border-top:1px solid rgba(0,0,0,.05);padding-top:.6rem;}
 .tl-card.crimson .tl-body{color:var(--crimson-dark);opacity:.85;}
 .tl-card.caution .tl-body{color:var(--caution-dark);opacity:.85;}
 .tl-card.gold .tl-body{color:var(--gold-dark);opacity:.85;}
@@ -336,11 +346,16 @@ details[open] .cd-chev{transform:rotate(180deg);}
    ========================================================= */
 
 /* ---------- スキップリンク ---------- */
+/* left:-999pxのような画面外配置は、ページ全体を横スクロール可能にしてしまう
+   （スマホでタップ・ドラッグした際に横へずれる不具合の原因になる）。
+   transformでの視覚的な隠蔽に置き換え、水平方向のオーバーフローを一切発生させない。 */
 .skip-link{
-  position:absolute;left:-999px;top:0;z-index:100;
+  position:absolute;top:0;left:0;z-index:100;
+  transform:translateY(-150%);
   background:var(--navy);color:#fff;padding:.6rem 1rem;border-radius:0 0 .5rem 0;font-size:.85rem;font-weight:700;
+  transition:transform .15s ease;
 }
-.skip-link:focus{left:0;}
+.skip-link:focus{transform:translateY(0);}
 
 /* ---------- フェーズ1：コア入力フォーム ---------- */
 .core-form{padding-bottom:1rem;}
@@ -396,6 +411,9 @@ details[open] .cd-chev{transform:rotate(180deg);}
 }
 .pu-btn:last-child{margin-bottom:0;}
 .pu-btn .pu-sub{flex:none;font-size:.68rem;font-weight:800;color:var(--emerald-dark);background:var(--emerald-light);border-radius:.4rem;padding:2px 7px;}
+/* 入力済みのグループは枠線・チェック済みバッジで一目で分かるようにする */
+.pu-btn.pu-btn-done{border-color:var(--emerald);background:var(--emerald-light);}
+.pu-btn.pu-btn-done .pu-sub{background:var(--emerald);color:#fff;}
 
 /* ---------- 文脈連動FAQ / 全件FAQ ---------- */
 .contextual-faq{display:flex;flex-direction:column;gap:.6rem;}
@@ -535,10 +553,12 @@ dialog.precision-modal[open]{animation:fadeUp .25s ease both;}
   #impactCard *{ color:#000!important; }
   .tl-item,.tl-card,.tl-advice,.info-card,.legal-disclaimer,.faq-item{ break-inside:avoid; page-break-inside:avoid; border-color:#94a3b8!important; }
   .tl-num{ background:#334155!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  /* FAQアコーディオンは開閉状態にかかわらず全開表示にする */
-  .faq-item > *{ display:block!important; }
-  .faq-summary{ cursor:default; }
-  .faq-item .cd-chev{ display:none!important; }
+  /* FAQ・タイムラインのアコーディオンは開閉状態にかかわらず全開表示にする */
+  .faq-item > *,
+  .tl-card > *{ display:block!important; }
+  .faq-summary,.tl-summary{ cursor:default; }
+  .faq-item .cd-chev,
+  .tl-card .cd-chev{ display:none!important; }
   .term-trigger{ border-bottom:none; color:inherit; }
   #glossary-appendix{ display:block!important; }
   .rate-fiscal-year{ display:block!important; }

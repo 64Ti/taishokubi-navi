@@ -83,6 +83,10 @@
       closedOnHolidays: true,
       // 精度向上フェーズを一度でも開いたか（暫定/精密の切り替え判定用）
       hasPrecisionInput: false,
+      // グループごとの入力済みフラグ（精度向上カードのボタンに「入力済み」を出すため）
+      groupACompleted: false,
+      groupBCompleted: false,
+      groupCCompleted: false,
       result: null,
     };
   }
@@ -102,6 +106,7 @@
     buildWeekdayGrid();
     bindEvents();
     validateCoreForm();
+    updatePrecisionButtons();
     if (state.resignDate && state.paidLeave !== null && state.annualIncome && state.branch) {
       runDiagnosisAndRender();
     }
@@ -357,12 +362,14 @@
       state.isEnrolledEducation = document.getElementById('inputEnrolledEducation').value;
       const by = document.getElementById('inputBirthYear').value;
       state.birthYear = by ? Number(by) : null;
+      state.groupACompleted = true;
     } else if (id === 'modalGroupB') {
       state.prefecture = document.getElementById('inputPrefecture').value;
       state.insuranceType = document.getElementById('inputInsuranceType').value;
       state.afterInsurance = document.getElementById('inputAfterInsurance').value;
       const ty = document.getElementById('inputTenureYears').value;
       state.tenureYears = ty === '' ? null : Number(ty);
+      state.groupBCompleted = true;
     } else if (id === 'modalGroupC') {
       // 体調不調フラグはstateのセッション内メモリにのみ保持（保存・送信しない）
       state.isMentalPhysicalUnfit = document.getElementById('inputMentalPhysicalUnfit').value;
@@ -373,7 +380,28 @@
       state.nextJoinDate = document.getElementById('inputNextJoinDate').value || null;
       state.wantAllowance = document.getElementById('inputWantAllowance').value;
       state.handoverDays = document.getElementById('inputHandoverDays').value || 0;
+      state.groupCCompleted = true;
     }
+    updatePrecisionButtons();
+  }
+
+  /** 精度向上カードの各ボタンに、入力済みかどうかを分かる形で反映する */
+  function updatePrecisionButtons() {
+    const map = [
+      ['btnOpenGroupA', state.groupACompleted],
+      ['btnOpenGroupB', state.groupBCompleted],
+      ['btnOpenGroupC', state.groupCCompleted],
+    ];
+    map.forEach(([btnId, completed]) => {
+      const btn = document.getElementById(btnId);
+      const sub = btn.querySelector('.pu-sub');
+      btn.classList.toggle('pu-btn-done', completed);
+      if (completed) {
+        sub.textContent = '✓ 入力済み';
+      } else {
+        sub.textContent = sub.dataset.defaultLabel;
+      }
+    });
   }
 
   function updateGroupAConditionalFields() {
@@ -668,16 +696,24 @@
   function buildTimelineNode(stepNum, dateLabel, heading, body, variant, headingIsHtml) {
     const el = document.createElement('div');
     el.className = 'tl-item';
+    // 詳細説明（tl-body）はやや長文になりがちなため、折りたたみ可能にする。
+    // 日付・見出しは常に見える summary 側に置き、初期状態は開いたままにして
+    // 「今まで見えていた内容がいきなり消える」ことがないようにする。
     el.innerHTML = `
       <div class="tl-node">
         <span class="tl-num">${stepNum}</span>
         <span class="tl-line"></span>
       </div>
-      <div class="tl-card${variant ? ' ' + variant : ''}">
-        <span class="tl-date">${escapeHtml(dateLabel)}</span>
-        <h3 class="tl-heading">${headingIsHtml ? heading : escapeHtml(heading)}</h3>
+      <details class="tl-card${variant ? ' ' + variant : ''}" open>
+        <summary class="tl-summary">
+          <span class="tl-summary-text">
+            <span class="tl-date">${escapeHtml(dateLabel)}</span>
+            <h3 class="tl-heading">${headingIsHtml ? heading : escapeHtml(heading)}</h3>
+          </span>
+          <span class="cd-chev" aria-hidden="true"></span>
+        </summary>
         <p class="tl-body">${escapeHtml(body)}</p>
-      </div>
+      </details>
     `;
     return el;
   }
@@ -811,7 +847,13 @@
   }
   document.addEventListener('click', e => {
     const trigger = e.target.closest('.term-trigger');
-    if (trigger) openTermPopover(trigger.dataset.term, trigger);
+    if (trigger) {
+      // term-trigger は tl-card の <summary> 内に置かれることがあるため、
+      // ここで止めないとクリックがタイムラインの開閉トグルにも伝播してしまう。
+      e.preventDefault();
+      e.stopPropagation();
+      openTermPopover(trigger.dataset.term, trigger);
+    }
   });
 
   function renderGlossaryAppendix() {
@@ -953,6 +995,9 @@
       offDays: state.offDays,
       closedOnHolidays: state.closedOnHolidays,
       hasPrecisionInput: state.hasPrecisionInput,
+      groupACompleted: state.groupACompleted,
+      groupBCompleted: state.groupBCompleted,
+      groupCCompleted: state.groupCCompleted,
       // isMentalPhysicalUnfit は NEVER_PERSIST_KEYS のため意図的に含めない
     };
     NEVER_PERSIST_KEYS.forEach(k => delete persistable[k]);
